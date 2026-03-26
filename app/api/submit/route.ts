@@ -66,7 +66,6 @@ async function saveToSupabase(record: SubmissionRecord): Promise<boolean> {
     headers: {
       "Content-Type": "application/json",
       apikey: serviceRoleKey,
-      Authorization: `Bearer ${serviceRoleKey}`,
       Prefer: "return=minimal",
     },
     body: JSON.stringify(record),
