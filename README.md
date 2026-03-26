@@ -1,16 +1,14 @@
 # integrity-novel
 
-텍스트 기반 공직 청렴 웹게임입니다. 플레이가 끝나면 이름과 소속을 입력해 결과를 제출할 수 있고, 서버에서 선택 기록을 다시 계산해 점수를 검증합니다.
+선택을 따라가며 청렴도와 위험도를 확인하는 웹게임입니다.
+엔딩에서 이름과 소속을 제출하면 결과가 저장됩니다.
 
-## 현재 구성
+## Links
 
-- `story.ts` 기반 장면/선택지/엔딩 분기
-- `lib/game.ts` 에서 클라이언트와 서버가 같은 규칙으로 진행/점수 계산
-- `app/api/submit/route.ts` 에서 결과 검증, 저장, 관리자 메일 발송
-- 이미지 없이도 실행 가능
-- 배경은 CSS 그라디언트, 인물은 이름 카드로 대체 렌더링
+- Local: `http://localhost:3000`
+- Deployed: `https://a-igame-sigma.vercel.app`
 
-## 실행
+## Run
 
 ```bash
 npm install
@@ -19,62 +17,59 @@ npm run dev
 
 브라우저에서 `http://localhost:3000` 으로 접속합니다.
 
-## 환경변수
+## Stack
 
-`.env.example` 을 참고해 `.env.local` 을 만듭니다.
+- `Next.js`
+- `React`
+- `TypeScript`
+- `Supabase`
 
-- `ADMIN_EMAILS`: 결과 메일을 받을 관리자 이메일. 여러 개면 쉼표로 구분
-- `MAIL_FROM`: Resend에서 승인된 발신자 주소
-- `RESEND_API_KEY`: 관리자 메일 발송용 Resend API 키
-- `SUPABASE_URL`: 결과 저장용 Supabase 프로젝트 URL
-- `SUPABASE_SERVICE_ROLE_KEY`: 서버 전용 Supabase 키
-- `SUPABASE_SUBMISSIONS_TABLE`: 저장 테이블명, 기본값은 `game_submissions`
+## Current Flow
 
-운영 배포에서는 `Resend` 또는 `Supabase` 중 하나만 있어도 제출은 가능하지만, 추첨/집계를 위해 둘 다 연결하는 구성을 권장합니다.
+- `story.ts` 에서 스토리와 선택지 분기 관리
+- `lib/game.ts` 에서 진행 상태와 점수 계산 관리
+- `app/page.tsx` 에서 게임 UI와 제출 폼 처리
+- `app/api/submit/route.ts` 에서 서버 검증 후 결과 저장
 
-## Supabase 테이블 예시
+## Saved Fields
+
+`game_submissions` 테이블에는 아래 값이 저장됩니다.
+
+- `participant_name`
+- `affiliation`
+- `submitted_at`
+- `final_score`
+- `integrity`
+- `risk`
+- `trust`
+
+## Supabase Table
 
 ```sql
 create table public.game_submissions (
   id text primary key,
   participant_name text not null,
   affiliation text not null,
-  consented boolean not null default true,
   submitted_at timestamptz not null,
-  ending_scene text not null,
-  ending_text text not null,
-  ending_label text not null,
   final_score integer not null,
   integrity integer not null,
   risk integer not null,
-  trust integer not null,
-  choice_history jsonb not null
+  trust integer not null
 );
 ```
 
-## 점수 계산
-
-서버 검증 기준 종합 점수는 다음 식을 사용합니다.
+## Score
 
 ```text
 finalScore = clamp(integrity - risk * 4 + trust * 3, 0, 100)
 ```
 
-클라이언트에 보이는 값도 같은 로직으로 표시되지만, 최종 제출 시에는 서버가 `choice_history` 를 다시 재생해서 점수를 재계산합니다.
-
-## 주요 파일
-
-- `story.ts`: 스토리 데이터
-- `lib/game.ts`: 공용 게임 로직과 점수 계산
-- `app/page.tsx`: 웹게임 UI와 결과 제출 폼
-- `app/api/submit/route.ts`: 결과 검증, 저장, 메일 발송
-- `app/globals.css`: 화면 스타일
 ## Image Pipeline
 
-Put original Midjourney backgrounds into `assets-source/bg` and run:
+원본 배경 이미지는 `assets-source/bg` 에 넣고 아래 스크립트를 실행합니다.
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File .\scripts\optimize-bg.ps1
 ```
 
-This resizes and compresses them to `1600x900` JPG files in `public/bg`.
+최종 배경은 `1600x900` JPG로 `public/bg` 에 생성됩니다.
