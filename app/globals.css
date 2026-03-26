@@ -1,5 +1,5 @@
 :root {
-  --bg: #0a1020;
+  --bg: #08101d;
   --panel: rgba(9, 13, 28, 0.88);
   --panel-strong: rgba(7, 10, 22, 0.94);
   --line: rgba(255, 255, 255, 0.14);
@@ -7,6 +7,8 @@
   --text-sub: #aeb9cf;
   --accent: #8cb7ff;
   --accent-2: #a7ffdd;
+  --danger: #ff8f9d;
+  --success: #90e7b9;
 }
 
 * {
@@ -28,8 +30,14 @@ body {
   font-family: "Noto Sans KR", "Apple SD Gothic Neo", "Segoe UI", sans-serif;
 }
 
-button {
+button,
+input {
   font: inherit;
+}
+
+button:disabled {
+  cursor: default;
+  opacity: 0.7;
 }
 
 .page-shell {
@@ -42,7 +50,7 @@ button {
 
 .novel-frame {
   position: relative;
-  width: min(100%, 1100px);
+  width: min(100%, 1180px);
   aspect-ratio: 16 / 9;
   overflow: hidden;
   border-radius: 20px;
@@ -228,17 +236,18 @@ button {
   align-items: center;
   justify-content: center;
   padding: 30px;
-  background: rgba(4, 7, 15, 0.72);
+  background: rgba(4, 7, 15, 0.8);
 }
 
 .ending-card {
-  width: min(560px, 100%);
+  width: min(680px, 100%);
+  max-height: min(92vh, 860px);
+  overflow: auto;
   padding: 28px;
   border-radius: 24px;
-  background: rgba(8, 12, 24, 0.94);
+  background: rgba(8, 12, 24, 0.95);
   border: 1px solid rgba(255, 255, 255, 0.12);
   box-shadow: 0 30px 80px rgba(0, 0, 0, 0.4);
-  text-align: center;
 }
 
 .ending-label {
@@ -251,7 +260,7 @@ button {
 .ending-title {
   font-size: 30px;
   font-weight: 900;
-  margin-bottom: 20px;
+  margin-bottom: 16px;
 }
 
 .ending-copy {
@@ -260,10 +269,124 @@ button {
   margin-bottom: 22px;
 }
 
-.ending-actions {
+.score-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  margin-bottom: 22px;
+}
+
+.score-tile {
+  padding: 16px;
+  border-radius: 18px;
+  background: rgba(12, 18, 34, 0.84);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.score-tile span {
+  display: block;
+  font-size: 12px;
+  color: var(--text-sub);
+  margin-bottom: 8px;
+}
+
+.score-tile strong {
+  font-size: 28px;
+}
+
+.result-form {
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.field span {
+  color: var(--text-sub);
+  font-size: 14px;
+}
+
+.field input {
+  width: 100%;
+  padding: 14px 16px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(7, 11, 22, 0.82);
+  color: var(--text-main);
+}
+
+.field input::placeholder {
+  color: rgba(255, 255, 255, 0.35);
+}
+
+.consent-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 14px 16px;
+  border-radius: 14px;
+  background: rgba(8, 13, 25, 0.66);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: var(--text-sub);
+  line-height: 1.6;
+}
+
+.consent-row input {
+  margin-top: 4px;
+}
+
+.result-actions {
+  display: flex;
   gap: 12px;
+  margin-top: 4px;
+}
+
+.submission-banner {
+  margin-top: 16px;
+  padding: 14px 16px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  line-height: 1.6;
+}
+
+.submission-banner.success {
+  background: rgba(30, 88, 56, 0.32);
+  border-color: rgba(144, 231, 185, 0.35);
+  color: var(--success);
+}
+
+.submission-banner.error {
+  background: rgba(90, 27, 41, 0.36);
+  border-color: rgba(255, 143, 157, 0.35);
+  color: var(--danger);
+}
+
+.receipt-card {
+  margin-top: 16px;
+  padding: 18px;
+  border-radius: 18px;
+  background: rgba(10, 17, 31, 0.82);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.receipt-title {
+  font-size: 15px;
+  font-weight: 800;
+  margin-bottom: 10px;
+}
+
+.receipt-copy {
+  color: var(--text-sub);
+  line-height: 1.7;
+}
+
+.receipt-copy strong {
+  color: var(--text-main);
 }
 
 .action-btn {
@@ -342,5 +465,41 @@ button {
 
   .text-block {
     font-size: 17px;
+  }
+
+  .score-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .top-bar {
+    position: static;
+    padding: 14px 14px 0;
+    flex-direction: column;
+  }
+
+  .char-card {
+    bottom: 34%;
+  }
+
+  .choice-wrap {
+    padding: 18px;
+  }
+
+  .ending-shell {
+    padding: 16px;
+  }
+
+  .ending-card {
+    padding: 20px;
+  }
+
+  .result-actions {
+    flex-direction: column;
+  }
+
+  .score-grid {
+    grid-template-columns: 1fr;
   }
 }

@@ -1,167 +1,29 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import type { CSSProperties } from "react";
-import { CHAR_INFO, STORY, type CharDisplay, type Position, type Vars } from "../story";
+import type { CSSProperties, FormEvent } from "react";
+import { CHAR_INFO, STORY, type Position } from "../story";
+import {
+  advanceState,
+  chooseOption,
+  createInitialState,
+  getScoreSummary,
+  getStageLabel,
+  type GameState,
+} from "../lib/game";
 
-interface GameState {
-  scene: string;
-  beatIdx: number;
-  vars: Vars;
-  chars: CharDisplay[];
-  bg: string | null;
-  ended: boolean;
-  endingText: string;
+type SubmissionStatus = "idle" | "submitting" | "success" | "error";
+
+interface SubmissionFormState {
+  name: string;
+  affiliation: string;
+  consent: boolean;
 }
 
-function applyEffects(vars: Vars, effects: Partial<Vars>): Vars {
-  return {
-    integrity: vars.integrity + (effects.integrity ?? 0),
-    risk: vars.risk + (effects.risk ?? 0),
-    trust: vars.trust + (effects.trust ?? 0),
-  };
-}
-
-function updateChars(current: CharDisplay[], incoming: CharDisplay[]): CharDisplay[] {
-  const next = [...current];
-
-  for (const entry of incoming) {
-    const index = next.findIndex((item) => item.id === entry.id);
-    if (index >= 0) {
-      next[index] = entry;
-    } else {
-      next.push(entry);
-    }
-  }
-
-  return next;
-}
-
-function processToInteractive(
-  scene: string,
-  beatIdx: number,
-  vars: Vars,
-  chars: CharDisplay[],
-  bg: string | null
-): GameState {
-  let currentScene = scene;
-  let currentBeatIdx = beatIdx;
-  let currentVars = vars;
-  let currentChars = chars;
-  let currentBg = bg;
-
-  while (true) {
-    const sceneData = STORY[currentScene];
-
-    if (!sceneData) {
-      return {
-        scene: currentScene,
-        beatIdx: currentBeatIdx,
-        vars: currentVars,
-        chars: currentChars,
-        bg: currentBg,
-        ended: true,
-        endingText: "장면 데이터를 찾지 못했습니다.",
-      };
-    }
-
-    if (currentBeatIdx >= sceneData.beats.length) {
-      if (!sceneData.next) {
-        return {
-          scene: currentScene,
-          beatIdx: currentBeatIdx,
-          vars: currentVars,
-          chars: currentChars,
-          bg: currentBg,
-          ended: true,
-          endingText: "",
-        };
-      }
-
-      if (sceneData.next === "ending_branch") {
-        const { integrity, risk, trust } = currentVars;
-
-        if (integrity >= 80 && risk <= 2 && trust >= 2) {
-          currentScene = "ending_clean";
-        } else if (integrity >= 40 && risk <= 6) {
-          currentScene = "ending_normal";
-        } else {
-          currentScene = "ending_fired";
-        }
-
-        currentBeatIdx = 0;
-        continue;
-      }
-
-      currentScene = sceneData.next;
-      currentBeatIdx = 0;
-      continue;
-    }
-
-    const beat = sceneData.beats[currentBeatIdx];
-
-    if (beat.kind === "bg") {
-      currentBg = beat.name;
-      currentBeatIdx += 1;
-      continue;
-    }
-
-    if (beat.kind === "show") {
-      currentChars = updateChars(currentChars, beat.chars);
-      currentBeatIdx += 1;
-      continue;
-    }
-
-    if (beat.kind === "hide") {
-      currentChars = currentChars.filter((item) => !beat.ids.includes(item.id));
-      currentBeatIdx += 1;
-      continue;
-    }
-
-    if (beat.kind === "hideAll") {
-      currentChars = [];
-      currentBeatIdx += 1;
-      continue;
-    }
-
-    if (beat.kind === "effects") {
-      currentVars = applyEffects(currentVars, beat);
-      currentBeatIdx += 1;
-      continue;
-    }
-
-    if (beat.kind === "ending") {
-      return {
-        scene: currentScene,
-        beatIdx: currentBeatIdx,
-        vars: currentVars,
-        chars: currentChars,
-        bg: currentBg,
-        ended: true,
-        endingText: beat.text,
-      };
-    }
-
-    return {
-      scene: currentScene,
-      beatIdx: currentBeatIdx,
-      vars: currentVars,
-      chars: currentChars,
-      bg: currentBg,
-      ended: false,
-      endingText: "",
-    };
-  }
-}
-
-function getStageLabel(scene: string): string {
-  if (scene.startsWith("stage1")) return "Stage 1";
-  if (scene.startsWith("stage2")) return "Stage 2";
-  if (scene.startsWith("stage3")) return "Stage 3";
-  if (scene.startsWith("stage4")) return "Stage 4";
-  if (scene.startsWith("stage5")) return "Stage 5";
-  if (scene.startsWith("ending")) return "Ending";
-  return "Intro";
+interface SubmissionResult {
+  id: string;
+  submittedAt: string;
+  finalScore: number;
 }
 
 function getBackgroundStyle(name: string | null): CSSProperties {
@@ -206,52 +68,98 @@ function getCharacterStyle(position: Position): CSSProperties {
   return { right: "4%", top: "6%", bottom: "auto" };
 }
 
-const INITIAL_STATE = processToInteractive(
-  "start",
-  0,
-  { integrity: 0, risk: 0, trust: 0 },
-  [],
-  null
-);
+function formatSubmittedAt(value: string): string {
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    return value;
+  }
+
+  return new Intl.DateTimeFormat("ko-KR", {
+    dateStyle: "medium",
+    timeStyle: "short",
+  }).format(date);
+}
 
 export default function HomePage() {
   const [started, setStarted] = useState(false);
-  const [gameState, setGameState] = useState(INITIAL_STATE);
+  const [gameState, setGameState] = useState<GameState>(() => createInitialState());
+  const [formState, setFormState] = useState<SubmissionFormState>({
+    name: "",
+    affiliation: "",
+    consent: false,
+  });
+  const [submissionStatus, setSubmissionStatus] = useState<SubmissionStatus>("idle");
+  const [submissionMessage, setSubmissionMessage] = useState("");
+  const [submissionResult, setSubmissionResult] = useState<SubmissionResult | null>(null);
 
   const currentBeat = STORY[gameState.scene]?.beats[gameState.beatIdx];
   const stageLabel = useMemo(() => getStageLabel(gameState.scene), [gameState.scene]);
+  const scoreSummary = useMemo(
+    () => getScoreSummary(gameState.vars, gameState.scene, gameState.endingText),
+    [gameState.endingText, gameState.scene, gameState.vars]
+  );
 
   function advance() {
-    setGameState((prev) => {
-      if (prev.ended) {
-        return prev;
-      }
-
-      const beat = STORY[prev.scene]?.beats[prev.beatIdx];
-      if (!beat || beat.kind === "choice") {
-        return prev;
-      }
-
-      return processToInteractive(prev.scene, prev.beatIdx + 1, prev.vars, prev.chars, prev.bg);
-    });
+    setGameState((prev) => advanceState(prev));
   }
 
   function choose(index: number) {
-    setGameState((prev) => {
-      const beat = STORY[prev.scene]?.beats[prev.beatIdx];
-      if (!beat || beat.kind !== "choice") {
-        return prev;
-      }
-
-      const option = beat.options[index];
-      const nextVars = option.effects ? applyEffects(prev.vars, option.effects) : prev.vars;
-      return processToInteractive(option.jump, 0, nextVars, prev.chars, prev.bg);
-    });
+    setGameState((prev) => chooseOption(prev, index));
   }
 
   function restart() {
     setStarted(false);
-    setGameState(INITIAL_STATE);
+    setGameState(createInitialState());
+    setFormState({ name: "", affiliation: "", consent: false });
+    setSubmissionStatus("idle");
+    setSubmissionMessage("");
+    setSubmissionResult(null);
+  }
+
+  async function submitResult(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+
+    if (!gameState.ended) {
+      return;
+    }
+
+    setSubmissionStatus("submitting");
+    setSubmissionMessage("");
+
+    try {
+      const response = await fetch("/api/submit", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          participantName: formState.name.trim(),
+          affiliation: formState.affiliation.trim(),
+          consent: formState.consent,
+          history: gameState.history,
+        }),
+      });
+
+      const payload = (await response.json()) as {
+        error?: string;
+        message?: string;
+        submission?: SubmissionResult;
+      };
+
+      if (!response.ok || !payload.submission) {
+        throw new Error(payload.error ?? "제출 처리 중 오류가 발생했습니다.");
+      }
+
+      setSubmissionResult(payload.submission);
+      setSubmissionStatus("success");
+      setSubmissionMessage(payload.message ?? "결과가 정상적으로 접수되었습니다.");
+    } catch (error) {
+      setSubmissionStatus("error");
+      setSubmissionMessage(
+        error instanceof Error ? error.message : "제출 처리 중 오류가 발생했습니다."
+      );
+    }
   }
 
   return (
@@ -263,12 +171,13 @@ export default function HomePage() {
         {!started && (
           <div className="start-screen">
             <div className="start-card">
-              <div className="start-eyebrow">TEXT VISUAL NOVEL PROTOTYPE</div>
+              <div className="start-eyebrow">WEB EVENT VISUAL NOVEL</div>
               <div className="start-title">공직 청렴 비주얼노벨</div>
               <div className="start-copy">
-                이미지 없이도 지금 바로 플레이 가능한 프로토타입입니다.
+                선택을 따라가며 청렴도와 위험도를 확인하는 웹게임입니다.
                 <br />
-                장면, 선택지, 후폭풍, 엔딩 분기만 먼저 검증합니다.
+                엔딩에서 이름과 소속을 제출하면 서버에서 결과를 다시 검증해 관리자에게
+                전달합니다.
               </div>
               <button className="action-btn primary" onClick={() => setStarted(true)}>
                 시작하기
@@ -288,7 +197,7 @@ export default function HomePage() {
                   Scene <strong>{gameState.scene}</strong>
                 </div>
                 <div className="badge">
-                  BG <strong>{gameState.bg ?? "none"}</strong>
+                  Final Score <strong>{scoreSummary.finalScore}</strong>
                 </div>
               </div>
 
@@ -320,15 +229,111 @@ export default function HomePage() {
                   <div className="ending-label">ENDING</div>
                   <div className="ending-title">{gameState.endingText}</div>
                   <div className="ending-copy">
-                    숨겨진 점수와 누적 위험도를 바탕으로 엔딩이 결정되었습니다.
+                    서버 제출 시 선택 기록을 기반으로 점수를 다시 계산합니다.
                     <br />
-                    실제 수치는 화면에 드러나지 않지만 모든 선택은 기록됩니다.
+                    점수와 응모 정보는 추첨 및 결과 집계 용도로만 사용됩니다.
                   </div>
-                  <div className="ending-actions">
-                    <button className="action-btn primary" onClick={restart}>
-                      다시 시작
-                    </button>
+
+                  <div className="score-grid">
+                    <div className="score-tile">
+                      <span>종합 점수</span>
+                      <strong>{scoreSummary.finalScore}</strong>
+                    </div>
+                    <div className="score-tile">
+                      <span>청렴</span>
+                      <strong>{scoreSummary.integrity}</strong>
+                    </div>
+                    <div className="score-tile">
+                      <span>위험</span>
+                      <strong>{scoreSummary.risk}</strong>
+                    </div>
+                    <div className="score-tile">
+                      <span>신뢰</span>
+                      <strong>{scoreSummary.trust}</strong>
+                    </div>
                   </div>
+
+                  <form className="result-form" onSubmit={submitResult}>
+                    <label className="field">
+                      <span>이름</span>
+                      <input
+                        type="text"
+                        value={formState.name}
+                        maxLength={40}
+                        onChange={(event) =>
+                          setFormState((prev) => ({ ...prev, name: event.target.value }))
+                        }
+                        placeholder="홍길동"
+                        disabled={submissionStatus === "submitting" || submissionStatus === "success"}
+                      />
+                    </label>
+
+                    <label className="field">
+                      <span>소속</span>
+                      <input
+                        type="text"
+                        value={formState.affiliation}
+                        maxLength={80}
+                        onChange={(event) =>
+                          setFormState((prev) => ({
+                            ...prev,
+                            affiliation: event.target.value,
+                          }))
+                        }
+                        placeholder="OO의료원 총무팀"
+                        disabled={submissionStatus === "submitting" || submissionStatus === "success"}
+                      />
+                    </label>
+
+                    <label className="consent-row">
+                      <input
+                        type="checkbox"
+                        checked={formState.consent}
+                        onChange={(event) =>
+                          setFormState((prev) => ({ ...prev, consent: event.target.checked }))
+                        }
+                        disabled={submissionStatus === "submitting" || submissionStatus === "success"}
+                      />
+                      <span>
+                        이벤트 운영, 결과 집계, 당첨자 추첨을 위해 이름과 소속을 수집하는 데
+                        동의합니다.
+                      </span>
+                    </label>
+
+                    <div className="result-actions">
+                      <button
+                        className="action-btn primary"
+                        type="submit"
+                        disabled={submissionStatus === "submitting" || submissionStatus === "success"}
+                      >
+                        {submissionStatus === "submitting" ? "제출 중..." : "결과 제출"}
+                      </button>
+                      <button className="action-btn" type="button" onClick={restart}>
+                        다시 시작
+                      </button>
+                    </div>
+                  </form>
+
+                  {submissionMessage && (
+                    <div className={`submission-banner ${submissionStatus}`}>
+                      {submissionMessage}
+                    </div>
+                  )}
+
+                  {submissionResult && (
+                    <div className="receipt-card">
+                      <div className="receipt-title">접수 완료</div>
+                      <div className="receipt-copy">
+                        접수번호 <strong>{submissionResult.id}</strong>
+                      </div>
+                      <div className="receipt-copy">
+                        제출 시각 {formatSubmittedAt(submissionResult.submittedAt)}
+                      </div>
+                      <div className="receipt-copy">
+                        검증 점수 {submissionResult.finalScore}점
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             ) : (
@@ -364,10 +369,7 @@ export default function HomePage() {
                   }}
                 >
                   {currentBeat?.kind === "dialogue" && (
-                    <div
-                      className="speaker"
-                      style={{ color: CHAR_INFO[currentBeat.who].color }}
-                    >
+                    <div className="speaker" style={{ color: CHAR_INFO[currentBeat.who].color }}>
                       {CHAR_INFO[currentBeat.who].name}
                     </div>
                   )}

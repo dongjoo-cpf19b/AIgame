@@ -4,7 +4,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "공직 청렴 비주얼노벨",
-  description: "선택과 후폭풍으로 진행되는 텍스트 기반 비주얼노벨",
+  description: "선택형 스토리를 통해 청렴 점수를 집계하는 웹 이벤트 게임",
 };
 
 export default function RootLayout({
