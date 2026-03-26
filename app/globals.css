@@ -322,10 +322,10 @@ button:disabled {
 }
 
 .ending-card {
-  width: min(680px, 100%);
-  max-height: min(92vh, 860px);
+  width: min(820px, 100%);
+  max-height: min(88vh, 780px);
   overflow: auto;
-  padding: 28px;
+  padding: 24px;
   border-radius: 24px;
   background: rgba(8, 12, 24, 0.95);
   border: 1px solid rgba(255, 255, 255, 0.12);
@@ -342,24 +342,24 @@ button:disabled {
 .ending-title {
   font-size: 30px;
   font-weight: 900;
-  margin-bottom: 16px;
+  margin-bottom: 12px;
 }
 
 .ending-copy {
   color: var(--text-sub);
   line-height: 1.8;
-  margin-bottom: 22px;
+  margin-bottom: 18px;
 }
 
 .score-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 10px;
-  margin-bottom: 22px;
+  gap: 8px;
+  margin-bottom: 18px;
 }
 
 .score-tile {
-  padding: 16px;
+  padding: 14px;
   border-radius: 18px;
   background: rgba(12, 18, 34, 0.84);
   border: 1px solid rgba(255, 255, 255, 0.08);
@@ -369,17 +369,17 @@ button:disabled {
   display: block;
   font-size: 12px;
   color: var(--text-sub);
-  margin-bottom: 8px;
+  margin-bottom: 6px;
 }
 
 .score-tile strong {
-  font-size: 28px;
+  font-size: 24px;
 }
 
 .result-form {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 12px;
 }
 
 .field {
@@ -395,7 +395,7 @@ button:disabled {
 
 .field input {
   width: 100%;
-  padding: 14px 16px;
+  padding: 13px 16px;
   border-radius: 14px;
   border: 1px solid rgba(255, 255, 255, 0.12);
   background: rgba(7, 11, 22, 0.82);
@@ -410,7 +410,7 @@ button:disabled {
   display: flex;
   align-items: flex-start;
   gap: 10px;
-  padding: 14px 16px;
+  padding: 12px 16px;
   border-radius: 14px;
   background: rgba(8, 13, 25, 0.66);
   border: 1px solid rgba(255, 255, 255, 0.08);
@@ -429,8 +429,8 @@ button:disabled {
 }
 
 .submission-banner {
-  margin-top: 16px;
-  padding: 14px 16px;
+  margin-top: 12px;
+  padding: 12px 16px;
   border-radius: 14px;
   border: 1px solid rgba(255, 255, 255, 0.08);
   line-height: 1.6;
@@ -449,8 +449,8 @@ button:disabled {
 }
 
 .receipt-card {
-  margin-top: 16px;
-  padding: 18px;
+  margin-top: 12px;
+  padding: 16px;
   border-radius: 18px;
   background: rgba(10, 17, 31, 0.82);
   border: 1px solid rgba(255, 255, 255, 0.08);
