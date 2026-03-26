@@ -141,7 +141,12 @@ export async function POST(request: Request) {
     console.error(error);
 
     return NextResponse.json(
-      { error: "제출 처리 중 예기치 않은 오류가 발생했습니다." },
+      {
+        error:
+          error instanceof Error
+            ? `제출 처리 중 오류: ${error.message}`
+            : "제출 처리 중 예기치 않은 오류가 발생했습니다.",
+      },
       { status: 500 }
     );
   }
