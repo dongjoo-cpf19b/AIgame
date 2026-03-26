@@ -242,6 +242,16 @@ export function replayHistory(history: number[]): GameState {
   let state = createInitialState();
 
   for (const choiceIndex of history) {
+    while (!state.ended) {
+      const currentBeat = STORY[state.scene]?.beats[state.beatIdx];
+
+      if (currentBeat?.kind === "choice") {
+        break;
+      }
+
+      state = advanceState(state);
+    }
+
     const beat = STORY[state.scene]?.beats[state.beatIdx];
 
     if (!beat || beat.kind !== "choice") {
@@ -253,6 +263,10 @@ export function replayHistory(history: number[]): GameState {
     }
 
     state = chooseOption(state, choiceIndex);
+  }
+
+  while (!state.ended) {
+    state = advanceState(state);
   }
 
   return state;
