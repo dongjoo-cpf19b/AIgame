@@ -19,10 +19,6 @@ npm run dev
 
 브라우저에서 `http://localhost:3000` 으로 접속합니다.
 
-## 프로토타입 링크
-
-- 공개 테스트 주소: `https://a-igame-sigma.vercel.app`
-
 ## 환경변수
 
 `.env.example` 을 참고해 `.env.local` 을 만듭니다.
@@ -73,3 +69,12 @@ finalScore = clamp(integrity - risk * 4 + trust * 3, 0, 100)
 - `app/page.tsx`: 웹게임 UI와 결과 제출 폼
 - `app/api/submit/route.ts`: 결과 검증, 저장, 메일 발송
 - `app/globals.css`: 화면 스타일
+## Image Pipeline
+
+Put original Midjourney backgrounds into `assets-source/bg` and run:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\optimize-bg.ps1
+```
+
+This resizes and compresses them to `1600x900` JPG files in `public/bg`.

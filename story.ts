@@ -66,7 +66,7 @@ export const STORY: Record<string, Scene> = {
       },
       {
         kind: "narration",
-        text: "이 게임은 공직 생활 속 선택의 기록이다. 점수는 보이지 않지만, 결과는 반드시 남는다.",
+        text: "공직생활은 선택의 연속이다. 점수는 보이지 않지만, 결과는 반드시 남는다.",
       },
     ],
     next: "stage1_intro",
