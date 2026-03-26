@@ -52,13 +52,13 @@ function parseRequestBody(value: unknown): SubmissionRequestBody | null {
   };
 }
 
-async function saveToSupabase(record: SubmissionRecord): Promise<boolean> {
+async function saveToSupabase(record: SubmissionRecord): Promise<void> {
   const supabaseUrl = process.env.SUPABASE_URL;
   const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
   const table = process.env.SUPABASE_SUBMISSIONS_TABLE ?? "game_submissions";
 
   if (!supabaseUrl || !serviceRoleKey) {
-    return false;
+    throw new Error("SUPABASE_URL 또는 SUPABASE_SERVICE_ROLE_KEY가 설정되지 않았습니다.");
   }
 
   const response = await fetch(`${supabaseUrl}/rest/v1/${table}`, {
@@ -73,11 +73,9 @@ async function saveToSupabase(record: SubmissionRecord): Promise<boolean> {
 
   if (!response.ok) {
     const body = await response.text();
-    console.error("Supabase save failed:", body);
-    return false;
+    console.error("Supabase save failed:", response.status, body);
+    throw new Error(`Supabase 저장 실패 (${response.status}): ${body || "응답 본문 없음"}`);
   }
-
-  return true;
 }
 
 export async function POST(request: Request) {
@@ -114,23 +112,10 @@ export async function POST(request: Request) {
       trust: score.trust,
     };
 
-    const saved = await saveToSupabase(record);
-
-    if (!saved) {
-      if (process.env.NODE_ENV === "production") {
-        return NextResponse.json(
-          { error: "제출 저장 설정을 확인해 주세요. 잠시 후 다시 시도해 주세요." },
-          { status: 500 }
-        );
-      }
-
-      console.info("Submission received without external persistence:", record);
-    }
+    await saveToSupabase(record);
 
     return NextResponse.json({
-      message: saved
-        ? "결과가 정상적으로 접수되었습니다."
-        : "개발 모드에서 결과를 임시로 확인했습니다.",
+      message: "결과가 정상적으로 접수되었습니다.",
       submission: {
         id: record.id,
         submittedAt: record.submitted_at,
