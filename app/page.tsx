@@ -553,7 +553,8 @@ export default function HomePage() {
                           className="choice-btn"
                           onClick={() => choose(index)}
                         >
-                          {option.text}
+                          <span className="choice-index">{index + 1}</span>
+                          <span className="choice-text">{option.text}</span>
                         </button>
                       ))}
                     </div>

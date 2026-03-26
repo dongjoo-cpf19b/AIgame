@@ -264,32 +264,40 @@ export const STORY: Record<string, Scene> = {
       { kind: "show", chars: [{ id: "friend", pos: "right" }] },
       {
         kind: "narration",
-        text: "퇴근 후 오랜만에 만난 동창이 코스 요리를 예약해 두었다고 했다.",
+        text: "퇴근 무렵, 대학 동창에게서 오랜만에 얼굴이나 보자는 연락이 왔다.",
       },
       {
         kind: "dialogue",
         who: "friend",
-        text: "야, 이 정도는 친구끼리 먹는 거지. 너 요즘 고생 많다며.",
+        text: "야, 너 요즘 시청 일 때문에 바쁘다며? 오늘은 내가 한턱낼게.",
       },
       {
         kind: "narration",
-        text: "문제는 그 친구가 최근 시 사업 관련 업체를 준비 중이라는 소문이 있다는 점이었다.",
+        text: "자리에 도착해 보니 이미 룸 식당 코스가 예약돼 있었다.",
+      },
+      {
+        kind: "narration",
+        text: "식사가 시작되자 동창은 자신이 준비 중인 업체가 곧 시 관련 사업에도 참여해 보고 싶다고 말을 꺼냈다.",
+      },
+      {
+        kind: "narration",
+        text: "아직 직접적인 부탁은 없었지만, 이 자리가 단순한 안부 모임만은 아니라는 느낌이 들었다.",
       },
       {
         kind: "choice",
         options: [
           {
-            text: "친구 좋다는 게 뭐야. 그냥 대접받는다.",
+            text: "오랜만에 만난 친구니까, 우선은 편하게 대접받는다.",
             effects: { integrity: 0, risk: 3, trust: -1 },
             jump: "stage3_result_free",
           },
           {
-            text: "만나긴 하되, 내 밥값은 내가 낸다.",
+            text: "식사는 함께하되, 비용은 각자 내고 업무 얘기엔 선을 긋는다.",
             effects: { integrity: 20, risk: -1, trust: 1 },
             jump: "stage3_result_dutch",
           },
           {
-            text: "오늘은 네가 사고, 다음엔 내가 산다.",
+            text: "식사 자리는 줄이고, 업무 관련 이야기는 공식 절차로 하자고 말한다.",
             effects: { integrity: 10, risk: 1, trust: 0 },
             jump: "stage3_result_nexttime",
           },
@@ -303,15 +311,15 @@ export const STORY: Record<string, Scene> = {
       { kind: "bg", name: "meeting_room" },
       {
         kind: "narration",
-        text: "한 달 뒤, 그 친구 업체가 실제로 시 사업에 참여했다.",
+        text: "몇 달 뒤 그 동창이 준비하던 업체가 실제로 시 사업 관련 문의를 넣기 시작했다.",
       },
       {
         kind: "narration",
-        text: "특혜 의혹 조사에서 친구는 '그날 밥을 산 건 사실'이라고 진술했다.",
+        text: "주변에서는 그날의 식사 자리 이야기가 함께 돌았고, 이해관계자와의 사적 접촉이 있었다는 말이 따라붙었다.",
       },
       {
         kind: "narration",
-        text: "우정은 오래갔지만, 진술서는 더 오래 남았다.",
+        text: "당장 부탁을 받은 것은 아니었지만, 선을 흐린 한 번의 만남이 결국 스스로를 설명해야 하는 상황으로 돌아왔다.",
       },
     ],
     next: "stage4_intro",
@@ -322,15 +330,15 @@ export const STORY: Record<string, Scene> = {
       { kind: "bg", name: "restaurant_exit" },
       {
         kind: "narration",
-        text: "계산대 앞에서 당신은 단호하게 본인 몫을 따로 결제했다.",
+        text: "계산대 앞에서 당신은 분명하게 자신의 몫을 따로 결제했다.",
       },
       {
         kind: "narration",
-        text: "친구는 처음엔 웃었지만, 그 뒤로는 선을 넘는 부탁을 하지 않았다.",
+        text: "동창은 잠시 머쓱해했지만, 당신이 업무와 사적 관계를 구분하려 한다는 뜻은 분명히 전달됐다.",
       },
       {
         kind: "narration",
-        text: "사적인 친분은 남았고, 업무의 객관성도 같이 남았다.",
+        text: "이후 연락은 이어졌지만 사업 이야기나 편의 요청은 더 나오지 않았고, 관계와 직무 사이의 간격도 유지됐다.",
       },
     ],
     next: "stage4_intro",
@@ -341,15 +349,15 @@ export const STORY: Record<string, Scene> = {
       { kind: "bg", name: "night_crosswalk" },
       {
         kind: "narration",
-        text: "그날은 어색하지 않게 지나갔다. 문제는 그 다음이었다.",
+        text: "분위기는 잠시 어색해졌지만, 당신은 업무와 연결될 수 있는 자리는 길게 가지 않겠다고 선을 그었다.",
       },
       {
         kind: "narration",
-        text: "이해충돌 상황이 생겼을 때, '얻어먹은 게 있어서'라는 감각이 미세하게 판단을 흐렸다.",
+        text: "대신 사업 관련 문의가 있으면 개인 연락이 아니라 공식 창구와 절차를 통해야 한다고 분명히 말했다.",
       },
       {
         kind: "narration",
-        text: "누군가 보기엔 아무 일도 아니지만, 당신은 이미 마음속 설명을 시작하고 있었다.",
+        text: "관계는 조금 서먹해졌지만, 나중에 설명해야 할 상황 자체를 만들지 않는 쪽이 더 안전했다.",
       },
     ],
     next: "stage4_intro",

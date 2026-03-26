@@ -57,6 +57,8 @@ button:disabled {
   border: 1px solid rgba(255, 255, 255, 0.12);
   box-shadow: 0 30px 90px rgba(0, 0, 0, 0.45);
   background: #050914;
+  -webkit-user-select: none;
+  user-select: none;
 }
 
 .bg-layer {
@@ -191,12 +193,36 @@ button:disabled {
   transition: 120ms ease;
   font-size: 22px;
   line-height: 1.8;
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
 }
 
 .choice-btn:hover {
   transform: translateY(-1px);
   border-color: rgba(140, 183, 255, 0.55);
   background: rgba(16, 30, 70, 0.96);
+}
+
+.choice-index {
+  flex: 0 0 auto;
+  width: 36px;
+  height: 36px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(97, 144, 255, 0.16);
+  border: 1px solid rgba(140, 183, 255, 0.3);
+  color: var(--accent);
+  font-size: 18px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.choice-text {
+  flex: 1 1 auto;
+  min-width: 0;
 }
 
 .transition-shell {
@@ -400,6 +426,8 @@ button:disabled {
   border: 1px solid rgba(255, 255, 255, 0.12);
   background: rgba(7, 11, 22, 0.82);
   color: var(--text-main);
+  -webkit-user-select: text;
+  user-select: text;
 }
 
 .field input::placeholder {
