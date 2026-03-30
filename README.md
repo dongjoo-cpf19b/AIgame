@@ -58,6 +58,18 @@ create table public.game_submissions (
 );
 ```
 
+## Supabase Security
+
+`game_submissions` is intended to be written by the server only.
+
+- Server route: `app/api/submit/route.ts`
+- Required secrets: `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`
+- Security SQL: `docs/supabase-server-only-security.sql`
+- Notes: `docs/supabase-server-only-security.md`
+
+Apply the RLS policy SQL in the Supabase `SQL Editor` after creating the table.
+This blocks `anon` and `authenticated` Data API access while still allowing the server to write with the service role key.
+
 ## Score
 
 ```text
