@@ -1,6 +1,6 @@
 param(
-  [string]$SourceDir = "C:\Users\Owner\AIgame\assets-source\bg",
-  [string]$OutputDir = "C:\Users\Owner\AIgame\public\bg",
+  [string]$SourceDir = (Join-Path (Split-Path -Parent $PSScriptRoot) "assets-source\bg"),
+  [string]$OutputDir = (Join-Path (Split-Path -Parent $PSScriptRoot) "public\bg"),
   [int]$Width = 1600,
   [int]$Height = 900,
   [int]$Quality = 65

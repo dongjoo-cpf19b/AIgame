@@ -1,14 +1,16 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { CSSProperties, FormEvent } from "react";
-import { BG_URL, CHAR_INFO, STORY } from "../story";
+import { BG_URL, CHAR_INFO, CHAR_URL, STORY } from "../story";
 import {
   advanceState,
   chooseOption,
   createInitialState,
   getScoreSummary,
   getStageLabel,
+  processToInteractive,
+  skipChoice,
   type GameState,
 } from "../lib/game";
 
@@ -38,6 +40,11 @@ interface StageLawSummaryItem {
   topic: string;
   law: string;
   copy: string;
+}
+
+interface DevSceneOption {
+  value: string;
+  label: string;
 }
 
 const STAGE_LAW_SUMMARY: Record<string, StageLawSummaryItem> = {
@@ -95,14 +102,14 @@ const STAGE_LAW_SUMMARY: Record<string, StageLawSummaryItem> = {
     topic: "사적 만남의 경계 유지",
     law: "이해충돌방지법 제5조",
     copy:
-      "사적인 자리라도 직무 연관성을 알게 되면 안 날부터 14일 이내 신고와 회피 신청이 필요한지 판단해야 합니다. 비용 부담을 나누는 것만으로 절차가 면제되지는 않습니다.",
+      "사적인 자리라도 직무 연관성을 알게 되면 안 날부터 14일 이내 신고와 기피신청 또는 회피 절차를 검토해야 합니다. 비용 부담을 나누는 것은 경계를 세우는 출발점일 뿐, 절차 자체를 대신하지는 않습니다.",
   },
   stage3_result_nexttime: {
     id: "stage3_result_nexttime",
     topic: "유보된 약속과 관계 관리",
     law: "이해충돌방지법 제5조",
     copy:
-      "다음 기회를 남겨두는 방식도 오해를 키울 수 있습니다. 직무 연관성을 인식했다면 관계의 선을 분명히 하고, 안 날부터 14일 이내 신고와 회피 절차를 검토해야 합니다.",
+      "관계를 정리하는 말만으로는 충분하지 않을 수 있습니다. 직무 연관성을 인식했다면 안 날부터 14일 이내 신고와 기피신청 또는 회피 절차를 검토해야 하며, 그 점에서 2번 선택이 더 완결된 대응에 가깝습니다.",
   },
   stage4_result_reported: {
     id: "stage4_result_reported",
@@ -137,14 +144,14 @@ const STAGE_LAW_SUMMARY: Record<string, StageLawSummaryItem> = {
     topic: "평가 개입 압력",
     law: "청탁금지법 제5조·제6조",
     copy:
-      "직접 지시가 아니어도 점수나 평가 방향을 건드리는 요구는 부정청탁으로 이어질 수 있습니다. 받은 공직자도 그에 따라 평가나 직무를 처리해서는 안 됩니다.",
+      "직접 지시가 아니어도, 점수나 평가 방향을 건드리는 요구는 부정청탁으로 이어질 수 있습니다. 받은 공직자도 그에 따라 평가나 직무를 처리해서는 안 됩니다.",
   },
   stage5_result_leak: {
     id: "stage5_result_leak",
     topic: "심사 정보와 보안",
     law: "개인정보 보호법 제18조",
     copy:
-      "면접위원 정보나 평가 자료는 수집 목적 범위를 벗어나 임의로 이용하거나 제3자에게 제공할 수 없습니다. 별도 동의나 법률상 근거가 없으면 조회와 전달만으로도 문제 됩니다.",
+      "면접위원 정보나 평가 자료는 수집 목적 범위를 벗어나, 임의로 이용하거나 제3자에게 제공할 수 없습니다. 별도 동의나 법률상 근거가 없으면 조회와 전달만으로도 문제됩니다.",
   },
 };
 
@@ -182,6 +189,79 @@ function getBackgroundStyle(name: string | null): CSSProperties {
     backgroundRepeat: "no-repeat",
     backgroundSize: "cover",
   };
+}
+
+function getCharacterStyle(id: keyof typeof CHAR_INFO): CSSProperties {
+  return {
+    backgroundImage: `url(${CHAR_URL(id)})`,
+  };
+}
+
+const SCENE_LABELS: Record<string, string> = {
+  office_evening: "사무실",
+  office_storage: "사무실",
+  audit_office: "감사실",
+  office_night: "사무실",
+  parking_lot: "주차장",
+  civil_counter: "민원 창구",
+  office_hallway: "사무실 복도",
+  team_room: "팀 사무실",
+  city_street: "도시 거리",
+  restaurant_private: "고급 식당 룸",
+  meeting_room: "회의실",
+  restaurant_exit: "식당 출구",
+  night_crosswalk: "밤거리 횡단보도",
+  lecture_hall: "강의실",
+  office_day: "사무실",
+  inspection_room: "조사실",
+  home_table: "집 식탁",
+  executive_office: "간부실",
+  records_room: "기록 보관실",
+  team_room_night: "팀 사무실",
+  dark_monitor: "어두운 모니터",
+  award_hall: "온누리실",
+  office_sunset: "사무실",
+  discipline_room: "징계위원회실",
+};
+
+function toDisplayLabel(value: string): string {
+  return value
+    .split("_")
+    .filter(Boolean)
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(" ");
+}
+
+function getSceneLabel(bg: string | null, scene: string): string {
+  if (bg) {
+    return SCENE_LABELS[bg] ?? toDisplayLabel(bg);
+  }
+
+  return toDisplayLabel(scene);
+}
+
+function getSceneBackgroundName(scene: string): string | null {
+  const beats = STORY[scene]?.beats ?? [];
+  const bgBeat = beats.find((beat) => beat.kind === "bg");
+
+  return bgBeat?.kind === "bg" ? bgBeat.name : null;
+}
+
+function createSceneOption(scene: string): DevSceneOption {
+  return {
+    value: scene,
+    label: `${getKoreanStageLabel(scene)} · ${getSceneLabel(getSceneBackgroundName(scene), scene)}`,
+  };
+}
+
+function getKoreanStageLabel(scene: string): string {
+  if (scene.startsWith("stage1")) return "1단계";
+  if (scene.startsWith("stage2")) return "2단계";
+  if (scene.startsWith("stage3")) return "3단계";
+  if (scene.startsWith("stage4")) return "4단계";
+  if (scene.startsWith("stage5")) return "5단계";
+  if (scene.startsWith("ending")) return "엔딩";
+  return "인트로";
 }
 
 function formatSubmittedAt(value: string): string {
@@ -249,9 +329,52 @@ function getStageLawSummary(scene: string): StageLawSummaryItem | null {
   return STAGE_LAW_SUMMARY[scene] ?? null;
 }
 
+function formatLegalCopy(copy: string): string {
+  return copy
+    .replaceAll(
+      "직접 지시가 아니어도, 점수나 평가 방향을 건드리는 요구는 부정청탁으로 이어질 수 있습니다.",
+      "직접 지시가 아니어도__KEEP_COMMA__ 점수나 평가 방향을\n건드리는 요구는 부정청탁으로 이어질 수 있습니다."
+    )
+    .replaceAll(
+      "안 날부터 14일 이내 신고와 회피 절차를 검토해야 합니다.",
+      "안 날부터 14일 이내\n신고와 회피 절차를 검토해야 합니다."
+    )
+    .replaceAll(
+      "면접위원 정보나 평가 자료는 수집 목적 범위를 벗어나, 임의로 이용하거나 제3자에게 제공할 수 없습니다.",
+      "면접위원 정보나 평가 자료는 수집 목적 범위를 벗어나,\n임의로 이용하거나 제3자에게 제공할 수 없습니다."
+    )
+    .replaceAll(". ", ".\n")
+    .replaceAll("안 날부터 14일 이내에 ", "안 날부터 14일 이내에\n")
+    .replaceAll("안 날부터 14일 이내 ", "안 날부터 14일 이내\n")
+    .replaceAll("14일 이내 신고와 회피신청이 필요한지 ", "14일 이내 신고와 회피신청이 필요한지\n")
+    .replaceAll("신고하고 회피를", "신고하고 회피를")
+    .replaceAll("__KEEP_COMMA__", ",");
+}
+
+function formatStoryCopy(copy: string): string {
+  return copy.replace(/([.])\s+/g, "$1\n");
+}
+
+const TIMED_CHOICE_SCENES = new Set([
+  "stage1_intro",
+  "stage2_intro",
+  "stage3_intro",
+  "stage4_intro",
+  "stage5_intro",
+]);
+
+const HIDDEN_CHOICE_BY_SCENE: Record<string, number> = {
+  stage1_intro: 2,
+  stage3_intro: 2,
+  stage4_intro: 0,
+};
+const HIDDEN_CHOICE_REVEAL_MS = 3000;
+const HIDDEN_CHOICE_TOTAL_MS = 7000;
+
 export default function HomePage() {
+  const initialState = useMemo(() => createInitialState(), []);
   const [started, setStarted] = useState(false);
-  const [gameState, setGameState] = useState<GameState>(() => createInitialState());
+  const [gameState, setGameState] = useState<GameState>(initialState);
   const [stageTransition, setStageTransition] = useState<StageTransitionCard | null>(null);
   const [queuedStageTransition, setQueuedStageTransition] = useState<StageTransitionCard | null>(null);
   const [stageLawSummary, setStageLawSummary] = useState<StageLawSummaryItem | null>(null);
@@ -263,13 +386,140 @@ export default function HomePage() {
   const [submissionStatus, setSubmissionStatus] = useState<SubmissionStatus>("idle");
   const [submissionMessage, setSubmissionMessage] = useState("");
   const [submissionResult, setSubmissionResult] = useState<SubmissionResult | null>(null);
+  const [isLocalDev, setIsLocalDev] = useState(false);
+  const [selectedScene, setSelectedScene] = useState("stage1_intro");
+  const [isDelayedChoiceVisible, setIsDelayedChoiceVisible] = useState(true);
+  const [delayedChoiceProgress, setDelayedChoiceProgress] = useState(100);
+  const latestGameStateRef = useRef(gameState);
+
+  const devSceneOptions = useMemo(
+    () =>
+      Object.keys(STORY)
+        .filter((scene) => scene !== "start" && scene !== "ending_branch")
+        .map(createSceneOption),
+    []
+  );
 
   const currentBeat = STORY[gameState.scene]?.beats[gameState.beatIdx];
   const stageLabel = useMemo(() => getStageLabel(gameState.scene), [gameState.scene]);
+  const sceneLabel = useMemo(
+    () => getSceneLabel(gameState.bg, gameState.scene),
+    [gameState.bg, gameState.scene]
+  );
+  const beatMotionKey = `${gameState.scene}-${gameState.beatIdx}-${currentBeat?.kind ?? "ended"}`;
   const scoreSummary = useMemo(
     () => getScoreSummary(gameState.vars, gameState.scene, gameState.endingText),
     [gameState.endingText, gameState.scene, gameState.vars]
   );
+
+  const shouldUseChoiceTimer =
+    currentBeat?.kind === "choice" && TIMED_CHOICE_SCENES.has(gameState.scene);
+  const hiddenChoiceIndex =
+    currentBeat?.kind === "choice" ? HIDDEN_CHOICE_BY_SCENE[gameState.scene] : undefined;
+  const shouldDelayHiddenChoice = hiddenChoiceIndex !== undefined;
+  const visibleOptions =
+    currentBeat?.kind === "choice"
+      ? currentBeat.options.filter(
+          (_, index) =>
+            !(shouldDelayHiddenChoice && index === hiddenChoiceIndex && !isDelayedChoiceVisible)
+        )
+      : [];
+
+  useEffect(() => {
+    latestGameStateRef.current = gameState;
+  }, [gameState]);
+
+  useEffect(() => {
+    const { hostname, search } = window.location;
+    const localHosts = new Set(["localhost", "127.0.0.1"]);
+    const enabled = localHosts.has(hostname);
+    setIsLocalDev(enabled);
+
+    if (!enabled) {
+      return;
+    }
+
+    const params = new URLSearchParams(search);
+    const requestedScene = params.get("scene");
+
+    if (requestedScene && STORY[requestedScene]) {
+      jumpToScene(requestedScene);
+      setSelectedScene(requestedScene);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!shouldUseChoiceTimer) {
+      setIsDelayedChoiceVisible(true);
+      setDelayedChoiceProgress(100);
+      return;
+    }
+
+    setIsDelayedChoiceVisible(!shouldDelayHiddenChoice);
+    setDelayedChoiceProgress(100);
+
+    const startedAt = Date.now();
+    const progressTimer = window.setInterval(() => {
+      const elapsed = Date.now() - startedAt;
+      const remaining = Math.max(0, 100 - (elapsed / HIDDEN_CHOICE_TOTAL_MS) * 100);
+      setDelayedChoiceProgress(remaining);
+
+      if (elapsed >= HIDDEN_CHOICE_TOTAL_MS) {
+        window.clearInterval(progressTimer);
+        setIsDelayedChoiceVisible(false);
+        setDelayedChoiceProgress(0);
+      }
+    }, 80);
+
+    const revealTimer =
+      shouldDelayHiddenChoice
+        ? window.setTimeout(() => {
+            setIsDelayedChoiceVisible(true);
+          }, HIDDEN_CHOICE_REVEAL_MS)
+        : null;
+
+    const hideTimer = window.setTimeout(() => {
+      setIsDelayedChoiceVisible(false);
+      setDelayedChoiceProgress(0);
+      window.clearInterval(progressTimer);
+
+      const latestState = latestGameStateRef.current;
+      const latestBeat = STORY[latestState.scene]?.beats[latestState.beatIdx];
+
+      if (latestBeat?.kind === "choice" && TIMED_CHOICE_SCENES.has(latestState.scene)) {
+        applySkippedChoice(latestState);
+      }
+    }, HIDDEN_CHOICE_TOTAL_MS);
+
+    return () => {
+      if (revealTimer) {
+        window.clearTimeout(revealTimer);
+      }
+      window.clearTimeout(hideTimer);
+      window.clearInterval(progressTimer);
+    };
+  }, [shouldDelayHiddenChoice, shouldUseChoiceTimer, gameState.scene, gameState.beatIdx]);
+
+  function resetUiState() {
+    setStageTransition(null);
+    setQueuedStageTransition(null);
+    setStageLawSummary(null);
+    setSubmissionStatus("idle");
+    setSubmissionMessage("");
+    setSubmissionResult(null);
+    setFormState({
+      name: "",
+      affiliation: "",
+      consent: false,
+    });
+  }
+
+  function jumpToScene(scene: string) {
+    const nextState = processToInteractive(scene, 0, initialState.vars, [], null, []);
+    setStarted(true);
+    setGameState(nextState);
+    resetUiState();
+  }
 
   function advance() {
     const next = advanceState(gameState);
@@ -290,9 +540,18 @@ export default function HomePage() {
 
   function choose(index: number) {
     const next = chooseOption(gameState, index);
-    const lawSummary = getStageLawSummary(gameState.scene);
-    const nextTransition = getTransitionForChange(gameState.scene, next.scene);
-    const shouldShowStageLawSummary = Boolean(lawSummary) && next.scene !== gameState.scene;
+    applySceneState(gameState.scene, next);
+  }
+
+  function applySkippedChoice(fromState: GameState) {
+    const next = skipChoice(fromState);
+    applySceneState(fromState.scene, next);
+  }
+
+  function applySceneState(previousScene: string, next: GameState) {
+    const lawSummary = getStageLawSummary(previousScene);
+    const nextTransition = getTransitionForChange(previousScene, next.scene);
+    const shouldShowStageLawSummary = Boolean(lawSummary) && next.scene !== previousScene;
 
     setGameState(next);
 
@@ -355,6 +614,13 @@ export default function HomePage() {
     setStageTransition(null);
   }
 
+  function restartGame() {
+    setStarted(false);
+    setGameState(initialState);
+    resetUiState();
+    setSelectedScene("stage1_intro");
+  }
+
   function closeStageLawSummary() {
     setStageLawSummary(null);
 
@@ -369,6 +635,28 @@ export default function HomePage() {
       <div className="novel-frame">
         <div className="bg-layer" style={getBackgroundStyle(gameState.bg)} />
         <div className="bg-overlay" />
+
+        {started && !gameState.ended && gameState.chars.length > 0 && (
+          <div className="char-layer" aria-hidden="true">
+            {gameState.chars.map((char) =>
+              char.pos === "caller" ? (
+                <div key={char.id} className="caller-card soft-fade-enter">
+                  <div className="caller-portrait" style={getCharacterStyle(char.id)} />
+                  <div className="caller-meta">
+                    <div className="caller-label">CALL</div>
+                    <div className="caller-name">{CHAR_INFO[char.id].name}</div>
+                  </div>
+                </div>
+              ) : (
+                <div
+                  key={char.id}
+                  className={`char-sprite ${char.pos} soft-fade-enter`}
+                  style={getCharacterStyle(char.id)}
+                />
+              )
+            )}
+          </div>
+        )}
 
         {!started && (
           <div className="start-screen">
@@ -389,21 +677,21 @@ export default function HomePage() {
 
         {started && (
           <>
-            <div className="top-bar">
+            <div className="top-bar soft-fade-enter">
               <div className="badge-row">
                 <div className="badge stage-badge stage-pill">
                   <strong>{stageLabel}</strong>
                 </div>
                 <div className="badge scene-pill">
                   <span>Scene:</span>
-                  <strong>{gameState.scene}</strong>
+                  <strong>{sceneLabel}</strong>
                 </div>
               </div>
             </div>
 
             {stageTransition && !gameState.ended && (
               <div className="transition-shell">
-                <div className="transition-card">
+                <div className="transition-card soft-card-enter">
                   {stageTransition.eyebrow && (
                     <div className="transition-eyebrow">{stageTransition.eyebrow}</div>
                   )}
@@ -422,10 +710,10 @@ export default function HomePage() {
 
             {stageLawSummary && !gameState.ended && (
               <div className="legal-shell">
-                <div className="legal-card">
+                <div className="legal-card soft-card-enter">
                   <div className="legal-title">{stageLawSummary.topic}</div>
                   <div className="legal-law">{stageLawSummary.law}</div>
-                  <div className="legal-copy">{stageLawSummary.copy}</div>
+                  <div className="legal-copy">{formatLegalCopy(stageLawSummary.copy)}</div>
                   <button className="action-btn primary" type="button" onClick={closeStageLawSummary}>
                     다음으로
                   </button>
@@ -435,7 +723,7 @@ export default function HomePage() {
 
             {gameState.ended ? (
               <div className="ending-shell">
-                <div className="ending-card">
+                <div className="ending-card soft-card-enter">
                   <div className="ending-label">ENDING</div>
                   <div className="ending-title">{gameState.endingText}</div>
                   <div className="ending-copy">
@@ -546,23 +834,50 @@ export default function HomePage() {
               <>
                 {currentBeat?.kind === "choice" && (
                   <div className="choice-wrap">
-                    <div className="choice-list">
-                      {currentBeat.options.map((option, index) => (
-                        <button
-                          key={`${gameState.scene}-${index}`}
-                          className="choice-btn"
-                          onClick={() => choose(index)}
-                        >
-                          <span className="choice-index">{index + 1}</span>
-                          <span className="choice-text">{option.text}</span>
-                        </button>
-                      ))}
+                    <div key={beatMotionKey} className="choice-list choice-list-animate">
+                      {shouldUseChoiceTimer && (
+                        <div className="choice-timer-shell" aria-hidden="true">
+                          <div className="choice-alarm">
+                            <span className="choice-alarm-bell choice-alarm-bell-left" />
+                            <span className="choice-alarm-bell choice-alarm-bell-right" />
+                            <span className="choice-alarm-face">
+                              <span className="choice-alarm-hand choice-alarm-hand-hour" />
+                              <span className="choice-alarm-hand choice-alarm-hand-minute" />
+                            </span>
+                          </div>
+                          <div className="choice-timebar">
+                            <span
+                              className="choice-timebar-fill"
+                              style={{ width: `${delayedChoiceProgress}%` }}
+                            />
+                          </div>
+                        </div>
+                      )}
+                      {visibleOptions.map((option, displayIndex) => {
+                        const index = currentBeat.options.indexOf(option);
+
+                        return (
+                          <button
+                            key={`${gameState.scene}-${index}`}
+                            className={`choice-btn ${
+                              shouldDelayHiddenChoice && index === hiddenChoiceIndex
+                                ? "choice-btn-reveal"
+                                : ""
+                            }`}
+                            onClick={() => choose(index)}
+                          >
+                            <span className="choice-index">{displayIndex + 1}</span>
+                            <span className="choice-text">{option.text}</span>
+                          </button>
+                        );
+                      })}
                     </div>
                   </div>
                 )}
 
                 <div
-                  className="bottom-panel"
+                  key={beatMotionKey}
+                  className={`bottom-panel ${currentBeat?.kind === "dialogue" ? "has-speaker" : ""}`}
                   onClick={currentBeat?.kind === "choice" ? undefined : advance}
                   role="button"
                   tabIndex={0}
@@ -583,7 +898,7 @@ export default function HomePage() {
 
                   <div className="text-block">
                     {currentBeat?.kind === "narration" || currentBeat?.kind === "dialogue"
-                      ? currentBeat.text
+                      ? formatStoryCopy(currentBeat.text)
                       : "선택지를 골라주세요."}
                   </div>
 
@@ -596,6 +911,34 @@ export default function HomePage() {
           </>
         )}
       </div>
+
+      {isLocalDev && (
+        <div className="dev-panel">
+          <div className="dev-panel-title">장면 이동</div>
+          <div className="dev-panel-copy">
+            현재: {getKoreanStageLabel(gameState.scene)} · {sceneLabel}
+          </div>
+          <select
+            className="dev-select"
+            value={selectedScene}
+            onChange={(event) => setSelectedScene(event.target.value)}
+          >
+            {devSceneOptions.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+          <div className="dev-actions">
+            <button className="action-btn" type="button" onClick={() => jumpToScene(selectedScene)}>
+              이동
+            </button>
+            <button className="action-btn" type="button" onClick={restartGame}>
+              처음으로
+            </button>
+          </div>
+        </div>
+      )}
     </main>
   );
 }

@@ -16,7 +16,7 @@ export interface ScoreSummary {
   integrity: number;
   risk: number;
   trust: number;
-  endingTier: "clean" | "normal" | "fired";
+  endingTier: "clean" | "normal" | "fired" | "hidden";
   endingLabel: string;
 }
 
@@ -24,6 +24,16 @@ const INITIAL_VARS: Vars = {
   integrity: 0,
   risk: 0,
   trust: 0,
+};
+
+const PASSIVE_CHOICE_VALUE = -1;
+
+const PASSIVE_SCENE_MAP: Record<string, string> = {
+  stage1_intro: "stage1_result_passive",
+  stage2_intro: "stage2_result_passive",
+  stage3_intro: "stage3_result_passive",
+  stage4_intro: "stage4_result_passive",
+  stage5_intro: "stage5_result_passive",
 };
 
 function clamp(value: number, min: number, max: number): number {
@@ -61,7 +71,14 @@ function hydrateState(state: Omit<GameState, "history">, history: number[]): Gam
   };
 }
 
-export function resolveEndingScene(vars: Vars): "ending_clean" | "ending_normal" | "ending_fired" {
+export function resolveEndingScene(
+  vars: Vars,
+  history: number[]
+): "ending_clean" | "ending_normal" | "ending_fired" | "ending_passive" {
+  if (history.length === 5 && history.every((entry) => entry === PASSIVE_CHOICE_VALUE)) {
+    return "ending_passive";
+  }
+
   if (vars.integrity >= 80 && vars.risk <= 2 && vars.trust >= 2) {
     return "ending_clean";
   }
@@ -122,13 +139,15 @@ export function processToInteractive(
       }
 
       if (sceneData.next === "ending_branch") {
-        currentScene = resolveEndingScene(currentVars);
+        currentScene = resolveEndingScene(currentVars, history);
         currentBeatIdx = 0;
+        currentChars = [];
         continue;
       }
 
       currentScene = sceneData.next;
       currentBeatIdx = 0;
+      currentChars = [];
       continue;
     }
 
@@ -238,6 +257,23 @@ export function chooseOption(state: GameState, index: number): GameState {
   return processToInteractive(option.jump, 0, nextVars, state.chars, state.bg, nextHistory);
 }
 
+export function skipChoice(state: GameState): GameState {
+  const beat = STORY[state.scene]?.beats[state.beatIdx];
+
+  if (!beat || beat.kind !== "choice") {
+    return state;
+  }
+
+  const nextScene = PASSIVE_SCENE_MAP[state.scene];
+
+  if (!nextScene) {
+    return state;
+  }
+
+  const nextHistory = [...state.history, PASSIVE_CHOICE_VALUE];
+  return processToInteractive(nextScene, 0, state.vars, state.chars, state.bg, nextHistory);
+}
+
 export function replayHistory(history: number[]): GameState {
   let state = createInitialState();
 
@@ -258,7 +294,16 @@ export function replayHistory(history: number[]): GameState {
       throw new Error("선택 기록이 현재 스토리 구조와 맞지 않습니다.");
     }
 
-    if (!Number.isInteger(choiceIndex) || choiceIndex < 0 || choiceIndex >= beat.options.length) {
+    if (!Number.isInteger(choiceIndex)) {
+      throw new Error("유효하지 않은 선택 기록이 포함되어 있습니다.");
+    }
+
+    if (choiceIndex === PASSIVE_CHOICE_VALUE) {
+      state = skipChoice(state);
+      continue;
+    }
+
+    if (choiceIndex < 0 || choiceIndex >= beat.options.length) {
       throw new Error("유효하지 않은 선택 기록이 포함되어 있습니다.");
     }
 
@@ -289,7 +334,9 @@ export function getScoreSummary(vars: Vars, endingScene: string, endingText: str
       ? "clean"
       : endingScene === "ending_normal"
         ? "normal"
-        : "fired";
+        : endingScene === "ending_passive"
+          ? "hidden"
+          : "fired";
 
   return {
     finalScore,
@@ -303,6 +350,8 @@ export function getScoreSummary(vars: Vars, endingScene: string, endingText: str
         ? "청렴 우수 엔딩"
         : endingTier === "normal"
           ? "무난한 생존 엔딩"
-          : "징계 엔딩"),
+          : endingTier === "hidden"
+            ? "수동형 인간 히든 엔딩"
+            : "징계 엔딩"),
   };
 }
