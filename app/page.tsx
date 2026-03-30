@@ -397,11 +397,13 @@ const TIMED_CHOICE_SCENES = new Set([
 
 const HIDDEN_CHOICE_BY_SCENE: Record<string, number> = {
   stage1_intro: 2,
+  stage2_intro: 0,
   stage3_intro: 2,
   stage4_intro: 0,
 };
 const HIDDEN_CHOICE_REVEAL_MS = 3000;
 const HIDDEN_CHOICE_TOTAL_MS = 7000;
+const CHOICE_TIMER_WARNING_MS = 2000;
 
 export default function HomePage() {
   const initialState = useMemo(() => createInitialState(), []);
@@ -441,12 +443,15 @@ export default function HomePage() {
   );
   const beatMotionKey = `${gameState.scene}-${gameState.beatIdx}-${currentBeat?.kind ?? "ended"}`;
   const scoreSummary = useMemo(
-    () => getScoreSummary(gameState.vars, gameState.scene, gameState.endingText),
-    [gameState.endingText, gameState.scene, gameState.vars]
+    () => getScoreSummary(gameState.vars, gameState.scene, gameState.endingText, gameState.history),
+    [gameState.endingText, gameState.history, gameState.scene, gameState.vars]
   );
 
   const shouldUseChoiceTimer =
     currentBeat?.kind === "choice" && TIMED_CHOICE_SCENES.has(gameState.scene);
+  const isChoiceTimerWarning =
+    shouldUseChoiceTimer &&
+    delayedChoiceProgress <= (CHOICE_TIMER_WARNING_MS / HIDDEN_CHOICE_TOTAL_MS) * 100;
   const hiddenChoiceIndex =
     currentBeat?.kind === "choice" ? HIDDEN_CHOICE_BY_SCENE[gameState.scene] : undefined;
   const shouldDelayHiddenChoice = hiddenChoiceIndex !== undefined;
@@ -707,9 +712,14 @@ export default function HomePage() {
                 <br />
                 엔딩에서 이름과 소속을 제출하면 결과가 관리자에게 전송됩니다.
               </div>
-              <button className="action-btn primary" onClick={startGame}>
-                시작하기
-              </button>
+              <div className="start-actions">
+                <button className="action-btn primary" onClick={startGame}>
+                  시작하기
+                </button>
+                <div className="start-warning">
+                  주의! 가장 정답 같지만, 정답이 아닌 선택지도 있습니다.
+                </div>
+              </div>
             </div>
           </div>
         )}
@@ -887,9 +897,15 @@ export default function HomePage() {
               <>
                 {currentBeat?.kind === "choice" && (
                   <div className="choice-wrap">
-                    <div key={beatMotionKey} className="choice-list choice-list-animate">
+                    <div
+                      key={beatMotionKey}
+                      className={`choice-list choice-list-animate ${isChoiceTimerWarning ? "choice-list-warning" : ""}`}
+                    >
                       {shouldUseChoiceTimer && (
-                        <div className="choice-timer-shell" aria-hidden="true">
+                        <div
+                          className={`choice-timer-shell ${isChoiceTimerWarning ? "choice-timer-shell-warning" : ""}`}
+                          aria-hidden="true"
+                        >
                           <div className="choice-alarm">
                             <span className="choice-alarm-bell choice-alarm-bell-left" />
                             <span className="choice-alarm-bell choice-alarm-bell-right" />
@@ -900,7 +916,7 @@ export default function HomePage() {
                           </div>
                           <div className="choice-timebar">
                             <span
-                              className="choice-timebar-fill"
+                              className={`choice-timebar-fill ${isChoiceTimerWarning ? "choice-timebar-fill-warning" : ""}`}
                               style={{ width: `${delayedChoiceProgress}%` }}
                             />
                           </div>

@@ -99,7 +99,12 @@ export async function POST(request: Request) {
       );
     }
 
-    const score = getScoreSummary(finalState.vars, finalState.scene, finalState.endingText);
+    const score = getScoreSummary(
+      finalState.vars,
+      finalState.scene,
+      finalState.endingText,
+      finalState.history
+    );
     const submittedAt = new Date().toISOString();
 
     const record: SubmissionRecord = {

@@ -27,6 +27,13 @@ const INITIAL_VARS: Vars = {
 };
 
 const PASSIVE_CHOICE_VALUE = -1;
+const STAGE_CHOICE_SCENES = [
+  "stage1_intro",
+  "stage2_intro",
+  "stage3_intro",
+  "stage4_intro",
+  "stage5_intro",
+] as const;
 
 const PASSIVE_SCENE_MAP: Record<string, string> = {
   stage1_intro: "stage1_result_passive",
@@ -75,11 +82,13 @@ export function resolveEndingScene(
   vars: Vars,
   history: number[]
 ): "ending_clean" | "ending_normal" | "ending_fired" | "ending_passive" {
+  const passiveCount = history.filter((entry) => entry === PASSIVE_CHOICE_VALUE).length;
+
   if (history.length === 5 && history.every((entry) => entry === PASSIVE_CHOICE_VALUE)) {
     return "ending_passive";
   }
 
-  if (vars.integrity >= 80 && vars.risk <= 2 && vars.trust >= 2) {
+  if (passiveCount < 2 && vars.integrity >= 80 && vars.risk <= 2 && vars.trust >= 2) {
     return "ending_clean";
   }
 
@@ -325,8 +334,99 @@ export function getStageLabel(scene: string): string {
   return "Intro";
 }
 
-export function getScoreSummary(vars: Vars, endingScene: string, endingText: string): ScoreSummary {
-  const finalScore = clamp(vars.integrity - vars.risk * 4 + vars.trust * 3, 0, 100);
+function getChoiceEffectsByHistoryIndex(historyIndex: number, choiceIndex: number): Partial<Vars> | null {
+  if (choiceIndex === PASSIVE_CHOICE_VALUE) {
+    return null;
+  }
+
+  const scene = STAGE_CHOICE_SCENES[historyIndex];
+
+  if (!scene) {
+    return null;
+  }
+
+  const choiceBeat = STORY[scene]?.beats.find((beat) => beat.kind === "choice");
+
+  if (!choiceBeat || choiceBeat.kind !== "choice") {
+    return null;
+  }
+
+  return choiceBeat.options[choiceIndex]?.effects ?? null;
+}
+
+function getPatternScore(history: number[]): number {
+  let principledCount = 0;
+  let passiveCount = 0;
+  let highRiskCount = 0;
+  let lateHighRiskCount = 0;
+  let latePrincipledCount = 0;
+  let compromiseCount = 0;
+
+  history.forEach((choiceIndex, historyIndex) => {
+    if (choiceIndex === PASSIVE_CHOICE_VALUE) {
+      passiveCount += 1;
+      return;
+    }
+
+    const effects = getChoiceEffectsByHistoryIndex(historyIndex, choiceIndex);
+
+    if (!effects) {
+      return;
+    }
+
+    const integrity = effects.integrity ?? 0;
+    const risk = effects.risk ?? 0;
+    const trust = effects.trust ?? 0;
+    const isLateStage = historyIndex >= 3;
+    const isPrincipled = integrity >= 15 && risk <= 0;
+    const isHighRisk = risk >= 4;
+    const isCompromised = integrity <= 0 && risk >= 3;
+
+    if (isPrincipled) {
+      principledCount += 1;
+      if (isLateStage) {
+        latePrincipledCount += 1;
+      }
+    }
+
+    if (isHighRisk) {
+      highRiskCount += 1;
+      if (isLateStage) {
+        lateHighRiskCount += 1;
+      }
+    }
+
+    if (isCompromised) {
+      compromiseCount += 1;
+    }
+
+    if (trust < 0 && risk > 0 && integrity === 0) {
+      compromiseCount += 1;
+    }
+  });
+
+  const consistencyBonus =
+    principledCount >= 3 ? 4 + Math.max(0, principledCount - 3) * 2 : 0;
+  const recoveryBonus =
+    latePrincipledCount === 2 ? 4 : latePrincipledCount === 1 ? 2 : 0;
+  const passivePenalty = passiveCount * 3;
+  const highRiskPenalty =
+    highRiskCount >= 2 ? 4 + (highRiskCount - 2) * 2 : highRiskCount === 1 ? 1 : 0;
+  const lateStagePenalty = lateHighRiskCount * 3;
+  const compromisePenalty = compromiseCount >= 2 ? 3 + (compromiseCount - 2) * 2 : 0;
+
+  return consistencyBonus + recoveryBonus - passivePenalty - highRiskPenalty - lateStagePenalty - compromisePenalty;
+}
+
+export function getScoreSummary(
+  vars: Vars,
+  endingScene: string,
+  endingText: string,
+  history: number[] = []
+): ScoreSummary {
+  const baseScore = vars.integrity - vars.risk * 4 + vars.trust * 3;
+  const patternScore = getPatternScore(history);
+  const finalScore = clamp(baseScore + patternScore, 0, 100);
   const endingTier =
     endingScene === "ending_clean"
       ? "clean"
