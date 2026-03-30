@@ -421,7 +421,7 @@ export const STORY: Record<string, Scene> = {
       },
       {
         kind: "narration",
-        text: "돈은 기부 처리됐고, 남은 건 괜한 경고와 찝찝함뿐이었다.",
+        text: "돈은 세외수입 후 기부처리됐고, 남은 건 경고와 찝찝함뿐이었다.",
       },
     ],
     next: "stage3_intro",
@@ -507,7 +507,7 @@ export const STORY: Record<string, Scene> = {
             jump: "stage3_result_dutch",
           },
           {
-            text: "식사 자리는 줄이고, 업무 관련 이야기는 공식 절차로 하자고 말한다.",
+            text: "식사 후, 업무 이야기는 공식 절차로 하자고 말한다.",
             effects: { integrity: 10, risk: 1, trust: 0 },
             jump: "stage3_result_nexttime",
           },

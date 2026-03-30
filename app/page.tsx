@@ -877,6 +877,10 @@ export default function HomePage() {
                             key={`${gameState.scene}-${index}`}
                             className={`choice-btn ${
                               shouldDelayHiddenChoice && index === hiddenChoiceIndex
+                                ? "choice-btn-hidden"
+                                : ""
+                            } ${
+                              shouldDelayHiddenChoice && index === hiddenChoiceIndex
                                 ? "choice-btn-reveal"
                                 : ""
                             }`}

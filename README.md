@@ -54,6 +54,7 @@ npm run dev
 - `participant_name`
 - `affiliation`
 - `submitted_at`
+- `ending_label`
 - `final_score`
 - `integrity`
 - `risk`
@@ -67,11 +68,19 @@ create table public.game_submissions (
   participant_name text not null,
   affiliation text not null,
   submitted_at timestamptz not null,
+  ending_label text,
   final_score integer not null,
   integrity integer not null,
   risk integer not null,
   trust integer not null
 );
+```
+
+이미 테이블이 있다면 아래 SQL만 추가로 실행하면 됩니다.
+
+```sql
+alter table public.game_submissions
+add column if not exists ending_label text;
 ```
 
 ## Supabase Security

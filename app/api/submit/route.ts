@@ -15,6 +15,7 @@ interface SubmissionRecord {
   participant_name: string;
   affiliation: string;
   submitted_at: string;
+  ending_label: string;
   final_score: number;
   integrity: number;
   risk: number;
@@ -106,6 +107,7 @@ export async function POST(request: Request) {
       participant_name: body.participantName,
       affiliation: body.affiliation,
       submitted_at: submittedAt,
+      ending_label: score.endingLabel,
       final_score: score.finalScore,
       integrity: score.integrity,
       risk: score.risk,
