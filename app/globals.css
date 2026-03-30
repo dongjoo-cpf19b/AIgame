@@ -272,7 +272,7 @@ button:disabled {
 .text-block {
   max-width: 920px;
   font-size: 23px;
-  line-height: 2;
+  line-height: 1.72;
   letter-spacing: -0.01em;
   color: var(--text-main);
   white-space: pre-wrap;
@@ -630,8 +630,8 @@ button:disabled {
   color: rgba(246, 239, 230, 0.82);
   max-width: 840px;
   margin: 0 auto 28px;
-  font-size: 23px;
-  line-height: 2;
+  font-size: 22px;
+  line-height: 1.76;
   margin-bottom: 32px;
   word-break: keep-all;
   overflow-wrap: break-word;
@@ -683,7 +683,7 @@ button:disabled {
 
 .ending-copy {
   color: var(--text-sub);
-  line-height: 1.8;
+  line-height: 1.68;
   margin-bottom: 18px;
   word-break: keep-all;
   overflow-wrap: break-word;
@@ -844,7 +844,13 @@ button:disabled {
 .submission-popup-actions {
   display: flex;
   justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
   margin-top: 18px;
+}
+
+.submission-popup-actions .action-btn {
+  min-width: 140px;
 }
 
 .action-btn {

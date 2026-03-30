@@ -141,13 +141,11 @@ export function processToInteractive(
       if (sceneData.next === "ending_branch") {
         currentScene = resolveEndingScene(currentVars, history);
         currentBeatIdx = 0;
-        currentChars = [];
         continue;
       }
 
       currentScene = sceneData.next;
       currentBeatIdx = 0;
-      currentChars = [];
       continue;
     }
 

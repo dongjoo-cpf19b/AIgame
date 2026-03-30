@@ -224,7 +224,11 @@ const SCENE_LABELS: Record<string, string> = {
   discipline_room: "징계위원회실",
 };
 
-function toDisplayLabel(value: string): string {
+function toDisplayLabel(value: unknown): string {
+  if (typeof value !== "string") {
+    return "";
+  }
+
   return value
     .split("_")
     .filter(Boolean)
@@ -342,6 +346,34 @@ function formatLegalCopy(copy: string): string {
     .replaceAll(
       "면접위원 정보나 평가 자료는 수집 목적 범위를 벗어나, 임의로 이용하거나 제3자에게 제공할 수 없습니다.",
       "면접위원 정보나 평가 자료는 수집 목적 범위를 벗어나,\n임의로 이용하거나 제3자에게 제공할 수 없습니다."
+    )
+    .replaceAll(
+      "10일 이내 신고가 원칙이고, 일부 예외를 제외하면 절차를 지켜야 합니다.",
+      "10일 이내 신고가 원칙이고,\n일부 예외를 제외하면 절차를 지켜야 합니다."
+    )
+    .replaceAll(
+      "외부강의 신고와 사례금 기준을 지켰더라도, 행사 뒤 받은 추가 선물은 별도로 판단해야 합니다.",
+      "외부강의 신고와 사례금 기준을 지켰더라도,\n행사 뒤 받은 추가 선물은 별도로 판단해야 합니다."
+    )
+    .replaceAll(
+      "직무 관련자가 준 선물은 금액이 작아도 받을 수 없고, 공동 소비로 바꿔도 허용되지 않습니다.",
+      "직무 관련자가 준 선물은 금액이 작아도 받을 수 없고,\n공동 소비로 바꿔도 허용되지 않습니다."
+    )
+    .replaceAll(
+      "같은 사람에게 1회 100만원, 연 300만원을 초과하면 직무 관련성 여부와 무관하게 금지됩니다.",
+      "같은 사람에게 1회 100만원, 연 300만원을 초과하면\n직무 관련성 여부와 무관하게 금지됩니다."
+    )
+    .replaceAll(
+      "민원 응대와 연결된 금전 수수는 1회 100만원, 연 300만원 기준과 별개로 직무 관련성이 있으면 금지됩니다.",
+      "민원 응대와 연결된 금전 수수는 1회 100만원, 연 300만원 기준과 별개로\n직무 관련성이 있으면 금지됩니다."
+    )
+    .replaceAll(
+      "그 점에서 2번 선택이 더 완결된 대응에 가깝습니다.",
+      "그 점에서\n2번 선택이 더 완결된 대응에 가깝습니다."
+    )
+    .replaceAll(
+      "청탁을 받은 공직자도 그에 따라 직무를 수행해서는 안 되므로, 기록을 남겨 공정성과 본인 보호를 함께 확보해야 합니다.",
+      "청탁을 받은 공직자도 그에 따라 직무를 수행해서는 안 되므로,\n기록을 남겨 공정성과 본인 보호를 함께 확보해야 합니다."
     )
     .replaceAll(". ", ".\n")
     .replaceAll("안 날부터 14일 이내에 ", "안 날부터 14일 이내에\n")
@@ -824,7 +856,9 @@ export default function HomePage() {
                 {submissionResult && isSubmissionPopupOpen && (
                   <div className="submission-popup-shell">
                     <div className="submission-popup soft-card-enter">
-                      <div className="receipt-title">접수 완료</div>
+                      <div className="receipt-title">
+                        접수 완료 ({scoreSummary.endingLabel})
+                      </div>
                       <div className="receipt-copy">
                         {submissionMessage || "결과가 정상적으로 접수되었습니다."}
                       </div>
@@ -838,6 +872,9 @@ export default function HomePage() {
                         검증 점수 {submissionResult.finalScore}점
                       </div>
                       <div className="submission-popup-actions">
+                        <button className="action-btn" type="button" onClick={restartGame}>
+                          처음 화면으로
+                        </button>
                         <button className="action-btn primary" type="button" onClick={closeSubmissionPopup}>
                           확인
                         </button>

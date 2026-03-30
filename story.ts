@@ -617,7 +617,7 @@ export const STORY: Record<string, Scene> = {
       },
       {
         kind: "narration",
-        text: "선을 그은 건 맞았지만, 절차까지 챙긴 2번 선택보다 한 박자 늦은 대응이었다.",
+        text: "선을 그은 건 맞았지만, 절차까지 챙기지 못한 점은 한 박자 늦은 대응이었다.",
       },
     ],
     next: "stage4_intro",
@@ -868,11 +868,11 @@ export const STORY: Record<string, Scene> = {
       {
         kind: "dialogue",
         who: "junior",
-        text: "선배님이 아니라 공무원으로 남고 싶었습니다.",
+        text: "선배님 뜻을 따르는 공무원보다,\n원칙과 기준을 지키는 공무원이고 싶었습니다.",
       },
       {
         kind: "narration",
-        text: "잃은 건 사건 하나가 아니라, 같이 일하던 사람들의 신뢰였다.",
+        text: "잃은 건 명예뿐 아니라, 같이 일하던 사람들의 신뢰였다.",
       },
     ],
     next: "ending_branch",
