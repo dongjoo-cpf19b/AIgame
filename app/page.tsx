@@ -386,6 +386,7 @@ export default function HomePage() {
   const [submissionStatus, setSubmissionStatus] = useState<SubmissionStatus>("idle");
   const [submissionMessage, setSubmissionMessage] = useState("");
   const [submissionResult, setSubmissionResult] = useState<SubmissionResult | null>(null);
+  const [isSubmissionPopupOpen, setIsSubmissionPopupOpen] = useState(false);
   const [isLocalDev, setIsLocalDev] = useState(false);
   const [selectedScene, setSelectedScene] = useState("stage1_intro");
   const [isDelayedChoiceVisible, setIsDelayedChoiceVisible] = useState(true);
@@ -507,6 +508,7 @@ export default function HomePage() {
     setSubmissionStatus("idle");
     setSubmissionMessage("");
     setSubmissionResult(null);
+    setIsSubmissionPopupOpen(false);
     setFormState({
       name: "",
       affiliation: "",
@@ -601,6 +603,7 @@ export default function HomePage() {
       setSubmissionResult(payload.submission);
       setSubmissionStatus("success");
       setSubmissionMessage(payload.message ?? "결과가 정상적으로 접수되었습니다.");
+      setIsSubmissionPopupOpen(true);
     } catch (error) {
       setSubmissionStatus("error");
       setSubmissionMessage(
@@ -628,6 +631,10 @@ export default function HomePage() {
       setStageTransition(queuedStageTransition);
       setQueuedStageTransition(null);
     }
+  }
+
+  function closeSubmissionPopup() {
+    setIsSubmissionPopupOpen(false);
   }
 
   return (
@@ -808,15 +815,19 @@ export default function HomePage() {
                     </div>
                   </form>
 
-                  {submissionMessage && (
+                  {submissionMessage && submissionStatus === "error" && (
                     <div className={`submission-banner ${submissionStatus}`}>
                       {submissionMessage}
                     </div>
                   )}
-
-                  {submissionResult && (
-                    <div className="receipt-card">
+                </div>
+                {submissionResult && isSubmissionPopupOpen && (
+                  <div className="submission-popup-shell">
+                    <div className="submission-popup soft-card-enter">
                       <div className="receipt-title">접수 완료</div>
+                      <div className="receipt-copy">
+                        {submissionMessage || "결과가 정상적으로 접수되었습니다."}
+                      </div>
                       <div className="receipt-copy">
                         접수번호 <strong>{submissionResult.id}</strong>
                       </div>
@@ -826,9 +837,14 @@ export default function HomePage() {
                       <div className="receipt-copy">
                         검증 점수 {submissionResult.finalScore}점
                       </div>
+                      <div className="submission-popup-actions">
+                        <button className="action-btn primary" type="button" onClick={closeSubmissionPopup}>
+                          확인
+                        </button>
+                      </div>
                     </div>
-                  )}
-                </div>
+                  </div>
+                )}
               </div>
             ) : (
               <>
@@ -866,6 +882,11 @@ export default function HomePage() {
                             }`}
                             onClick={() => choose(index)}
                           >
+                            {shouldDelayHiddenChoice && index === hiddenChoiceIndex && (
+                              <span className="choice-hidden-ribbon" aria-hidden="true">
+                                Hidden
+                              </span>
+                            )}
                             <span className="choice-index">{displayIndex + 1}</span>
                             <span className="choice-text">{option.text}</span>
                           </button>

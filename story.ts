@@ -470,7 +470,7 @@ export const STORY: Record<string, Scene> = {
       {
         kind: "dialogue",
         who: "friend",
-        text: "이야~ 주사보님~ 이게 얼마만이야!\n요즘 많이 바쁘다며? 오늘은 내가 살게.",
+        text: "이야~ 시청 나으리님~ 이게 얼마만이야!\n요즘 많이 바쁘다며? 오늘은 내가 살게.",
       },
       {
         kind: "narration",

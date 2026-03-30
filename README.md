@@ -1,4 +1,4 @@
-# integrity-novel
+# AIgame
 
 선택을 따라가며 청렴도와 위험도를 확인하는 웹게임입니다.
 엔딩에서 이름과 소속을 제출하면 결과가 저장됩니다.
@@ -30,6 +30,22 @@ npm run dev
 - `lib/game.ts` 에서 진행 상태와 점수 계산 관리
 - `app/page.tsx` 에서 게임 UI와 제출 폼 처리
 - `app/api/submit/route.ts` 에서 서버 검증 후 결과 저장
+
+## Current Gameplay
+
+- `Stage 1` 부터 `Stage 5` 까지 선택형 스토리 진행
+- 분기 결과마다 법령 요약 카드와 점수 반영
+- 일부 스테이지에는 제한시간과 히든 선택지 연출 적용
+- 엔딩에서 최종 점수와 제출 폼 표시
+
+## Recent UI / Story Work
+
+- 스토리 본문과 대사를 장면 단위로 확장해 전개 속도 보강
+- 한국어 장소명 표시와 상단 진행 정보 정리
+- 대화창 이름표를 패널 상단에 걸치도록 조정
+- 결과 카드 본문 줄바꿈과 가독성 개선
+- 로컬 확인용 장면 이동 패널 추가
+- 캐릭터 스프라이트와 배경 이미지 연결 구조 반영
 
 ## Saved Fields
 
@@ -85,3 +101,5 @@ powershell -ExecutionPolicy Bypass -File .\scripts\optimize-bg.ps1
 ```
 
 최종 배경은 `1600x900` JPG로 `public/bg` 에 생성됩니다.
+
+캐릭터 이미지는 `public/chars` 에 `player.png`, `manager.png` 처럼 바로 넣어 사용합니다.
