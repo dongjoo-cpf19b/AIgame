@@ -3,7 +3,7 @@ import type { ReactNode } from "react";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "공직 청렴 비주얼노벨",
+  title: "공직 청렴 스토리 게임",
   description: "선택형 스토리를 통해 청렴 점수를 집계하는 웹 이벤트 게임",
 };
 

@@ -78,19 +78,21 @@ export const STORY: Record<string, Scene> = {
 
   stage1_intro: {
     beats: [
-      { kind: "bg", name: "office_storage" },
+      { kind: "bg", name: "office_night_basket" },
       { kind: "show", chars: [{ id: "player", pos: "left" }] },
       {
         kind: "narration",
-        text: "야근을 마치고 자리에서 일어나려는 순간, 책상 밑에서 과일 박스 하나가 발견됐다.",
+        text: "야근을 마치고 자리에서 일어나려는 순간, 책상 밑에서 과일 바구니 하나가 발견됐다.",
       },
+      { kind: "bg", name: "fruit_basket_closeup" },
       {
         kind: "narration",
         text: "보낸 사람 이름도, 부서명도 적혀 있지 않았다. 과일은 아직 싱싱했다.",
       },
+      { kind: "bg", name: "office_night_basket" },
       {
         kind: "narration",
-        text: "조용한 사무실 안에서 유독 그 박스만 낯설게 보였다. 퇴근 직전이라는 점이 더 마음에 걸렸다.",
+        text: "조용한 사무실 안에서 유독 그 바구니만 낯설게 보였다. 퇴근 직전이라는 점이 더 마음에 걸렸다.",
       },
       {
         kind: "narration",
@@ -192,11 +194,11 @@ export const STORY: Record<string, Scene> = {
 
   stage1_result_share: {
     beats: [
-      { kind: "bg", name: "office_night" },
+      { kind: "bg", name: "fruit_basket_closeup_v2" },
       { kind: "show", chars: [{ id: "manager", pos: "right" }] },
       {
         kind: "narration",
-        text: "박스를 회의 테이블 위에 올려두자, 하나둘 사람들이 몰려왔다.\n야근 끝의 허기 앞에서는 분위기는 금세 풀어졌다.",
+        text: "바구니를 회의 테이블 위에 올려두자, 하나둘 사람들이 몰려왔다.\n야근 끝의 허기 앞에서는 분위기는 금세 풀어졌다.",
       },
       {
         kind: "dialogue",
@@ -215,12 +217,14 @@ export const STORY: Record<string, Scene> = {
       },
       {
         kind: "narration",
-        text: "몇몇은 피식 웃었고, 누군가는 말없이 박스 뚜껑을 열었다. 망설임은 생각보다 짧았다.",
+        text: "몇몇은 피식 웃었고, 누군가는 말없이 바구니를 풀었다. 망설임은 생각보다 짧았다.",
       },
+      { kind: "bg", name: "fruit_basket_opened" },
       {
         kind: "narration",
-        text: "부서장까지 웃어 넘기자, 박스는 금방 비어 갔다. 잠깐은 정말 별일 아닌 일처럼 느껴졌다.",
+        text: "부서장까지 웃어 넘기자, 바구니는 금방 비어갔다. 잠깐은 정말 별일 아닌 일처럼 느껴졌다.",
       },
+      { kind: "bg", name: "anonymous_report_desk" },
       {
         kind: "narration",
         text: "며칠 뒤 익명 제보가 들어왔다. 과 사람들 전원이 소명서를 쓰느라 사무실 분위기가 싸해졌다.",

@@ -51,6 +51,7 @@ button:disabled {
 
 .novel-frame {
   position: relative;
+  isolation: isolate;
   width: min(100%, 1180px);
   aspect-ratio: 16 / 9;
   overflow: hidden;
@@ -65,11 +66,14 @@ button:disabled {
 .bg-layer {
   position: absolute;
   inset: 0;
+  z-index: 0;
 }
 
 .bg-overlay {
   position: absolute;
   inset: 0;
+  z-index: 1;
+  pointer-events: none;
   background:
     linear-gradient(180deg, rgba(255, 244, 229, 0.04), transparent 38%),
     linear-gradient(0deg, rgba(10, 8, 7, 0.5), rgba(10, 8, 7, 0.38));

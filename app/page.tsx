@@ -60,7 +60,7 @@ const STAGE_LAW_SUMMARY: Record<string, StageLawSummaryItem> = {
     topic: "선물 수수와 공동 소비",
     law: "청탁금지법 제8조",
     copy:
-      "함께 나누어 썼다는 사정만으로 책임이 사라지지는 않습니다. 직무 관련자가 준 선물은 금액이 작아도 받을 수 없고, 공동 소비로 바꿔도 허용되지 않습니다.",
+      "함께 나누어 먹었다는 사정만으로 책임이 사라지지는 않습니다. 직무 관련자가 준 선물은 금액이 적어도 받을 수 없고, 공동 소비로 바꿔도 허용되지 않습니다.",
   },
   stage1_result_take: {
     id: "stage1_result_take",
@@ -184,7 +184,7 @@ function getBackgroundStyle(name: string | null): CSSProperties {
   };
 
   return {
-    backgroundImage: `${palette[name ?? ""] ?? "linear-gradient(135deg, #1d2940 0%, #425878 45%, #0e1522 100%)"}, url(${BG_URL(name ?? "office_evening")})`,
+    backgroundImage: `url(${BG_URL(name ?? "office_evening")}), ${palette[name ?? ""] ?? "linear-gradient(135deg, #1d2940 0%, #425878 45%, #0e1522 100%)"}`,
     backgroundPosition: "center center",
     backgroundRepeat: "no-repeat",
     backgroundSize: "cover",
@@ -237,6 +237,16 @@ function toDisplayLabel(value: unknown): string {
 }
 
 function getSceneLabel(bg: string | null, scene: string): string {
+  if (
+    bg === "office_night_basket" ||
+    bg === "fruit_basket_closeup" ||
+    bg === "fruit_basket_closeup_v2" ||
+    bg === "fruit_basket_opened" ||
+    bg === "anonymous_report_desk"
+  ) {
+    return "사무실";
+  }
+
   if (bg) {
     return SCENE_LABELS[bg] ?? toDisplayLabel(bg);
   }
@@ -356,8 +366,8 @@ function formatLegalCopy(copy: string): string {
       "외부강의 신고와 사례금 기준을 지켰더라도,\n행사 뒤 받은 추가 선물은 별도로 판단해야 합니다."
     )
     .replaceAll(
-      "직무 관련자가 준 선물은 금액이 작아도 받을 수 없고, 공동 소비로 바꿔도 허용되지 않습니다.",
-      "직무 관련자가 준 선물은 금액이 작아도 받을 수 없고,\n공동 소비로 바꿔도 허용되지 않습니다."
+      "직무 관련자가 준 선물은 금액이 적어도 받을 수 없고, 공동 소비로 바꿔도 허용되지 않습니다.",
+      "직무 관련자가 준 선물은 금액이 적어도 받을 수 없고,\n공동 소비로 바꿔도 허용되지 않습니다."
     )
     .replaceAll(
       "같은 사람에게 1회 100만원, 연 300만원을 초과하면 직무 관련성 여부와 무관하게 금지됩니다.",
@@ -705,8 +715,8 @@ export default function HomePage() {
         {!started && (
           <div className="start-screen">
             <div className="start-card">
-              <div className="start-eyebrow">WEB EVENT VISUAL NOVEL</div>
-              <div className="start-title">공직 청렴 비주얼노벨</div>
+              <div className="start-eyebrow">WEB EVENT STORY GAME</div>
+              <div className="start-title">공직 청렴 스토리 게임</div>
               <div className="start-copy">
                 선택을 따라가며 청렴도와 위험도를 확인하는 웹게임입니다.
                 <br />
