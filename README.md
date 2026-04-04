@@ -16,6 +16,20 @@ npm run dev
 
 브라우저에서 `http://localhost:3000`으로 접속합니다.
 
+## 백그라운드 실행 (Windows)
+
+터미널 창을 하나 더 띄우지 않고 백그라운드에서 개발 서버를 실행할 수 있습니다.
+
+```powershell
+Start-Process -WindowStyle Hidden -FilePath "cmd.exe" -ArgumentList '/c','npm.cmd run dev > local-dev-live.out.log 2> local-dev-live.err.log' -WorkingDirectory 'C:\Users\Owner\AIgame-repo'
+```
+
+실행 후 브라우저에서 `http://localhost:3000`으로 접속합니다.
+
+- 표준 로그: `local-dev-live.out.log`
+- 에러 로그: `local-dev-live.err.log`
+- PowerShell에서 `npm` 실행 정책 오류가 날 때는 `npm` 대신 `npm.cmd`를 사용합니다.
+
 ## 스택
 
 - `Next.js`
