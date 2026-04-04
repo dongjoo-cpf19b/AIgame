@@ -30,6 +30,12 @@ Start-Process -WindowStyle Hidden -FilePath "cmd.exe" -ArgumentList '/c','npm.cm
 - 에러 로그: `local-dev-live.err.log`
 - PowerShell에서 `npm` 실행 정책 오류가 날 때는 `npm` 대신 `npm.cmd`를 사용합니다.
 
+Codex에게 바로 실행을 맡길 때는 이렇게 말하면 됩니다.
+
+```text
+AIgame-repo 백그라운드 dev 서버 띄우고 localhost:3000 브라우저로 열어줘
+```
+
 ## 스택
 
 - `Next.js`
