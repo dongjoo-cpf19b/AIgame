@@ -162,3 +162,23 @@ add column if not exists ending_label text;
 
 RLS 정책 SQL은 Supabase `SQL Editor`에서 적용합니다.
 이 설정으로 `anon`, `authenticated`의 Data API 직접 쓰기를 막고, 서버의 service role만 저장 가능하게 합니다.
+
+## 행정망 / 외부 서비스 운영 원칙
+
+이 저장소는 `GitHub`, `Vercel`, `Supabase` 같은 외부 서비스를 함께 사용합니다.
+작업 PC가 공무원 행정망일 수 있으므로, 이후 작업은 아래 원칙을 기본으로 합니다.
+
+- 기본은 `read-only` 확인부터 시작하고, 배포/스키마 변경/환경변수 갱신은 필요할 때만 진행합니다.
+- 비밀값은 채팅이나 커밋에 직접 남기지 않고, 가능하면 세션 환경변수 또는 대시보드에서만 사용합니다.
+- `service_role`, 장기 토큰, 운영용 키는 최소 범위로 쓰고 작업 후 revoke 또는 교체를 우선 검토합니다.
+- `.vercel/.env.development.local`, 로컬 CLI 인증 정보, 임시 링크 정보는 로컬 전용으로 취급하고 저장소에 커밋하지 않습니다.
+- 업무자료, 개인정보, 내부망 전용 정보, 민감한 운영 데이터는 이 저장소나 외부 AI 대화에 넣지 않습니다.
+- 행정망에서는 보수적으로 움직이며, 확인 목적의 조회와 로컬 개발을 우선하고 외부 반영은 한 번 더 점검합니다.
+
+### 현재 연결 참고
+
+- GitHub repo: `dongjoo-cpf19b/AIgame`
+- Vercel project: `dongjoo-cpf19bs-projects/a-igame`
+- Supabase project ref: `vcgkszoamkjalhtzrupd`
+
+필요하면 이후 세션에서도 이 기준을 우선 적용해 작업합니다.
