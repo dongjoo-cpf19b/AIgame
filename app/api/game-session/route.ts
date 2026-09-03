@@ -5,18 +5,24 @@ const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 
 const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
-async function supabase(path: string, method: string, body: unknown, prefer = "return=minimal") {
+async function supabase(path: string, method: string, body: unknown) {
   return fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
     method,
     headers: {
       apikey: SUPABASE_ANON_KEY,
       Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
       "Content-Type": "application/json",
-      Prefer: prefer,
+      Prefer: "return=minimal",
     },
     body: JSON.stringify(body),
     cache: "no-store",
   });
+}
+
+async function ensureSession(id: string) {
+  const response = await supabase("game_sessions", "POST", { id });
+  if (response.ok || response.status === 409) return null;
+  return response;
 }
 
 export async function POST(request: NextRequest) {
@@ -30,21 +36,19 @@ export async function POST(request: NextRequest) {
     }
 
     if (action === "start") {
-      const response = await supabase(
-        "game_sessions?on_conflict=id",
-        "POST",
-        { id },
-        "resolution=ignore-duplicates,return=minimal",
-      );
-
-      if (!response.ok) {
-        return NextResponse.json({ error: await response.text() }, { status: response.status });
+      const errorResponse = await ensureSession(id);
+      if (errorResponse) {
+        return NextResponse.json({ error: await errorResponse.text() }, { status: errorResponse.status });
       }
-
       return NextResponse.json({ ok: true });
     }
 
     if (action === "finish") {
+      const errorResponse = await ensureSession(id);
+      if (errorResponse) {
+        return NextResponse.json({ error: await errorResponse.text() }, { status: errorResponse.status });
+      }
+
       const allowed = {
         completed_at: payload.completed_at,
         clues_collected: payload.clues_collected,
@@ -55,22 +59,10 @@ export async function POST(request: NextRequest) {
         phone_hints: payload.phone_hints,
       };
 
-      // 시작 저장이 지연되거나 실패했더라도 세션이 존재하도록 보장한다.
-      const ensure = await supabase(
-        "game_sessions?on_conflict=id",
-        "POST",
-        { id },
-        "resolution=ignore-duplicates,return=minimal",
-      );
-      if (!ensure.ok) {
-        return NextResponse.json({ error: await ensure.text() }, { status: ensure.status });
-      }
-
       const response = await supabase(`game_sessions?id=eq.${id}`, "PATCH", allowed);
       if (!response.ok) {
         return NextResponse.json({ error: await response.text() }, { status: response.status });
       }
-
       return NextResponse.json({ ok: true });
     }
 
