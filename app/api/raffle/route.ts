@@ -6,14 +6,14 @@ const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const phonePattern = /^010\d{8}$/;
 
-async function supabase(path: string, method: string, body: unknown, prefer = "return=minimal") {
+async function supabase(path: string, method: string, body: unknown) {
   return fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
     method,
     headers: {
       apikey: SUPABASE_ANON_KEY,
       Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
       "Content-Type": "application/json",
-      Prefer: prefer,
+      Prefer: "return=minimal",
     },
     body: JSON.stringify(body),
     cache: "no-store",
@@ -39,14 +39,9 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "invalid_phone" }, { status: 400 });
     }
 
-    // 첫 화면의 백그라운드 세션 저장이 늦어져도 응모 단계에서 세션을 보장한다.
-    const ensure = await supabase(
-      "game_sessions?on_conflict=id",
-      "POST",
-      { id: sessionId },
-      "resolution=ignore-duplicates,return=minimal",
-    );
-    if (!ensure.ok) {
+    // 백그라운드 세션 저장이 늦더라도 응모 직전에 한 번 더 보장한다.
+    const ensure = await supabase("game_sessions", "POST", { id: sessionId });
+    if (!ensure.ok && ensure.status !== 409) {
       return NextResponse.json({ error: await ensure.text() }, { status: ensure.status });
     }
 
