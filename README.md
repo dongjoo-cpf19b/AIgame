@@ -32,6 +32,8 @@ Supabase 테이블:
 
 `raffle_entries.phone_digits`에는 UNIQUE 제약이 있어 동일 휴대전화 번호는 한 번만 응모할 수 있습니다.
 
+서버→Supabase 실제 운영 연결 테스트에서 세션과 경품응모 INSERT 모두 HTTP 201 응답과 DB 레코드 생성을 확인했습니다. 테스트 레코드와 임시 진단 엔드포인트는 확인 후 제거했습니다.
+
 ## 실행
 
 ```bash
