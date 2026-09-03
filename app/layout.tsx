@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import RuntimeFix from "./runtime-fix";
 import "./globals.css";
+import "./art-direction.css";
 
 export const metadata: Metadata = {
   title: "인수인계의 전설",
