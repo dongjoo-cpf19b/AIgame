@@ -1,13 +1,19 @@
-# 공직 청렴 스토리 게임
+# 인수인계의 전설
 
-선택형 스토리를 따라가며 청렴, 위험, 신뢰 점수를 누적하고 엔딩에서 결과를 제출하는 웹 이벤트 게임입니다.
+공무원 업무 인수인계를 소재로 한 **모바일 세로형 체험 게임**입니다.
 
-## 링크
+행사장에서 QR 코드를 스캔해 바로 플레이하는 PWA/웹 게임을 목표로 하며, 플레이어는 성남시청 청사관리 업무를 새로 맡은 담당자가 되어 흩어진 자료를 찾아 전년도 합동소방훈련의 업무 맥락을 복원합니다.
 
-- Local: `http://localhost:3000`
-- Deployed: `https://a-igame-sigma.vercel.app`
+> 전임자는 떠났습니다.  
+> **인수인계서는 없습니다.**
 
-## 실행
+## 배포
+
+- Production: https://a-igame-sigma.vercel.app
+- GitHub: `dongjoo-cpf19b/AIgame`
+- Vercel project: `a-igame`
+
+## 개발 환경
 
 ```bash
 npm install
@@ -16,169 +22,186 @@ npm run dev
 
 브라우저에서 `http://localhost:3000`으로 접속합니다.
 
-## 백그라운드 실행 (Windows)
+기존 저장소를 이미 받아둔 경우:
 
-터미널 창을 하나 더 띄우지 않고 백그라운드에서 개발 서버를 실행할 수 있습니다.
-
-```powershell
-Start-Process -WindowStyle Hidden -FilePath "cmd.exe" -ArgumentList '/c','npm.cmd run dev > local-dev-live.out.log 2> local-dev-live.err.log' -WorkingDirectory 'C:\Users\Owner\AIgame-repo'
+```bash
+git checkout main
+git pull origin main
+npm install
+npm run dev
 ```
 
-실행 후 브라우저에서 `http://localhost:3000`으로 접속합니다.
+## 기술 스택
 
-- 표준 로그: `local-dev-live.out.log`
-- 에러 로그: `local-dev-live.err.log`
-- PowerShell에서 `npm` 실행 정책 오류가 날 때는 `npm` 대신 `npm.cmd`를 사용합니다.
+- Next.js
+- React
+- TypeScript
+- Supabase
+- Vercel
 
-Codex에게 바로 실행을 맡길 때는 이렇게 말하면 됩니다.
+## 게임 방향
 
-```text
-AIgame-repo 백그라운드 dev 서버 띄우고 localhost:3000 브라우저로 열어줘
-```
+- 모바일 **세로 화면 우선** (`360~430px` 중심)
+- 행사장 QR 접속 후 설치 없이 플레이
+- 목표 플레이타임 약 **4~5분**
+- 실제 공무원 업무 흐름을 방탈출/조사형 게임으로 재구성
+- 단순 객관식보다 `자료 탐색 → 단서 수집 → 업무 판단 → 팀장 보고` 흐름을 우선
 
-## 스택
+## 현재 구현된 플레이 흐름
 
-- `Next.js`
-- `React`
-- `TypeScript`
-- `Supabase`
+1. 팀장에게 2025년 합동소방훈련 자료 파악 지시를 받음
+2. 업무PC 바탕화면에서 아래 메뉴 탐색
+   - 업무폴더
+   - 문등대(문서등록대장)
+   - 단서함
+   - 팀장님께 보고하기
+3. 공용폴더의 수많은 `최종 / 최최종 / 진짜최종` 파일 확인
+4. 문등대에서 실제 결재문서와 결과보고 검색
+5. 소방계획서와 피난동선도 확인
+6. 총 10개 단서 수집
+7. 원하면 단서를 다 모으기 전에도 팀장에게 보고 가능
+8. 10/10 달성 시 팀장이 자동 호출
+9. 팀장 5문항 보고
+10. S/A/B/C 등급 확인
+11. 엔딩 후 경품 추첨 응모
 
-## 주요 구조
+## 핵심 연출
 
-- `story.ts`
-  스토리 비트, 분기, 배경 전환, 엔딩 흐름 정의
-- `lib/game.ts`
-  진행 상태, 선택 처리, 점수 계산
-- `app/page.tsx`
-  게임 UI, 화면 전환, 결과 제출 처리
-- `app/api/submit/route.ts`
-  서버 측 결과 저장
+### 업무PC UI
 
-## 현재 진행 상황
+메인 메뉴는 실제 자리에서 업무용 모니터를 보는 느낌으로 구성합니다.
 
-- `Stage 1` 과일 수수 케이스 배경/문구 흐름 정리 완료
-- 배경 컷 전환 흐름 보강
-  야근 사무실 -> 바구니 클로즈업 -> 열린 바구니 -> 익명 제보/소명서
-- 시작 화면 제목을 `공직 청렴 스토리 게임`으로 정리
-- Scene 배지는 특수 컷에서도 `사무실`로 자연스럽게 보이도록 처리
-- 장면 이동 패널은 `localhost`, `127.0.0.1`에서만 보이도록 제한
+- 📁 업무폴더
+- 📑 문등대
+- 🧩 단서함
+- 👔 보고하러 가기
+- 💬 전임자 메신저
+- 📞 전임자 전화
 
-## 현재 게임 플레이
+### 담당자 독백
 
-- `Stage 1`부터 `Stage 5`까지 선택형 스토리 진행
-- 분기 결과마다 법령 요약 카드와 점수 반영
-- 일부 스테이지에는 제한 시간과 숨은 선택지 연출 적용
-- 엔딩에서 최종 점수와 제출 결과 표시
+의미 있는 선택마다 담당자의 판단이 짧게 출력됩니다.
 
-## 점수
+예:
 
-```text
-finalScore = clamp(integrity - risk * 4 + trust * 3, 0, 100)
-```
+> “……최종이 왜 이렇게 많아.”
 
-## 자산 관리
+> “이건 건축 준공도면이네. 합동소방훈련과 직접적인 관련은 없어 보여…”
 
-원본과 게임용 최종본을 분리해서 관리합니다.
+> “공용폴더에는 10월 15일이었는데… 결재문서는 10월 22일이네.”
 
-- 원본 배경: `assets-source/bg`
-- 게임용 최종 배경: `public/bg`
-- 캐릭터: `public/chars`
+### 전임자 힌트
 
-배경 원본은 PNG 등 원본 그대로 보관하고, 게임에서는 최적화된 JPG만 사용합니다.
+막힐 경우 메신저 또는 전화로 힌트를 받을 수 있습니다. 힌트 사용은 점수 감점 요소가 아닙니다.
 
-## 배경 최적화 파이프라인
+## 단서 10개
 
-원본 배경 이미지를 `assets-source/bg`에 넣은 뒤 아래 스크립트를 실행합니다.
+1. 공용폴더 계획자료
+2. 최종 결재 훈련일
+3. 실제 실시일
+4. 추진근거
+5. 협조기관
+6. 훈련 진행순서
+7. 예산·준비사항
+8. 피난계획
+9. 피난동선
+10. 실제 훈련내용
 
-```powershell
-powershell -ExecutionPolicy Bypass -File .\scripts\optimize-bg.ps1
-```
+## 팀장 보고
 
-결과:
+총 5문항이며, 문항별로 정답/오답에 따라 팀장 반응이 다르게 출력됩니다.
 
-- 출력 폴더: `public/bg`
-- 출력 형식: `1600x900` JPG
+평가 등급:
 
-## 현재 반영된 Stage 1 배경 자산
+- 5/5 → `S · 청사관리 마스터`
+- 4/5 → `A · 믿고 맡길 주무관`
+- 2~3/5 → `B · 인수인계 적응 완료`
+- 0~1/5 → `C · 이제 업무 시작`
 
-- `office_day`
-- `office_evening`
-- `office_night`
-- `office_night_basket`
-- `fruit_basket_closeup`
-- `fruit_basket_closeup_v2`
-- `fruit_basket_opened`
-- `anonymous_report_desk`
+단서 수나 힌트 횟수는 감점하지 않고 결과 화면에 플레이 기록으로만 표시합니다.
 
-## Gemini 배경 작업 문서
+## Supabase
 
-- 프롬프트 팩: `docs/gemini-background-prompts.md`
-- 제작 계획: `docs/image-production-plan.md`
+현재 별도 Supabase 프로젝트를 이 게임 전용으로 사용합니다.
 
-## 제출 저장 필드
+### `game_sessions`
 
-`game_submissions` 테이블에 아래 값이 저장됩니다.
+게임 시작/완료 및 결과 기록용입니다.
 
+주요 필드:
+
+- `id`
+- `started_at`
+- `completed_at`
+- `clues_collected`
+- `report_clues`
+- `correct_answers`
+- `grade`
+- `messenger_hints`
+- `phone_hints`
+
+### `raffle_entries`
+
+완주자 경품 추첨 응모용입니다.
+
+주요 필드:
+
+- `session_id`
 - `participant_name`
 - `affiliation`
-- `submitted_at`
-- `ending_label`
-- `final_score`
-- `integrity`
-- `risk`
-- `trust`
+- `phone_digits`
+- `consented_at`
+- `created_at`
+- `is_winner`
 
-## Supabase 테이블
+휴대전화 번호는 숫자만 정규화한 `010XXXXXXXX` 형식으로 저장하며 `UNIQUE` 제약을 적용해 동일 번호의 중복 응모를 막습니다.
 
-```sql
-create table public.game_submissions (
-  id text primary key,
-  participant_name text not null,
-  affiliation text not null,
-  submitted_at timestamptz not null,
-  ending_label text,
-  final_score integer not null,
-  integrity integer not null,
-  risk integer not null,
-  trust integer not null
-);
-```
+## 개인정보 / RLS
 
-이미 테이블이 있다면 아래 SQL만 추가로 실행합니다.
+- 일반 플레이어는 경품 응모정보를 조회할 수 없음
+- 참가자 데이터는 필요한 쓰기만 허용
+- `raffle_entries.phone_digits`에는 UNIQUE 제약 적용
+- 운영/추첨용 개인정보 조회는 향후 관리자 기능에서만 수행
+- Service Role Key 같은 비밀값은 GitHub에 커밋하지 않음
 
-```sql
-alter table public.game_submissions
-add column if not exists ending_label text;
-```
+## 현재 구현 상태
 
-## Supabase 보안
+구현 완료:
 
-`game_submissions`는 서버만 쓰도록 설계되어 있습니다.
+- 모바일 세로형 기본 UI
+- 업무폴더 / 문등대 / 단서함 / 보고하기
+- HWP 느낌의 계획안 / 결과보고 / 소방계획서
+- 피난동선도
+- 단서 10개
+- 담당자 독백 및 관련 없는 선택 반응
+- 전임자 메신저/전화 힌트
+- 조기 보고 및 10/10 자동 호출
+- 팀장 5문항 및 문항별 반응
+- 결과 등급
+- 엔딩
+- Supabase 게임세션 및 경품응모 저장 구조
+- 동일 휴대전화 번호 중복응모 방지
+- Vercel production 배포
 
-- Server route: `app/api/submit/route.ts`
-- Required secrets: `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`
-- Security SQL: `docs/supabase-server-only-security.sql`
-- Notes: `docs/supabase-server-only-security.md`
+다음 작업:
 
-RLS 정책 SQL은 Supabase `SQL Editor`에서 적용합니다.
-이 설정으로 `anon`, `authenticated`의 Data API 직접 쓰기를 막고, 서버의 service role만 저장 가능하게 합니다.
+- 감성적인 오리지널 애니메이션풍 배경 일러스트 삽입
+- 업무PC/모니터 비주얼 고급화
+- HWP 문서 재현도 개선
+- 실제 휴대폰 플레이 테스트 및 터치 UX 조정
+- 관리자용 참가현황 / 3명 추첨 화면
+- PWA manifest 및 행사장 QR 최종 운영 설정
 
-## 행정망 / 외부 서비스 운영 원칙
+## 주요 파일
 
-이 저장소는 `GitHub`, `Vercel`, `Supabase` 같은 외부 서비스를 함께 사용합니다.
-작업 PC가 공무원 행정망일 수 있으므로, 이후 작업은 아래 원칙을 기본으로 합니다.
+- `app/page.tsx` — 게임 로직 및 화면 구성
+- `app/globals.css` — 모바일 UI / 업무PC / 문서 스타일
+- `app/layout.tsx` — 메타데이터
+- `docs/handover-game-spec.md` — 게임 기획 요약
+- `docs/handover-game-build-note.md` — 구현 메모
 
-- 기본은 `read-only` 확인부터 시작하고, 배포/스키마 변경/환경변수 갱신은 필요할 때만 진행합니다.
-- 비밀값은 채팅이나 커밋에 직접 남기지 않고, 가능하면 세션 환경변수 또는 대시보드에서만 사용합니다.
-- `service_role`, 장기 토큰, 운영용 키는 최소 범위로 쓰고 작업 후 revoke 또는 교체를 우선 검토합니다.
-- `.vercel/.env.development.local`, 로컬 CLI 인증 정보, 임시 링크 정보는 로컬 전용으로 취급하고 저장소에 커밋하지 않습니다.
-- 업무자료, 개인정보, 내부망 전용 정보, 민감한 운영 데이터는 이 저장소나 외부 AI 대화에 넣지 않습니다.
-- 행정망에서는 보수적으로 움직이며, 확인 목적의 조회와 로컬 개발을 우선하고 외부 반영은 한 번 더 점검합니다.
+기존 청렴 스토리 게임용 `app/api/submit/route.ts`는 제거되었습니다. 저장소의 `main` 브랜치는 현재 **「인수인계의 전설」 개발본**을 기준으로 합니다.
 
-### 현재 연결 참고
+## 콘텐츠 관련 주의
 
-- GitHub repo: `dongjoo-cpf19b/AIgame`
-- Vercel project: `dongjoo-cpf19bs-projects/a-igame`
-- Supabase project ref: `vcgkszoamkjalhtzrupd`
-
-필요하면 이후 세션에서도 이 기준을 우선 적용해 작업합니다.
+현재 2025년 훈련일자, 문서번호, 협조기관 등 일부 내용은 **게임 시나리오용 설정**입니다. 실제 행사 최종본 제작 시 필요한 항목은 실제 성남시 자료 및 현행 법령과 다시 대조해 확정합니다.
