@@ -32,7 +32,10 @@ alter table public.raffle_entries enable row level security;
 revoke all on public.game_sessions from anon, authenticated;
 revoke all on public.raffle_entries from anon, authenticated;
 
-grant insert, update on public.game_sessions to anon, authenticated;
+grant insert on public.game_sessions to anon, authenticated;
+grant select (id) on public.game_sessions to anon, authenticated;
+grant update (completed_at, clues_collected, report_clues, correct_answers, grade, messenger_hints, phone_hints)
+on public.game_sessions to anon, authenticated;
 grant insert on public.raffle_entries to anon, authenticated;
 
 create policy "public_can_start_game"
