@@ -154,7 +154,7 @@
   100% { opacity: 0; transform: translate3d(-260px, 390px, 0) rotate(-420deg); }
 }
 
-@media (min-aspect-ratio: 9 / 16) {
+@media (max-width: 640px) and (min-aspect-ratio: 9 / 16) {
   .intro .primaryBtn {
     bottom: 2% !important;
     width: 68% !important;
