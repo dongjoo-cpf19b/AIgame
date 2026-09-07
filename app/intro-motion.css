@@ -96,9 +96,10 @@
   position: absolute !important;
   z-index: 5;
   left: 50% !important;
-  bottom: 14.1% !important;
-  width: 62% !important;
-  min-height: clamp(50px, 7.2dvh, 62px) !important;
+  bottom: 14.5% !important;
+  width: 68% !important;
+  height: 9.5% !important;
+  min-height: 0 !important;
   margin: 0 !important;
   padding: 0 24px !important;
   transform: translateX(-50%);
@@ -155,14 +156,15 @@
 
 @media (min-aspect-ratio: 9 / 16) {
   .intro .primaryBtn {
-    bottom: 10.2% !important;
-    width: 58% !important;
+    bottom: 2% !important;
+    width: 68% !important;
+    height: 16% !important;
   }
 }
 
 @media (max-height: 680px) {
   .intro .primaryBtn {
-    min-height: 51px !important;
+    min-height: 0 !important;
   }
 }
 
