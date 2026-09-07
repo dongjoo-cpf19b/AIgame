@@ -1,0 +1,177 @@
+/* Portrait intro prototype: cinematic motion without audio/video.
+   The poster provides the character/story art; the real start button remains HTML. */
+
+.intro {
+  isolation: isolate;
+  background: #0d1b2b;
+}
+
+.introSky {
+  inset: -2.5%;
+  background-image: url('/art/intro-character-poster.webp') !important;
+  background-size: cover !important;
+  background-position: center center !important;
+  background-repeat: no-repeat !important;
+  transform: scale(1.015) translate3d(0, 0, 0);
+  animation: introCameraDrift 15s ease-in-out infinite alternate;
+  will-change: transform, filter;
+}
+
+/* moving daylight / glass reflection */
+.introSky::after {
+  content: "";
+  position: absolute;
+  inset: -12%;
+  background:
+    radial-gradient(circle at 78% 18%, rgba(255,255,238,.28) 0 3%, transparent 18%),
+    linear-gradient(112deg, transparent 27%, rgba(255,255,255,.10) 43%, transparent 58%),
+    linear-gradient(180deg, transparent 63%, rgba(5,15,30,.18) 100%);
+  mix-blend-mode: screen;
+  pointer-events: none;
+  animation: introSunSweep 9s ease-in-out infinite alternate;
+}
+
+/* very light floating particles/leaves; intentionally subtle */
+.intro::before,
+.intro::after {
+  content: "";
+  position: absolute;
+  z-index: 2;
+  width: 12px;
+  height: 7px;
+  border-radius: 100% 0 100% 0;
+  background: rgba(210, 229, 107, .58);
+  filter: blur(.15px);
+  pointer-events: none;
+  opacity: .65;
+}
+
+.intro::before {
+  left: 12%;
+  top: 19%;
+  animation: introLeafA 8.5s linear infinite;
+}
+
+.intro::after {
+  right: 13%;
+  top: 29%;
+  width: 9px;
+  height: 6px;
+  opacity: .48;
+  animation: introLeafB 10.5s linear infinite;
+}
+
+/* The poster already carries the title/story/tutorial visually.
+   Hide the previous duplicated copy while keeping the accessible real start button. */
+.introOverlay {
+  inset: 0 !important;
+  padding: 0 !important;
+  background: none !important;
+  pointer-events: none;
+  text-shadow: none !important;
+}
+
+.introOverlay > small,
+.introOverlay > h1,
+.introOverlay > p,
+.introOverlay > .message {
+  display: none !important;
+}
+
+.intro .primaryBtn {
+  position: absolute;
+  z-index: 5;
+  left: 20.5%;
+  bottom: 11.4%;
+  width: 59%;
+  min-height: 0;
+  height: clamp(52px, 7.2dvh, 64px);
+  border: 1px solid rgba(255,255,255,.68);
+  border-radius: 999px;
+  color: #12304c;
+  font-size: clamp(17px, 2.5dvh, 22px);
+  font-weight: 900;
+  letter-spacing: -.02em;
+  background: linear-gradient(100deg, rgba(146,195,255,.97), rgba(111,236,245,.98));
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,.20) inset,
+    0 0 24px rgba(94,202,255,.50),
+    0 10px 32px rgba(7,30,57,.30);
+  pointer-events: auto;
+  animation: introStartPulse 2.6s ease-in-out infinite;
+}
+
+.intro .primaryBtn::after {
+  content: "  →";
+}
+
+.intro .primaryBtn:active {
+  transform: scale(.965);
+  filter: brightness(.96);
+}
+
+@keyframes introCameraDrift {
+  0% {
+    transform: scale(1.018) translate3d(-.25%, -.15%, 0);
+    filter: saturate(1.02) brightness(1);
+  }
+  50% {
+    transform: scale(1.045) translate3d(.4%, -.45%, 0);
+    filter: saturate(1.06) brightness(1.025);
+  }
+  100% {
+    transform: scale(1.028) translate3d(-.1%, .18%, 0);
+    filter: saturate(1.035) brightness(1.01);
+  }
+}
+
+@keyframes introSunSweep {
+  from { transform: translate3d(-4%, -1%, 0); opacity: .56; }
+  to   { transform: translate3d(5%, 2%, 0); opacity: .88; }
+}
+
+@keyframes introLeafA {
+  0%   { transform: translate3d(-28px,-30px,0) rotate(0deg); opacity: 0; }
+  14%  { opacity: .7; }
+  72%  { opacity: .55; }
+  100% { transform: translate3d(270px,410px,0) rotate(430deg); opacity: 0; }
+}
+
+@keyframes introLeafB {
+  0%   { transform: translate3d(36px,-45px,0) rotate(20deg); opacity: 0; }
+  18%  { opacity: .5; }
+  78%  { opacity: .42; }
+  100% { transform: translate3d(-220px,370px,0) rotate(-390deg); opacity: 0; }
+}
+
+@keyframes introStartPulse {
+  0%,100% { box-shadow: 0 0 0 1px rgba(255,255,255,.20) inset, 0 0 18px rgba(94,202,255,.40), 0 10px 32px rgba(7,30,57,.28); }
+  50% { box-shadow: 0 0 0 1px rgba(255,255,255,.30) inset, 0 0 32px rgba(94,202,255,.66), 0 12px 36px rgba(7,30,57,.34); }
+}
+
+/* Tall phones: keep the poster composition centered instead of stretching UI. */
+@media (max-aspect-ratio: 9/18.5) {
+  .introSky {
+    background-position: center center !important;
+  }
+  .intro .primaryBtn {
+    bottom: 11.8%;
+  }
+}
+
+@media (max-height: 720px) {
+  .intro .primaryBtn {
+    height: 46px;
+    font-size: 16px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .introSky,
+  .introSky::after,
+  .intro::before,
+  .intro::after,
+  .intro .primaryBtn {
+    animation: none !important;
+  }
+}
