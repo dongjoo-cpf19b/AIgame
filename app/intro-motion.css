@@ -1,104 +1,189 @@
-/* Portrait intro prototype: cinematic motion without audio/video.
-   The poster provides the character/story art; the real start button remains HTML. */
+/* Lightweight portrait intro: layered game UI, no audio/video, no heavy filters. */
 
 .intro {
   isolation: isolate;
-  background: #0d1b2b;
+  contain: paint;
+  overflow: hidden;
+  background: #071522;
 }
 
+/* Background layer: same city-hall art, movement via transform only. */
 .introSky {
-  inset: -2.5%;
-  background-image: url('/art/intro-character-poster.webp') !important;
+  inset: -3% !important;
+  background-image: url('/art/city-morning.webp') !important;
   background-size: cover !important;
-  background-position: center center !important;
+  background-position: center 46% !important;
   background-repeat: no-repeat !important;
-  transform: scale(1.015) translate3d(0, 0, 0);
-  animation: introCameraDrift 15s ease-in-out infinite alternate;
-  will-change: transform, filter;
+  transform: scale(1.04) translate3d(0, 0, 0);
+  animation: introBgMove 18s ease-in-out infinite alternate;
+  will-change: transform;
 }
 
-/* moving daylight / glass reflection */
 .introSky::after {
   content: "";
   position: absolute;
-  inset: -12%;
-  background:
-    radial-gradient(circle at 78% 18%, rgba(255,255,238,.28) 0 3%, transparent 18%),
-    linear-gradient(112deg, transparent 27%, rgba(255,255,255,.10) 43%, transparent 58%),
-    linear-gradient(180deg, transparent 63%, rgba(5,15,30,.18) 100%);
-  mix-blend-mode: screen;
+  inset: 0;
   pointer-events: none;
-  animation: introSunSweep 9s ease-in-out infinite alternate;
+  background:
+    radial-gradient(circle at 72% 16%, rgba(255,255,235,.30) 0 4%, transparent 24%),
+    linear-gradient(180deg, rgba(4,17,31,.08) 0%, rgba(4,17,31,.05) 36%, rgba(4,15,28,.52) 72%, rgba(3,10,19,.82) 100%);
+  animation: introLight 6s ease-in-out infinite alternate;
 }
 
-/* very light floating particles/leaves; intentionally subtle */
-.intro::before,
-.intro::after {
+/* Character layer: crop only the character region from the existing poster asset. */
+.intro::before {
   content: "";
   position: absolute;
   z-index: 2;
+  left: -7%;
+  top: 22%;
+  width: 78%;
+  height: 42%;
+  border-radius: 0 28px 28px 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(90deg, rgba(7,21,34,.02) 62%, rgba(7,21,34,.24) 100%),
+    url('/art/intro-character-poster.webp');
+  background-size: 205% auto;
+  background-position: 8% 32%;
+  background-repeat: no-repeat;
+  box-shadow: 0 18px 40px rgba(2,10,18,.22);
+  opacity: 0;
+  animation:
+    introCharacterIn .55s cubic-bezier(.2,.75,.2,1) .25s forwards,
+    introCharacterFloat 4.8s ease-in-out 1.0s infinite;
+  will-change: transform, opacity;
+}
+
+/* One tiny moving leaf is enough to make the frame feel alive. */
+.intro::after {
+  content: "";
+  position: absolute;
+  z-index: 3;
+  top: 19%;
+  right: 8%;
   width: 12px;
   height: 7px;
   border-radius: 100% 0 100% 0;
-  background: rgba(210, 229, 107, .58);
-  filter: blur(.15px);
+  background: rgba(204,225,111,.76);
   pointer-events: none;
-  opacity: .65;
+  opacity: 0;
+  animation: introLeaf 10s linear 1.1s infinite;
+  will-change: transform, opacity;
 }
 
-.intro::before {
-  left: 12%;
-  top: 19%;
-  animation: introLeafA 8.5s linear infinite;
-}
-
-.intro::after {
-  right: 13%;
-  top: 29%;
-  width: 9px;
-  height: 6px;
-  opacity: .48;
-  animation: introLeafB 10.5s linear infinite;
-}
-
-/* The poster already carries the title/story/tutorial visually.
-   Hide the previous duplicated copy while keeping the accessible real start button. */
 .introOverlay {
   inset: 0 !important;
-  padding: 0 !important;
+  z-index: 4;
+  display: flex !important;
+  flex-direction: column;
+  padding: max(16px, env(safe-area-inset-top)) 16px calc(14px + env(safe-area-inset-bottom)) !important;
+  color: #fff;
   background: none !important;
+  text-shadow: 0 2px 10px rgba(0,0,0,.36) !important;
   pointer-events: none;
-  text-shadow: none !important;
 }
 
-.introOverlay > small,
-.introOverlay > h1,
-.introOverlay > p,
+.introOverlay > small {
+  display: block !important;
+  margin: 0;
+  color: #ccecff;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: .09em;
+  text-transform: uppercase;
+  opacity: 0;
+  animation: introUiIn .42s ease-out .05s forwards;
+}
+
+.introOverlay > h1 {
+  display: block !important;
+  margin: 3px 0 6px !important;
+  font-size: clamp(29px, 4.8dvh, 38px) !important;
+  line-height: 1.06;
+  letter-spacing: -.04em;
+  opacity: 0;
+  animation: introUiIn .48s ease-out .14s forwards;
+}
+
+.introOverlay > p {
+  display: block !important;
+  margin: 0;
+  width: 72%;
+  font-size: clamp(13px, 1.9dvh, 15px);
+  line-height: 1.48 !important;
+  opacity: 0;
+  animation: introUiIn .48s ease-out .24s forwards;
+}
+
+.introOverlay > p b {
+  color: #fff;
+  font-weight: 900;
+}
+
+/* Reuse the existing message DOM as the actual play-guide card. */
 .introOverlay > .message {
+  display: block !important;
+  position: relative;
+  margin: auto 0 8px !important;
+  padding: 10px 12px !important;
+  border: 1px solid rgba(185,224,255,.30) !important;
+  border-radius: 14px !important;
+  background: rgba(5,18,31,.82) !important;
+  box-shadow: 0 10px 26px rgba(2,11,20,.24);
+  text-shadow: none;
+  opacity: 0;
+  transform: translateY(12px);
+  animation: introUiIn .5s ease-out .60s forwards;
+}
+
+.introOverlay > .message b,
+.introOverlay > .message p {
   display: none !important;
 }
 
-.intro .primaryBtn {
-  position: absolute;
-  z-index: 5;
-  left: 20.5%;
-  bottom: 11.4%;
-  width: 59%;
-  min-height: 0;
-  height: clamp(52px, 7.2dvh, 64px);
-  border: 1px solid rgba(255,255,255,.68);
-  border-radius: 999px;
-  color: #12304c;
-  font-size: clamp(17px, 2.5dvh, 22px);
+.introOverlay > .message::before {
+  content: "플레이 방법";
+  display: block;
+  margin-bottom: 6px;
+  color: #7ee9ff;
+  font-size: 12px;
   font-weight: 900;
+  letter-spacing: .04em;
+}
+
+.introOverlay > .message::after {
+  content: "① 업무폴더와 문등대에서 자료를 확인하세요\A② 음영 표시된 단서를 찾아 모으세요\A③ 단서를 정리해 팀장님께 보고하세요";
+  display: block;
+  white-space: pre-line;
+  color: #f7fbff;
+  font-size: 12.5px;
+  line-height: 1.55;
+}
+
+.intro .primaryBtn {
+  position: relative !important;
+  z-index: 5;
+  left: auto !important;
+  bottom: auto !important;
+  width: 100% !important;
+  height: 50px !important;
+  min-height: 50px !important;
+  margin: 0 !important;
+  border: 1px solid rgba(255,255,255,.56) !important;
+  border-radius: 14px !important;
+  color: #09223a !important;
+  font-size: 16px !important;
+  font-weight: 900 !important;
   letter-spacing: -.02em;
-  background: linear-gradient(100deg, rgba(146,195,255,.97), rgba(111,236,245,.98));
-  box-shadow:
-    0 0 0 1px rgba(255,255,255,.20) inset,
-    0 0 24px rgba(94,202,255,.50),
-    0 10px 32px rgba(7,30,57,.30);
+  background: linear-gradient(100deg,#8dc6ff 0%,#6fe6ef 100%) !important;
+  box-shadow: 0 8px 22px rgba(7,39,70,.24) !important;
   pointer-events: auto;
-  animation: introStartPulse 2.6s ease-in-out infinite;
+  opacity: 0;
+  transform: translateY(10px);
+  animation:
+    introUiIn .48s ease-out .78s forwards,
+    introButtonBreathe 2.8s ease-in-out 1.6s infinite;
 }
 
 .intro .primaryBtn::after {
@@ -106,64 +191,103 @@
 }
 
 .intro .primaryBtn:active {
-  transform: scale(.965);
-  filter: brightness(.96);
+  transform: scale(.97) !important;
 }
 
-@keyframes introCameraDrift {
-  0% {
-    transform: scale(1.018) translate3d(-.25%, -.15%, 0);
-    filter: saturate(1.02) brightness(1);
+.introOverlay::after {
+  content: "예상 플레이 시간 약 5분";
+  display: block;
+  margin-top: 6px;
+  text-align: center;
+  color: rgba(235,246,255,.76);
+  font-size: 10.5px;
+  letter-spacing: .02em;
+  opacity: 0;
+  animation: introUiIn .42s ease-out .92s forwards;
+}
+
+@keyframes introBgMove {
+  from { transform: scale(1.04) translate3d(-.5%, -.2%, 0); }
+  to   { transform: scale(1.075) translate3d(.7%, -.8%, 0); }
+}
+
+@keyframes introLight {
+  from { opacity: .78; }
+  to   { opacity: 1; }
+}
+
+@keyframes introCharacterIn {
+  from { opacity: 0; transform: translate3d(-14px, 12px, 0) scale(.985); }
+  to   { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
+}
+
+@keyframes introCharacterFloat {
+  0%,100% { transform: translate3d(0,0,0) scale(1); }
+  50% { transform: translate3d(0,-4px,0) scale(1.004); }
+}
+
+@keyframes introUiIn {
+  from { opacity: 0; transform: translate3d(0,10px,0); }
+  to   { opacity: 1; transform: translate3d(0,0,0); }
+}
+
+@keyframes introButtonBreathe {
+  0%,100% { transform: scale(1); }
+  50% { transform: scale(1.012); }
+}
+
+@keyframes introLeaf {
+  0% { opacity: 0; transform: translate3d(20px,-24px,0) rotate(0deg); }
+  12% { opacity: .70; }
+  72% { opacity: .58; }
+  100% { opacity: 0; transform: translate3d(-250px,360px,0) rotate(-420deg); }
+}
+
+@media (max-height: 760px) {
+  .introOverlay {
+    padding: max(10px, env(safe-area-inset-top)) 12px calc(9px + env(safe-area-inset-bottom)) !important;
   }
-  50% {
-    transform: scale(1.045) translate3d(.4%, -.45%, 0);
-    filter: saturate(1.06) brightness(1.025);
+  .introOverlay > h1 {
+    font-size: 28px !important;
+    margin-bottom: 3px !important;
   }
-  100% {
-    transform: scale(1.028) translate3d(-.1%, .18%, 0);
-    filter: saturate(1.035) brightness(1.01);
+  .introOverlay > p {
+    font-size: 12px;
+    line-height: 1.35 !important;
   }
-}
-
-@keyframes introSunSweep {
-  from { transform: translate3d(-4%, -1%, 0); opacity: .56; }
-  to   { transform: translate3d(5%, 2%, 0); opacity: .88; }
-}
-
-@keyframes introLeafA {
-  0%   { transform: translate3d(-28px,-30px,0) rotate(0deg); opacity: 0; }
-  14%  { opacity: .7; }
-  72%  { opacity: .55; }
-  100% { transform: translate3d(270px,410px,0) rotate(430deg); opacity: 0; }
-}
-
-@keyframes introLeafB {
-  0%   { transform: translate3d(36px,-45px,0) rotate(20deg); opacity: 0; }
-  18%  { opacity: .5; }
-  78%  { opacity: .42; }
-  100% { transform: translate3d(-220px,370px,0) rotate(-390deg); opacity: 0; }
-}
-
-@keyframes introStartPulse {
-  0%,100% { box-shadow: 0 0 0 1px rgba(255,255,255,.20) inset, 0 0 18px rgba(94,202,255,.40), 0 10px 32px rgba(7,30,57,.28); }
-  50% { box-shadow: 0 0 0 1px rgba(255,255,255,.30) inset, 0 0 32px rgba(94,202,255,.66), 0 12px 36px rgba(7,30,57,.34); }
-}
-
-/* Tall phones: keep the poster composition centered instead of stretching UI. */
-@media (max-aspect-ratio: 9/18.5) {
-  .introSky {
-    background-position: center center !important;
+  .intro::before {
+    top: 21%;
+    height: 39%;
+  }
+  .introOverlay > .message {
+    padding: 8px 10px !important;
+    margin-bottom: 6px !important;
+  }
+  .introOverlay > .message::before {
+    margin-bottom: 4px;
+    font-size: 11px;
+  }
+  .introOverlay > .message::after {
+    font-size: 11.2px;
+    line-height: 1.43;
   }
   .intro .primaryBtn {
-    bottom: 11.8%;
+    height: 45px !important;
+    min-height: 45px !important;
+    font-size: 15px !important;
+  }
+  .introOverlay::after {
+    margin-top: 4px;
+    font-size: 9.5px;
   }
 }
 
-@media (max-height: 720px) {
-  .intro .primaryBtn {
-    height: 46px;
-    font-size: 16px;
-  }
+@media (max-height: 670px) {
+  .introOverlay > small { font-size: 9.5px; }
+  .introOverlay > h1 { font-size: 25px !important; }
+  .introOverlay > p { width: 78%; font-size: 11px; }
+  .intro::before { top: 20%; height: 36%; width: 72%; }
+  .introOverlay > .message::after { font-size: 10.5px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -171,7 +295,14 @@
   .introSky::after,
   .intro::before,
   .intro::after,
-  .intro .primaryBtn {
+  .introOverlay > small,
+  .introOverlay > h1,
+  .introOverlay > p,
+  .introOverlay > .message,
+  .intro .primaryBtn,
+  .introOverlay::after {
     animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
   }
 }
