@@ -110,7 +110,7 @@ export default function Page(){
     return null;
   }
 
-  if(screen==="intro")return <main className="page"><section className="intro"><div className="introSky"/><div className="introOverlay"><small>성남시청 청사관리 업무 체험</small><h1>인수인계의 전설</h1><p>전임자는 떠났습니다.<br/><b>인수인계서는 없습니다.</b></p><div className="message"><b>👔 팀장님</b><p>“작년에 했던 합동소방훈련 있죠? 올해도 해야 하니까 작년 자료 한번 파악해봐요.”</p></div><button className="primaryBtn" onClick={start}>업무 시작하기</button></div></section></main>;
+  if(screen==="intro")return <main className="page"><section className="intro"><div className="introSky"/><div className="introOverlay"><small>성남시청 신규 담당자 업무 시뮬레이션</small><h1>인수인계의 전설</h1><p>전임자는 떠났습니다.<br/><b>인수인계서는 없습니다.</b><br/>그래도 오늘의 업무는 시작됩니다.</p><div className="message"><b>플레이 방법</b><p>업무 폴더와 문등대에서 자료를 확인하고, 음영 표시된 단서를 모아 팀장님께 보고하세요.</p></div><button className="primaryBtn" onClick={start}>업무 시작하기</button></div></section></main>;
 
   return <main className="page"><section className="gameShell"><header><div><small>업무 파악</small><b>🧩 단서 {found.length} / 10</b></div><span>성남시청 업무PC</span></header><div className="office"><div className="monitor"><div className="monitorBar"><span>성남시청 업무PC</span><span>● 연결됨</span></div><div className="monitorScreen">{mainContent()}</div><nav><button onClick={()=>go("desktop","일단 작년 자료부터 찾아보자.")}>🏠 홈</button><button onClick={()=>hint("msg")}>💬 메신저</button><button onClick={()=>hint("call")}>📞 전화</button></nav></div><div className="stand"/><div className="base"/></div><div className="dialogue"><div>👤</div><p><b>담당자</b><br/>{line}</p></div></section></main>;
 }
