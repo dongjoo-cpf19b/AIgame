@@ -7,13 +7,15 @@
   background: #10263b;
 }
 
-/* The supplied poster already contains the title, guide, character and city. */
+/* A soft full-bleed copy fills the frame behind the uncropped poster. */
 .introSky {
-  inset: 0 !important;
+  inset: -18px !important;
   background-image: url('/art/handover-cover.jpg') !important;
   background-position: center center !important;
   background-repeat: no-repeat !important;
   background-size: cover !important;
+  filter: blur(14px) brightness(.58) saturate(.82);
+  transform: scale(1.04);
 }
 
 .introSky::after {
@@ -27,9 +29,18 @@
   animation: introLight 5.8s ease-in-out infinite alternate;
 }
 
-/* Previous character crop is unnecessary because the character is in the poster. */
+/* Keep almost the full poster width while avoiding large letterbox bands. */
 .intro::before {
-  display: none !important;
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: block !important;
+  background-image: url('/art/handover-cover.jpg');
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: 112% auto;
+  pointer-events: none;
 }
 
 /* A single drifting leaf adds game-like life without another asset download. */
@@ -84,9 +95,9 @@
   position: absolute !important;
   z-index: 5;
   left: 50% !important;
-  bottom: 10.45% !important;
-  width: 76% !important;
-  min-height: clamp(58px, 8.2dvh, 72px) !important;
+  bottom: 14.1% !important;
+  width: 62% !important;
+  min-height: clamp(50px, 7.2dvh, 62px) !important;
   margin: 0 !important;
   padding: 0 24px !important;
   transform: translateX(-50%);
@@ -162,9 +173,15 @@
   100% { opacity: 0; transform: translate3d(-260px, 390px, 0) rotate(-420deg); }
 }
 
+@media (min-aspect-ratio: 9 / 16) {
+  .intro .primaryBtn {
+    bottom: 10.2% !important;
+    width: 58% !important;
+  }
+}
+
 @media (max-height: 680px) {
   .intro .primaryBtn {
-    bottom: 8.2% !important;
     min-height: 51px !important;
     font-size: 17px !important;
   }
