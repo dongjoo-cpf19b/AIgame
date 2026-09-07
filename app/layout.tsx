@@ -4,6 +4,7 @@ import RuntimeFix from "./runtime-fix";
 import "./globals.css";
 import "./art-direction.css";
 import "./viewport-fit.css";
+import "./intro-motion.css";
 
 export const metadata: Metadata = {
   title: "인수인계의 전설",
