@@ -108,15 +108,7 @@
 }
 
 .intro .primaryBtn::before {
-  content: "";
-  position: absolute;
-  top: -120%;
-  left: -42%;
-  width: 32%;
-  height: 340%;
-  transform: rotate(22deg);
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, .62), transparent);
-  animation: introButtonShine 4.8s 1.1s ease-in-out infinite;
+  display: none;
 }
 
 .intro .primaryBtn::after {
@@ -161,12 +153,6 @@
     transform: translateX(-50%) scale(1.012);
     box-shadow: 0 13px 36px rgba(35, 193, 240, .48), 0 0 16px rgba(104, 235, 255, .2), inset 0 1px 0 rgba(255, 255, 255, .9);
   }
-}
-
-@keyframes introButtonShine {
-  0%, 54% { left: -42%; opacity: 0; }
-  62% { opacity: .8; }
-  76%, 100% { left: 115%; opacity: 0; }
 }
 
 @keyframes introLeaf {
