@@ -1,0 +1,66 @@
+button {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+button:enabled:active {
+  scale: .97;
+  filter: brightness(1.08);
+}
+button:focus-visible {
+  outline: 3px solid #45b9d7;
+  outline-offset: 3px;
+}
+.buttonFeedbackLayer {
+  position: fixed;
+  inset: 0;
+  z-index: 11000;
+  overflow: hidden;
+  pointer-events: none;
+}
+.buttonBurst {
+  position: absolute;
+  width: 0;
+  height: 0;
+  animation: buttonBurstLifetime .48s linear forwards;
+}
+.buttonBurst::before {
+  content: "";
+  position: absolute;
+  left: -18px;
+  top: -18px;
+  width: 36px;
+  height: 36px;
+  border: 2px solid #96e8f5;
+  border-radius: 50%;
+  background: radial-gradient(circle, #ffffff88, #94e6f52e 55%, transparent 70%);
+  box-shadow: 0 0 9px #6adbf866;
+  animation: buttonRipple .46s ease-out forwards;
+}
+.buttonBurst i {
+  position: absolute;
+  left: -2px;
+  top: -2px;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #b6edf7;
+  box-shadow: 0 0 4px #4fbdd7;
+  animation: buttonSpark .4s ease-out forwards;
+}
+@keyframes buttonBurstLifetime {
+  0%, 70% { opacity: 1; }
+  100% { opacity: 0; }
+}
+@keyframes buttonRipple {
+  from { transform: scale(.25); opacity: .95; }
+  to { transform: scale(2); opacity: 0; }
+}
+@keyframes buttonSpark {
+  from { transform: translate(0, 0) scale(.5); opacity: .9; }
+  to { transform: translate(var(--spark-x), var(--spark-y)) scale(.2); opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  button:enabled:active { scale: none; }
+  .buttonFeedbackLayer { display: none; }
+  .buttonBurst, .buttonBurst::before, .buttonBurst i { animation: none; }
+}

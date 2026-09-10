@@ -1,10 +1,13 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import RuntimeFix from "./runtime-fix";
+import ButtonFeedback from "./button-feedback";
 import "./globals.css";
 import "./art-direction.css";
 import "./viewport-fit.css";
 import "./intro-motion.css";
+import "./button-feedback.css";
+import "./gameplay.css";
 
 export const metadata: Metadata = {
   title: "인수인계의 전설",
@@ -17,6 +20,7 @@ export default function RootLayout({ children }: Readonly<{ children: ReactNode 
       <body>
         {children}
         <RuntimeFix />
+        <ButtonFeedback />
       </body>
     </html>
   );

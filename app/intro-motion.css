@@ -1,246 +1,222 @@
-/* Photo-led intro: one optimized Next.js image, one real button, no video. */
-
-.intro {
+/* Preserve the cover illustration; render the guide and action as real UI. */
+.page > .intro {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
   isolation: isolate;
-  contain: paint;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  background: #101f30;
+  border: 1px solid rgba(214, 235, 249, .3);
+  border-radius: 24px;
   container-type: inline-size;
+}
+.introArtwork {
+  position: relative;
   overflow: hidden;
-  background: #10263b;
+  flex: 1 0 auto;
+  width: 100%;
+  min-height: 0;
+  aspect-ratio: 941 / 1040;
+  max-height: min(62%, 125cqw);
+  background: #203b52 url('/art/handover-cover.jpg') center top / 112% auto no-repeat;
 }
-
-/* A soft full-bleed copy fills the frame behind the uncropped poster. */
-.introSky {
-  inset: -18px !important;
-  background-image: url('/art/handover-cover.jpg') !important;
-  background-position: center center !important;
-  background-repeat: no-repeat !important;
-  background-size: cover !important;
-  filter: blur(14px) brightness(.58) saturate(.82);
-  transform: scale(1.04);
-}
-
-.introSky::after {
+.introArtwork::before {
   content: "";
   position: absolute;
   inset: 0;
   pointer-events: none;
   background:
-    radial-gradient(circle at 62% 9%, rgba(255, 250, 186, .22), transparent 15%),
-    linear-gradient(180deg, rgba(3, 18, 31, .02), transparent 68%, rgba(3, 14, 25, .12));
-  animation: introLight 5.8s ease-in-out infinite alternate;
+    radial-gradient(ellipse at 64% 8%, #fff3c52b, transparent 48%),
+    linear-gradient(125deg, transparent 25%, #fff3d014 45%, transparent 64%);
+  animation: introSunlight 7s ease-in-out infinite alternate;
 }
-
-/* Keep almost the full poster width while avoiding large letterbox bands. */
-.intro::before {
-  content: "";
+/* Positions follow the cover's 112%-wide, top-aligned image, not viewport height. */
+.introTears,
+.introMotes {
   position: absolute;
   inset: 0;
-  z-index: 1;
-  display: block !important;
-  background-image: url('/art/handover-cover.jpg');
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: 112% auto;
   pointer-events: none;
 }
-
-/* A single drifting leaf adds game-like life without another asset download. */
-.intro::after {
-  content: "";
-  position: absolute;
-  z-index: 3;
-  top: 12%;
-  right: 7%;
-  width: 13px;
-  height: 8px;
-  border-radius: 100% 0 100% 0;
-  background: rgba(220, 232, 115, .76);
-  box-shadow: 0 0 8px rgba(255, 242, 151, .22);
-  pointer-events: none;
-  opacity: 0;
-  animation: introLeaf 10s linear 1.1s infinite;
-  will-change: transform, opacity;
-}
-
-/* The typo is baked into the poster, so replace only that one visible line. */
-.introCopyFix {
-  position: absolute;
-  z-index: 2;
-  left: 21.6%;
-  top: calc(50% + 53.5cqw);
-  width: 15cqw;
-  min-width: 54px;
-  padding: .25cqw 0 .35cqw;
-  transform: translate(-50%, -50%);
-  color: rgba(255, 255, 255, .92);
-  background: rgba(25, 34, 44, .97);
-  box-shadow: 0 0 4px 2px rgba(25, 34, 44, .97);
-  font-size: clamp(9px, 2.55cqw, 11px);
-  font-weight: 400;
-  line-height: 1;
-  letter-spacing: -.04em;
-  text-align: center;
-  white-space: nowrap;
-  pointer-events: none;
-}
-
-/* Small highlights travel down the existing painted tear paths. */
-.introTears {
-  position: absolute;
-  z-index: 2;
-  inset: 0;
-  pointer-events: none;
-}
-
 .introTears i {
   position: absolute;
-  top: calc(50% - 29cqw);
   left: 28.7%;
-  width: clamp(3px, 1cqw, 5px);
-  height: clamp(7px, 2.2cqw, 10px);
-  border-radius: 55% 55% 68% 68%;
-  background: linear-gradient(180deg, rgba(255,255,255,.94), rgba(190,231,255,.32));
-  box-shadow: 0 0 5px rgba(225, 247, 255, .82);
+  top: 71cqw;
+  width: clamp(2px, .75cqw, 3.5px);
+  height: clamp(5px, 1.8cqw, 8px);
+  border-radius: 60% 60% 65% 65%;
+  background: linear-gradient(180deg, #e0f5ff55, #fff 65%, #d5f1ffb3);
+  box-shadow: 0 0 4px #e7f8ff88;
   opacity: 0;
-  filter: blur(.15px);
-  animation: introTear 3.8s ease-in 1s infinite;
-  will-change: transform, opacity;
+  animation: introTearFlow 4.8s ease-in -1.2s infinite;
 }
-
+.introTears i::before {
+  content: "";
+  position: absolute;
+  bottom: 70%;
+  left: 35%;
+  width: 30%;
+  height: 3cqw;
+  background: linear-gradient(transparent, #e5f6ff66);
+}
 .introTears i + i {
-  top: calc(50% - 27.8cqw);
   left: 41.4%;
-  width: clamp(2px, .8cqw, 4px);
-  height: clamp(6px, 1.8cqw, 9px);
-  animation-delay: 2.8s;
-  animation-duration: 4.4s;
+  top: 72.2cqw;
+  width: clamp(2px, .6cqw, 3px);
+  animation-duration: 5.6s;
+  animation-delay: -3.5s;
 }
-
-.introOverlay {
-  inset: 0 !important;
-  z-index: 4;
-  display: block !important;
-  padding: 0 !important;
-  color: #fff;
-  background: none !important;
-  text-shadow: none !important;
+.introMotes i {
+  position: absolute;
+  top: 34%;
+  left: 77%;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: #fff0be;
+  box-shadow: 0 0 7px #fff0beaa;
+  opacity: 0;
+  animation: introMoteDrift 9s ease-in-out -2s infinite;
+}
+.introMotes i:nth-child(2) { top: 60%; left: 58%; animation-delay: -6s; }
+.introMotes i:nth-child(3) { top: 22%; left: 18%; width: 2px; height: 2px; animation-delay: -4s; }
+@keyframes introSunlight {
+  from { opacity: .2; }
+  to { opacity: .8; }
+}
+@keyframes introTearFlow {
+  0%, 12% { opacity: 0; transform: translate3d(0, 0, 0) scale(.6); }
+  22% { opacity: .9; }
+  62% { opacity: .8; transform: translate3d(-.2cqw, 6cqw, 0) scale(.9, 1.15); }
+  85%, 100% { opacity: 0; transform: translate3d(-.4cqw, 10cqw, 0) scale(.7, 1.2); }
+}
+@keyframes introMoteDrift {
+  0% { opacity: 0; transform: translate3d(0, 12px, 0); }
+  35%, 60% { opacity: .55; }
+  100% { opacity: 0; transform: translate3d(-16px, -32px, 0); }
+}
+.introArtwork::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 -1px;
+  height: 64px;
+  background: linear-gradient(transparent, #101f30);
   pointer-events: none;
 }
-
-/* Keep the written title and instructions available to assistive technology.
-   The visible typography is already part of the supplied poster artwork. */
-.introOverlay > small,
-.introOverlay > h1,
-.introOverlay > p,
-.introOverlay > .message {
-  position: absolute !important;
-  width: 1px !important;
-  height: 1px !important;
-  margin: -1px !important;
-  padding: 0 !important;
-  overflow: hidden !important;
-  clip: rect(0 0 0 0) !important;
-  clip-path: inset(50%) !important;
-  border: 0 !important;
-  white-space: nowrap !important;
-}
-
-/* The poster already paints the button. Keep one transparent, accessible hit area
-   over it instead of drawing a second button that can drift at other ratios. */
-.intro .primaryBtn {
-  position: absolute !important;
-  z-index: 5;
-  left: 50% !important;
-  bottom: 14.5% !important;
-  width: 68% !important;
-  height: 9.5% !important;
-  min-height: 0 !important;
-  margin: 0 !important;
-  padding: 0 24px !important;
-  transform: translateX(-50%);
+.intro .introAccessibleCopy {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
   overflow: hidden;
-  border: 0 !important;
-  border-radius: 999px !important;
-  color: transparent !important;
-  font-size: 0 !important;
-  font-weight: 900 !important;
-  background: transparent !important;
-  box-shadow: none !important;
-  pointer-events: auto;
-  animation: none;
-  transition: none;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
 }
-
-.intro .primaryBtn::before {
-  display: none;
+.introWelcome {
+  position: relative;
+  flex: 1 0 auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 12px 22px max(18px, env(safe-area-inset-bottom));
+  margin-top: auto;
+  color: #f3f7fb;
+  background: #101f30;
 }
-
-.intro .primaryBtn::after {
-  display: none;
+.introGuideHeading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
 }
-
-.intro .primaryBtn:hover {
-  filter: none;
-  box-shadow: none !important;
+.introGuideHeading h2 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: -.04em;
 }
-
-.intro .primaryBtn:active {
-  transform: translateX(-50%) scale(.975) !important;
+.introGuideHeading > span {
+  flex-shrink: 0;
+  color: #b5c7d7;
+  font-size: 12px;
 }
-
-.intro .primaryBtn:focus-visible {
-  outline: 3px solid #fff;
-  outline-offset: 4px;
+.introSteps {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  padding: 0;
+  margin: 20px 0 23px;
+  list-style: none;
 }
-
-.introOverlay::after {
-  display: none !important;
+.introSteps li { text-align: center; padding: 0 6px; }
+.introSteps li + li { border-left: 1px solid #314253; }
+.introSteps li > span {
+  display: block;
+  margin-bottom: 7px;
+  color: #85d9ec;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .12em;
 }
-
-@keyframes introLight {
-  from { opacity: .7; }
-  to { opacity: 1; }
+.introSteps strong {
+  display: block;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: -.04em;
 }
-
-@keyframes introLeaf {
-  0% { opacity: 0; transform: translate3d(18px, -22px, 0) rotate(0deg); }
-  12% { opacity: .68; }
-  72% { opacity: .54; }
-  100% { opacity: 0; transform: translate3d(-260px, 390px, 0) rotate(-420deg); }
+.intro .introSteps p {
+  margin: 6px 0 0;
+  color: #b5c7d7;
+  font-size: 12px;
+  line-height: 1.6;
+  word-break: keep-all;
 }
-
-@keyframes introTear {
-  0%, 18% { opacity: 0; transform: translate3d(0, -.6cqw, 0) scale(.55, .7); }
-  27% { opacity: .95; }
-  58% { opacity: .78; transform: translate3d(.2cqw, 4.8cqw, 0) scale(.78, 1.12); }
-  100% { opacity: 0; transform: translate3d(-.15cqw, 10.5cqw, 0) scale(.62, 1.35); }
+.introStart {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  width: 100%;
+  min-height: 54px;
+  padding: 14px 20px;
+  border: 1px solid #a8ebf6;
+  border-radius: 14px;
+  color: #102a40;
+  background: #8dddec;
+  box-shadow: 0 6px 20px #0002;
+  font-size: 16px;
+  font-weight: 800;
+  transition: background .15s, transform .15s;
 }
-
-@media (max-width: 640px) and (min-aspect-ratio: 9 / 16) {
-  .intro .primaryBtn {
-    bottom: 2% !important;
-    width: 68% !important;
-    height: 16% !important;
-  }
+.introStart > span { font-size: 22px; line-height: 1; }
+.introStart:hover { background: #b0edf6; }
+.introStart:active { transform: translateY(1px); }
+.introStart:focus-visible { outline: 3px solid #fff; outline-offset: 4px; }
+.intro .introFootnote {
+  margin: 13px 0 0;
+  color: #a5b8ca;
+  text-align: center;
+  font-size: 11px;
+  line-height: 1.5;
+  word-break: keep-all;
 }
-
-@media (max-height: 680px) {
-  .intro .primaryBtn {
-    min-height: 0 !important;
-  }
+@media (max-height: 740px) {
+  .introWelcome { padding: 8px 18px max(14px, env(safe-area-inset-bottom)); }
+  .introSteps { margin: 14px 0 16px; }
+  .introSteps li > span { margin-bottom: 5px; }
+  .introStart { min-height: 50px; padding: 12px 18px; }
+  .intro .introFootnote { margin-top: 10px; }
 }
-
+@media (max-width: 360px) {
+  .introWelcome { padding-left: 15px; padding-right: 15px; }
+  .introGuideHeading h2 { font-size: 14px; }
+  .introSteps li { padding: 0 3px; }
+}
 @media (prefers-reduced-motion: reduce) {
-  .introSky::after,
-  .intro::after,
+  .introStart { transition: none; }
+  .introArtwork::before { animation: none; opacity: .3; }
   .introTears i,
-  .intro .primaryBtn,
-  .intro .primaryBtn::before {
-    animation: none !important;
-  }
-
-  .intro .primaryBtn {
-    transform: translateX(-50%) !important;
-    transition: none;
-  }
+  .introMotes i { animation: none; opacity: 0; }
 }
