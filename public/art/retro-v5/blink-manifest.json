@@ -8,13 +8,18 @@
     "sheet_columns": 3,
     "cell_width": 512,
     "cell_height": 768,
-    "blink_duration_ms": 120,
+    "blink_duration_ms": [
+      176,
+      208
+    ],
     "recommended_interval_ms": [
-      4000,
-      6000
+      2200,
+      2600
     ],
     "prefers_reduced_motion": "Hide the blink overlay.",
-    "original_assets_modified": false
+    "original_assets_modified": false,
+    "first_blink_within_ms": 600,
+    "worried_double_blink_cycle_ms": 2400
   },
   "assets": [
     {
@@ -54,4 +59,3 @@
   ],
   "postprocessing": "Generated PNGs proportionally resized to 1536×768 with Lanczos and encoded as RGBA WebP at quality 90 using ffmpeg."
 }
-

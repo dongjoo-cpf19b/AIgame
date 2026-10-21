@@ -9,14 +9,16 @@
   background-image: url('/art/retro-v5/hero-expressions.webp');
   background-size: 300% 100%;
   aspect-ratio: 2 / 3;
-  animation: none;
+  animation: celIdle 2.2s ease-in-out infinite;
+  transform-origin: 50% 85%;
 }
-.character.bossCharacter { background-image: url('/art/retro-v5/boss-expressions.webp'); background-size: 300% 100%; }
-.character.seniorCharacter { background-image: url('/art/retro-v5/senior.webp'); background-size: contain; background-position: center top!important; }
-.character.mood-worried { animation: celReact .28s ease-out; }
-.character.mood-happy { animation: celNod .4s ease-out; }
+.character.bossCharacter { background-image: url('/art/retro-v5/boss-expressions.webp'); background-size: 300% 100%; animation-duration: 2.7s; animation-delay: -.45s; }
+.character.seniorCharacter { background-image: url('/art/retro-v5/senior.webp'); background-size: contain; background-position: center top!important; animation-duration: 2.6s; }
+.character.mood-worried { animation: celNervous 1.65s ease-in-out infinite; }
+.character.mood-happy { animation: celNod 2.1s ease-in-out infinite; }
 .sceneStill { position: relative; margin: 0; overflow: hidden; background: #c2cbd0; border-radius: 9px; }
 .sceneStill img { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; object-fit: cover; }
+.introArt img,.prologueStill img,.incomingScene .sceneStill img,.phoneStoryStrip img,.finalScene .sceneStill img { transform-origin: 50% 45%; animation: celCamera 3.6s ease-in-out infinite alternate; }
 .sceneStill figcaption { position: absolute; bottom: 0; left: 0; right: 0; padding: 24px 12px 9px; color: #fff; background: linear-gradient(transparent,#1b2a3cd9); font-size: 12px; font-weight: 700; line-height: 1.6; }
 .sceneCompact { margin: 0 0 18px; }
 .sceneCompact img { max-height: 182px; }
@@ -100,8 +102,10 @@
 .raffleClose { z-index: 2; background: #fff!important; }
 .raffleDone .sceneStill { margin-bottom: 18px; }
 
-@keyframes celReact { 35% { transform: translateX(-2px); } 70% { transform: translateX(2px); } }
-@keyframes celNod { 50% { transform: translateY(3px); } }
+@keyframes celIdle { 0%,100% { transform: translateY(0) rotate(-.6deg); } 50% { transform: translateY(-2.5%) rotate(.8deg); } }
+@keyframes celNervous { 0%,100% { transform: translateY(0) rotate(0); } 22% { transform: translate(-1.2%,-2%) rotate(-1.4deg); } 42% { transform: translate(1.2%,-3%) rotate(1.4deg); } 64% { transform: translate(-.7%,-1%) rotate(-.8deg); } 82% { transform: translate(.5%,-1.5%) rotate(.5deg); } }
+@keyframes celNod { 0%,60%,100% { transform: translateY(0) rotate(-.4deg); } 18% { transform: translateY(3%) rotate(1.2deg); } 34% { transform: translateY(-1.5%) rotate(-.5deg); } }
+@keyframes celCamera { from { transform: scale(1.035) translate(-.35%,0); } to { transform: scale(1.075) translate(.35%,-.5%); } }
 @media(max-height:740px) {
   .introHeader { padding-top: max(13px,env(safe-area-inset-top)); padding-bottom: 8px; }
   .introTitle { padding-bottom: 10px; }
@@ -139,7 +143,7 @@
   .reportCast .reportBoss { right: 0; }
 }
 @media(prefers-reduced-motion:reduce) {
-  .character { animation: none!important; }
+  .character,.sceneStill img { animation: none!important; transform: none!important; }
 }
 
 /* Local continuation keeps the primary action prominent on narrow phones. */
@@ -149,13 +153,15 @@
 .restartPrompt h2 {font-size:25px;}
 .voiceRetry {display:block;margin-top:8px;padding:7px 10px;border:1px solid currentColor;border-radius:5px;color:inherit;background:transparent;font-size:12px;}
 
-/* Brief cel animation beats, separated by long still poses. */
+/* First blink lands within a second; the reaction remains visible on phones. */
 .character { position:relative; }
-.characterBlink { position:absolute;inset:0;pointer-events:none;background-image:url('/art/retro-v5/hero-blink.webp');background-size:300% 100%;background-position:inherit;clip-path:inset(33% 24% 60% 42%);opacity:0;animation:celBlink 5.3s step-end infinite; }
-.bossCharacter .characterBlink {background-image:url('/art/retro-v5/boss-blink.webp');clip-path:inset(29% 35% 63% 27%);animation-duration:6.1s;animation-delay:1.2s;}
-.sweatDrops {position:absolute;left:71%;top:35%;width:13%;height:24%;pointer-events:none;}
-.sweatDrops i {position:absolute;left:4%;top:0;width:30%;height:28%;border-radius:70% 70% 70% 8%;background:#94dce9;border:1px solid #2d6474;box-shadow:inset 1px 1px #f0ffff;transform:rotate(-35deg);opacity:0;animation:nervousSweat 2.8s ease-in infinite;}
-.sweatDrops i+i {left:55%;top:12%;width:23%;height:22%;animation-delay:1.15s;}
-@keyframes celBlink {0%,86%,89%,100%{opacity:0}87%,88.5%{opacity:1}}
-@keyframes nervousSweat {0%,38%,100%{opacity:0;transform:translateY(0) rotate(-35deg)}46%{opacity:.95}74%{opacity:.85}87%{opacity:0;transform:translateY(100%) rotate(-35deg)}}
+.characterBlink { position:absolute;inset:0;pointer-events:none;background-image:url('/art/retro-v5/hero-blink.webp');background-size:300% 100%;background-position:inherit;clip-path:inset(33% 24% 60% 42%);opacity:0;animation:celBlink 2.2s step-end infinite; }
+.bossCharacter .characterBlink {background-image:url('/art/retro-v5/boss-blink.webp');clip-path:inset(29% 35% 63% 27%);animation-duration:2.6s;animation-delay:.35s;}
+.mood-worried .characterBlink {animation-name:celDoubleBlink;animation-duration:2.4s;}
+.sweatDrops {position:absolute;left:70%;top:34%;width:17%;height:23%;pointer-events:none;}
+.sweatDrops i {position:absolute;left:0;top:0;width:36%;height:27%;min-width:3px;min-height:6px;border-radius:70% 70% 70% 8%;background:#8ee5f4;border:1px solid #285565;box-shadow:inset 1px 1px #f0ffff;transform:rotate(-35deg);opacity:0;animation:nervousSweat 1.25s ease-in infinite;}
+.sweatDrops i+i {left:58%;top:16%;width:28%;height:23%;animation-delay:.48s;}
+@keyframes celBlink {0%,17%,100%{opacity:0}9%,16%{opacity:1}}
+@keyframes celDoubleBlink {0%,17%,39%,100%{opacity:0}9%,16%,31%,38%{opacity:1}}
+@keyframes nervousSweat {0%{opacity:0;transform:translateY(0) rotate(-35deg)}12%{opacity:1}65%{opacity:.95}88%,100%{opacity:0;transform:translateY(145%) rotate(-25deg)}}
 @media(prefers-reduced-motion:reduce){.characterBlink,.sweatDrops{display:none!important}}
