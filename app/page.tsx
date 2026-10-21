@@ -1,106 +1,54 @@
 "use client";
+import {FormEvent,useEffect,useMemo,useRef,useState,type ReactNode} from "react";
+import {ArrowRight,ArrowLeft,Volume2,VolumeX,ShieldCheck,Clock3,Sparkles,Check,CheckCheck,RotateCcw,WifiOff,Gift,Home,MessageCircle,Phone,FolderOpen,Search,NotebookPen,BriefcaseBusiness,X} from "lucide-react";
+import {FirePlanBody} from "./report-documents";
+import {SupportingFile} from "./supporting-files";
+import {searchRegistry} from "./registry-data";
+import {EvacuationPlan,GameIcon,OfficialPaper} from "./game-ui";
+import {clues,questions,decoys,type ClueId} from "./game-data";
+import {Character,TypeLine,Messenger,PhoneCall,sound,haptic} from "./immersive-ui";
 
-import { FormEvent, useEffect, useMemo, useState } from "react";
-import Image from "next/image";
-import { FirePlanBody } from "./report-documents";
-import { SupportingFile } from "./supporting-files";
-import { searchRegistry } from "./registry-data";
-import { ContactDialog, EvacuationPlan, GameIcon, OfficialPaper, type ChatEntry } from "./game-ui";
-
-type Screen =
-  | "intro" | "desktop" | "folders" | "fire-folder" | "safety-folder" | "drawing-folder" | "drawing-sub"
-  | "registry" | "draft" | "plan" | "result" | "fire-plan" | "route" | "clues" | "report" | "auto-call"
-  | "boss" | "boss-reply" | "score" | "ending" | "final" | "raffle" | "file-preview";
-type ClueId = "c1"|"c2"|"c3"|"c4"|"c5"|"c6"|"c7"|"c8"|"c9"|"c10";
-type Clue = { title: string; value: string; line: string };
-
-const SUPABASE_URL = "https://jkbselbyyfvupojlnbqk.supabase.co";
-const SUPABASE_KEY = "sb_publishable_kZyp6c6w9PuZiUZuUuYeyQ_VnQutHYv";
-
-const clues: Record<ClueId, Clue> = {
-  c1:{title:"공용폴더 계획자료",value:"공용폴더 마지막 수정본: 2025. 10. 15.",line:"2025년 10월 15일… 일단 기억해두자."},
-  c2:{title:"최종 결재 훈련일",value:"결재문서 계획(안): 2025. 10. 22.",line:"어? 공용폴더에는 10월 15일이었는데… 결재문서는 10월 22일이네."},
-  c3:{title:"실제 실시일",value:"결과보고: 2025. 10. 22.",line:"결과보고도 10월 22일이네. 실제 훈련일은 확실하다."},
-  c4:{title:"추진근거",value:"「공공기관의 소방안전관리에 관한 규정」 제14조",line:"아, 합동소방훈련은 이 규정에 근거해서 하는 거구나."},
-  c5:{title:"협조기관",value:"분당소방서 야탑119안전센터",line:"작년에는 야탑119안전센터하고 같이 했네. 올해 협의할 때 참고해야겠다."},
-  c6:{title:"훈련 진행순서",value:"상황전파 → 대피 → 초기진화 → 합동대응 → 교육·강평",line:"훈련 순서도 파악해두자. 올해 계획 짤 때 참고할 수 있겠네."},
-  c7:{title:"예산·준비사항",value:"별도 사업예산 없음 / 현수막·방송·사진촬영·장비점검",line:"별도 사업예산은 없었네. 대신 준비할 건 꽤 있구나."},
-  c8:{title:"피난계획",value:"성남시청 소방계획서 제3장 피난계획",line:"피난계획은 청사 소방계획서에 들어 있네."},
-  c9:{title:"피난동선",value:"청사도면 소방 폴더의 피난동선도",line:"비상구하고 피난계단이 이렇게 연결되는구나. 실제 동선도 봐둬야겠다."},
-  c10:{title:"실제 훈련내용",value:"상황전파·대피·초기소화·소방관서 합동대응",line:"계획만 세운 게 아니라 실제로 이 순서대로 훈련했네."},
-};
-
-const questions = [
-  {q:"작년 합동소방훈련 언제 했어요?",a:["2025. 10. 15.","2025. 10. 22.","2025. 10. 29."],correct:1,ok:"네, 10월 22일이었죠. 계속해봐요.",bad:["10월 15일이요? 그거 최종 일정 맞아요?","","그 날짜는 아닌 것 같은데… 일단 계속해보죠."]},
-  {q:"우리가 소방관서하고 합동훈련하는 근거가 뭐예요?",a:["재난 및 안전관리 기본법","산업안전보건법","「공공기관의 소방안전관리에 관한 규정」"],correct:2,ok:"맞아요. 공공기관 소방안전관리 규정에 근거해서 하는 거죠.",bad:["그 법이 이 훈련의 직접적인 근거였나요? 한번 더 확인해봐야겠는데.","그 법이 이 훈련의 직접적인 근거였나요? 한번 더 확인해봐야겠는데.",""]},
-  {q:"작년에는 어디랑 같이 했어요?",a:["성남소방서","야탑119안전센터","판교119안전센터"],correct:1,ok:"네. 작년에는 야탑119안전센터하고 했어요.",bad:["거기였어요? 작년 협조기관 다시 확인해봐야 할 것 같은데.","","거기였어요? 작년 협조기관 다시 확인해봐야 할 것 같은데."]},
-  {q:"훈련하면서 별도 예산이나 준비할 사항은 있었어요?",a:["별도 용역예산을 편성했습니다.","소방장비 임차비만 지출했습니다.","별도 사업예산은 없고 현수막·방송·사진촬영·장비점검 등을 준비했습니다."],correct:2,ok:"그렇죠. 별도 예산은 없었어도 준비할 건 꽤 있었죠.",bad:["별도 예산을 썼다고요? 계획서에 그렇게 되어 있었나요?","별도 예산을 썼다고요? 계획서에 그렇게 되어 있었나요?",""]},
-  {q:"우리 시청 피난계획이나 피난동선도 확인했어요?",a:["합동소방훈련 계획안에서만 확인했습니다.","성남시청 소방계획서와 관련 도면에서 확인했습니다.","별도로 확인할 필요는 없습니다."],correct:1,ok:"그래요. 훈련계획만 볼 게 아니라 실제 피난동선도 같이 봐야죠.",bad:["훈련계획서만 봐서는 부족해요. 실제 대피할 때 어디로 가는지도 알아야죠.","","훈련계획서만 봐서는 부족해요. 실제 대피할 때 어디로 가는지도 알아야죠."]},
-];
-
-const decoys = [
-  ["2025년_성남시청_합동소방훈련_계획.hwp","초안 같은데… 더 최근 파일이 있나 찾아보자."],
-  ["2025년_성남시청_합동소방훈련_계획_수정.hwp","중간 수정본 같은데… 뒤에 더 최근 파일이 있네."],
-  ["2025년_성남시청_합동소방훈련_계획_최종.hwp","최종…이라고 써 있긴 한데 아래에 파일이 더 있네."],
-  ["2025년_성남시청_합동소방훈련_계획_최종(1).hwp","최종(1)… 벌써 느낌이 좀 불안한데."],
-  ["2025년_성남시청_합동소방훈련_계획_최종(2).hwp","최종(2)… 이름만 보면 꽤 최종 같긴 한데."],
-  ["2025년_성남시청_합동소방훈련_계획_최최종.hwp","최최종까지 왔네…"],
-  ["2025년_성남시청_합동소방훈련_계획_최최종_수정.hwp","최최종인데 수정됐네. 역시 끝까지 봐야겠다."],
-  ["★2025년_성남시청_합동소방훈련_계획_진짜최종.hwp","진짜최종… 이제 믿어도 되나? 근데 하나 더 있다."],
-];
-
-function uid(){ return crypto.randomUUID(); }
-async function db(path:string,method:string,body:unknown){
-  const res=await fetch(`${SUPABASE_URL}/rest/v1/${path}`,{method,headers:{apikey:SUPABASE_KEY,Authorization:`Bearer ${SUPABASE_KEY}`,"Content-Type":"application/json",Prefer:"return=minimal"},body:body?JSON.stringify(body):undefined});
-  if(!res.ok) throw new Error(await res.text());
-}
-
+type Credential={id:string;token:string};
+type SessionState={entered:boolean;progress:{found?:ClueId[];answers?:number[];msgHints?:number;callHints?:number;reportedAt?:number;qIndex?:number;screen?:string}};
+const SAVE_KEY="handover-v2-session";
+const grades:Record<string,string>={S:"청사관리 마스터",A:"믿고 맡길 주무관",B:"인수인계 적응 완료",C:"이제 업무 시작"};
+const sourceNames=["결재된 계획안 + 결과보고","결재된 계획안 · 추진근거","결재된 계획안 · 협조기관","결재된 계획안 · 행정사항","청사 소방계획서 + 피난동선도"];
 export default function Page(){
-  const [screen,setScreen]=useState<Screen>("intro");
-  const [line,setLine]=useState("일단 작년 자료부터 찾아보자.");
-  const [found,setFound]=useState<ClueId[]>([]);
-  const [sessionId,setSessionId]=useState<string|null>(null);
-  const [msgHints,setMsgHints]=useState(0);
-  const [callHints,setCallHints]=useState(0);
-  const [search,setSearch]=useState("");
-  const [searched,setSearched]=useState(false);
-  const [qIndex,setQIndex]=useState(0);
-  const [score,setScore]=useState(0);
-  const [reportedAt,setReportedAt]=useState(0);
-  const [bossReply,setBossReply]=useState("");
-  const [lastCorrect,setLastCorrect]=useState(false);
-  const [raffleStatus,setRaffleStatus]=useState("");
-  const [form,setForm]=useState({name:"",affiliation:"",phone:"",consent:false});
-  const [contact,setContact]=useState<{kind:"msg"|"call";text:string}|null>(null);
-  const [chatHistory,setChatHistory]=useState<ChatEntry[]>([]);
-  const [latestClue,setLatestClue]=useState<ClueId|null>(null);
-  const [preview,setPreview]=useState<{name:string;from:Screen;record?:{number:string;date:string}}|null>(null);
-  useEffect(()=>{if(!latestClue)return;const timer=window.setTimeout(()=>setLatestClue(null),2800);return ()=>window.clearTimeout(timer);},[latestClue]);
-  const grade=useMemo(()=>score===5?["S","청사관리 마스터"]:score===4?["A","믿고 맡길 주무관"]:score>=2?["B","인수인계 적응 완료"]:["C","이제 업무 시작"],[score]);
-
-  function go(s:Screen,l?:string){setScreen(s);if(l)setLine(l);}
-  function inspectFile(name:string,remark:string,record?:{number:string;date:string}){setPreview({name,from:screen,record});go("file-preview",remark);}
-  function runSearch(query:string){setSearch(query);setSearched(true);setLine(searchRegistry(query).length?"여러 문서가 나오네. 제목과 연도를 잘 살펴보자.":"검색어를 조금 다르게 넣어봐야겠다.");}
-  async function start(){const sid=uid();setSessionId(sid);try{await db("game_sessions","POST",{id:sid});}catch{}go("desktop","일단 작년 자료부터 찾아보자.");}
-  function clue(cid:ClueId){if(found.includes(cid)){setLine("이 내용은 이미 확인했다.");return;}const next=[...found,cid];setFound(next);setLatestClue(cid);setLine(clues[cid].line);if(next.length===10)setTimeout(()=>go("auto-call","좋아. 이 정도면 물어보셔도 대답할 수 있겠다."),500);}
-  function hint(kind:"msg"|"call"){
-    const miss=(Object.keys(clues) as ClueId[]).find(c=>!found.includes(c));let t="그 정도면 충분히 파악한 것 같은데요? 팀장님께 가보세요.";
-    if(miss==="c1")t="합동소방훈련 폴더의 마지막 수정본부터 한번 보세요.";else if(miss==="c2")t="공용폴더 보고 있어요? 최종 결재된 건 문등대에서 확인해봐요.";else if(miss==="c3"||miss==="c10")t="계획만 보지 말고 결과보고까지 한번 확인해보세요.";else if(["c4","c5","c6","c7"].includes(miss||""))t="결재된 계획안을 자세히 보면 근거, 협조기관, 준비사항까지 나와요.";else if(miss==="c8")t="청사 소방계획서 한번 봐봐요. 피난계획이 거기 있을 거예요.";else if(miss==="c9")t="준공도면 폴더에서 소방 관련 자료를 찾아보세요.";
-    setContact({kind,text:t});
-    if(kind==="msg"){setMsgHints(v=>v+1);setChatHistory(h=>[...h,{id:h.length+1,text:t}]);}
-  }
-  function beginBoss(){setReportedAt(found.length);setQIndex(0);setScore(0);go("boss","차근차근 대답해보자.");}
-  function answer(i:number){const q=questions[qIndex];const ok=i===q.correct;setLastCorrect(ok);if(ok)setScore(v=>v+1);setBossReply(ok?q.ok:q.bad[i]);setLine(`“${q.a[i]}”라고 보고했다.`);setScreen("boss-reply");}
-  function nextQuestion(){if(qIndex===questions.length-1){finish();return;}setQIndex(v=>v+1);setScreen("boss");setLine("다음 질문이다.");}
-  async function finish(){const finalScore=score;setScore(finalScore);if(sessionId){try{await db(`game_sessions?id=eq.${sessionId}`,"PATCH",{completed_at:new Date().toISOString(),clues_collected:found.length,report_clues:reportedAt,correct_answers:finalScore,grade:finalScore===5?"S":finalScore===4?"A":finalScore>=2?"B":"C",messenger_hints:msgHints,phone_hints:callHints});}catch{}}setScreen("score");setLine("휴… 일단 첫 보고는 끝났다.");}
-  async function raffle(e:FormEvent){e.preventDefault();const phone=form.phone.replace(/\D/g,"");if(!sessionId||!form.name.trim()||!form.affiliation.trim()||!/^010\d{8}$/.test(phone)||!form.consent){setRaffleStatus("성명·소속·휴대전화 11자리·동의 여부를 확인해주세요.");return;}try{await db("raffle_entries","POST",{id:uid(),session_id:sessionId,participant_name:form.name.trim(),affiliation:form.affiliation.trim(),phone_digits:phone});setRaffleStatus("응모가 완료되었습니다. 행운을 빕니다!");}catch(err){const t=String(err);setRaffleStatus(t.includes("duplicate")||t.includes("unique")?"이미 응모한 휴대전화 번호입니다.":"응모 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.");}}
-
-  const paper=(body:React.ReactNode)=><OfficialPaper screen={screen}>{body}</OfficialPaper>;
-  const clueBtn=(cid:ClueId,children:React.ReactNode)=><button className={`clueTap ${found.includes(cid)?"got":""}`} onClick={()=>clue(cid)}>{children}</button>;
-
+ const [screen,setScreen]=useState("intro"),[line,setLine]=useState("일단 작년 자료부터 찾아보자."),[found,setFound]=useState<ClueId[]>([]),[credential,setCredential]=useState<Credential|null>(null),[resume,setResume]=useState<Credential|null>(null);
+ const [msgHints,setMsgHints]=useState(0),[callHints,setCallHints]=useState(0),[search,setSearch]=useState(""),[searched,setSearched]=useState(false),[qIndex,setQIndex]=useState(0),[answers,setAnswers]=useState<number[]>([]),[reportedAt,setReportedAt]=useState(0);
+ const [bossReply,setBossReply]=useState(""),[lastCorrect,setLastCorrect]=useState(false),[raffleStatus,setRaffleStatus]=useState(""),[form,setForm]=useState({name:"",affiliation:"",phone:"",consent:false});
+ const [contact,setContact]=useState<"msg"|"call"|"ending"|null>(null),[latestClue,setLatestClue]=useState<ClueId|null>(null),[preview,setPreview]=useState<{name:string;from:string;record?:{number:string;date:string}}|null>(null);
+ const [audio,setAudio]=useState(false),[busy,setBusy]=useState(false),[error,setError]=useState(""),[sync,setSync]=useState("saved"),[syncNonce,setSyncNonce]=useState(0),[prologue,setPrologue]=useState(0),[review,setReview]=useState(false);
+ const autoCallTimer=useRef<ReturnType<typeof setTimeout>|null>(null);
+ useEffect(()=>()=>{if(autoCallTimer.current)clearTimeout(autoCallTimer.current);},[]);
+ const saveQueue=useRef<Promise<unknown>>(Promise.resolve());
+ const score=answers.reduce((n,a,i)=>n+(questions[i].correct===a?1:0),0),grade=[score===5?"S":score===4?"A":score>=2?"B":"C",grades[score===5?"S":score===4?"A":score>=2?"B":"C"]];
+ const reportPhase=["boss","boss-reply","score","ending","final","raffle","raffle-done"].includes(screen),folderPhase=["folders","fire-folder","safety-folder","drawing-folder","drawing-sub"].includes(screen);
+ const progress={screen:screen==="file-preview"?preview?.from||"desktop":screen,found,answers,msgHints,callHints,reportedAt,qIndex};
+ useEffect(()=>{try{const c=JSON.parse(localStorage.getItem(SAVE_KEY)||"null");if(c?.token)setResume(c);setAudio(localStorage.getItem("handover-audio")==="true");}catch{}},[]);
+ useEffect(()=>{if(!latestClue)return;const timer=setTimeout(()=>setLatestClue(null),2600);return()=>clearTimeout(timer);},[latestClue]);
+ useEffect(()=>{if(!credential||["intro","prologue","raffle-done"].includes(screen))return;const snapshot=JSON.stringify(progress);const timer=setTimeout(()=>{setSync("saving");saveQueue.current=saveQueue.current.catch(()=>{}).then(async()=>{await api("/api/session",{action:"save",progress:JSON.parse(snapshot)},credential);setSync("saved");}).catch(()=>setSync("error"));},650);return()=>clearTimeout(timer);},[credential,screen,found,answers,msgHints,callHints,reportedAt,qIndex,syncNonce]);
+ useEffect(()=>{const retry=()=>setSyncNonce(v=>v+1);window.addEventListener("online",retry);return()=>window.removeEventListener("online",retry);},[]);
+ async function api<T={ok:boolean}>(path:string,body?:unknown,c=credential){const res=await fetch(path,{method:body?"POST":"GET",headers:{"Content-Type":"application/json",...(c?{Authorization:`Bearer ${c.token}`}:{})},body:body?JSON.stringify(body):undefined});const data=await res.json() as T & {error?:string};if(!res.ok)throw new Error(data.error||"연결을 확인해주세요.");return data;}
+ function go(s:string,l?:string){if(autoCallTimer.current)clearTimeout(autoCallTimer.current);setScreen(s);if(l)setLine(l);sound("tap",audio);haptic();}
+ function inspectFile(name:string,remark:string,record?:{number:string;date:string}){setPreview({name,from:screen,record});go("file-preview",remark);}
+ function runSearch(query:string){setSearch(query);setSearched(true);setLine(searchRegistry(query).length?"제목과 연도를 잘 살펴보자. 결재된 자료에 답이 있다.":"검색어를 조금 다르게 넣어봐야겠다.");sound("tap",audio);}
+ async function start(){if(busy)return;setBusy(true);setError("");sound("tap",audio);try{const c=await api<Credential>("/api/session",{action:"start"},null);setCredential(c);setResume(c);localStorage.setItem(SAVE_KEY,JSON.stringify(c));sessionStorage.removeItem("handover-chat");setFound([]);setAnswers([]);setMsgHints(0);setCallHints(0);setReportedAt(0);setQIndex(0);setPrologue(0);go("prologue");}catch(e){setError((e as Error).message);}finally{setBusy(false);}}
+ async function continueGame(){if(!resume||busy)return;setBusy(true);setError("");try{const data=await api<SessionState>("/api/session",undefined,resume),p=data.progress||{};setCredential(resume);setFound(p.found||[]);setAnswers(p.answers||[]);setMsgHints(p.msgHints||0);setCallHints(p.callHints||0);setReportedAt(p.reportedAt||0);setQIndex(p.qIndex||0);if(p.screen==="boss-reply"){const qi=p.qIndex||0,a=p.answers?.[qi],ok=a===questions[qi].correct;setLastCorrect(ok);setBossReply(ok?questions[qi].ok:questions[qi].bad[a??0]||"다시 확인해보세요.");}setScreen(data.entered?"raffle-done":p.screen||"desktop");setLine("좋아. 하던 업무부터 이어서 해보자.");}catch(e){setError((e as Error).message);}finally{setBusy(false);}}
+ function clue(id:ClueId){if(found.includes(id)){setLine("이미 단서함에 정리해둔 내용이다.");return;}const next=[...found,id];setFound(next);setLatestClue(id);setLine(clues[id].line);sound("clue",audio);haptic();if(next.length===10)autoCallTimer.current=setTimeout(()=>go("auto-call","팀장님이 부르신다. 이제 내가 확인한 내용을 보고할 시간."),1600);}
+ const missing=(Object.keys(clues)as ClueId[]).find(c=>!found.includes(c));
+ const nextHint=missing==="c1"?"업무폴더의 합동소방훈련 폴더부터 열어봐요. 마지막 수정본에 표시된 날짜를 한번 확인해보세요.":missing==="c2"?"공용폴더 확인했어요? 이제 문서등록대장, 우리가 문등대라고 부르는 곳에서 결재된 계획안을 찾아봐요.":missing==="c3"||missing==="c10"?"계획대로 실제로 했는지도 봐야죠. 문서등록대장에서 결과보고를 찾아봐요.":["c4","c5","c6","c7"].includes(missing||"")?"결재된 계획안을 아래까지 읽어봐요. 근거, 협조기관, 훈련 순서, 준비사항이 모두 있어요.":missing==="c8"?"소방안전관리 폴더의 청사 소방계획서요. 피난계획이 거기 있어요.":missing==="c9"?"청사도면 폴더 안의 소방 폴더를 찾아봐요. 피난동선도가 있을 거예요.":"그 정도면 충분해요. 팀장님께 차근차근 보고해봐요!";
+ function hint(kind:"msg"|"call"){sound("tap",audio);setContact(kind);}
+ function beginBoss(){setReportedAt(found.length);setQIndex(0);setAnswers([]);go("boss","침착하자. 내가 확인한 자료대로 말씀드리면 된다.");}
+ function answer(i:number){const q=questions[qIndex],ok=i===q.correct;setAnswers(prev=>[...prev.slice(0,qIndex),i]);setLastCorrect(ok);setBossReply(ok?q.ok:q.bad[i]);go("boss-reply",ok?"좋아. 확인한 근거가 있으니 대답할 수 있다.":"……그 자료를 좀 더 꼼꼼히 봤어야 했나.");sound(ok?"clue":"tap",audio);}
+ async function nextQuestion(){if(qIndex<4){setQIndex(n=>n+1);go("boss","다음 질문도 차근차근.");return;}if(busy)return;setBusy(true);setError("");try{await saveQueue.current;await api("/api/session",{action:"finish",answers,progress});go("score","휴… 첫 보고를 마쳤다.");}catch(e){setError((e as Error).message);}finally{setBusy(false);}}
+ async function raffle(e:FormEvent){e.preventDefault();if(busy)return;setBusy(true);setRaffleStatus("");try{await api("/api/raffle",form);go("raffle-done");sound("clue",audio);}catch(e){setRaffleStatus((e as Error).message);}finally{setBusy(false);}}
+ function toggleAudio(){const enabled=!audio;setAudio(enabled);localStorage.setItem("handover-audio",String(enabled));sound("message",enabled);}
+ const paper=(body:ReactNode)=><OfficialPaper screen={screen}>{body}</OfficialPaper>;
+ const clueBtn=(cid:ClueId,children:ReactNode)=><button className={`clueTap ${found.includes(cid)?"got":""}`} onClick={()=>clue(cid)}>{children}{found.includes(cid)&&<Check size={12}/>}</button>;
   function mainContent(){
     if(screen==="file-preview"&&preview)return <><Nav onBack={()=>go(preview.from)} title={preview.name}/><SupportingFile key={preview.name} name={preview.name} record={preview.record}/></>;
-    if(screen==="desktop")return <div className="windowsDesktop"><div className="desktopGrid"><button onClick={()=>go("folders","합동소방훈련 자료면 여기 어딘가에 있겠지.")}><span className="appIcon folderIcon"><GameIcon name="folder"/></span><b>업무폴더</b></button><button onClick={()=>go("registry","그래도 결재된 문서는 한번 확인해봐야겠지.")}><span className="appIcon registryIcon"><GameIcon name="document"/></span><b>문서등록대장</b></button><button onClick={()=>go("clues","지금까지 파악한 내용을 한번 정리해보자.")}><span className="appIcon clueIcon"><GameIcon name="clue"/></span><b>단서함</b></button><button onClick={()=>go("report","핵심 내용은 어느 정도 파악한 것 같은데… 이대로 보고할까?")}><span className="appIcon reportIcon"><GameIcon name="person"/></span><b>보고하러 가기</b></button></div><aside className="deskMemo"><small>오늘의 업무</small><strong>작년 합동소방훈련<br/>내용 파악하기</strong><p>폴더에 남은 자료부터<br/>하나씩 확인해보자.</p><span>회계과 · 청사관리</span></aside><div className="desktopWatermark">성남시청 업무PC<small>작은 단서에서 시작되는 나의 첫 업무</small></div></div>;
+    if(screen==="desktop")return <div className="windowsDesktop"><div className="desktopGreeting"><small>09:{String(2+found.length*3).padStart(2,"0")} · 나의 첫 업무</small><h2>오늘부터,<br/>내가 담당자.</h2><p>작년 합동소방훈련의 흔적을 찾아보자.</p></div><div className="desktopGrid">{[{to:"folders",icon:<FolderOpen/>,title:"업무폴더",sub:"전임자가 남긴 자료",color:"gold"},{to:"registry",icon:<Search/>,title:"문서등록대장",sub:"결재된 문서 찾기",color:"blue"},{to:"clues",icon:<NotebookPen/>,title:"단서함",sub:`확인한 단서 ${found.length}개`,color:"mint"},{to:"report",icon:<BriefcaseBusiness/>,title:"팀장 보고",sub:"알아낸 내용 보고하기",color:"rose"}].map(app=><button key={app.to} className={app.color} onClick={()=>go(app.to)}><span className="appIcon">{app.icon}</span><b>{app.title}</b><small>{app.sub}</small><ArrowRight className="appArrow" size={16}/></button>)}</div><div className="deskMemo"><span>✎ 오늘의 메모</span><p>“최종 파일”이라고<br/>진짜 최종일까?</p><small>계획과 결과, 둘 다 확인하기.</small></div></div>;
     if(screen==="folders")return <><Nav onBack={()=>go("desktop")} title="📁 업무폴더"/><div className="stack"><button className="fileBtn" onClick={()=>go("fire-folder","……최종이 왜 이렇게 많아.")}>📁 01_합동소방훈련</button><button className="fileBtn" onClick={()=>go("safety-folder","소방훈련만 보면 끝인가… 청사 자체 소방계획도 한번 봐야겠다.")}>📁 02_소방안전관리</button><button className="fileBtn" onClick={()=>go("drawing-folder","계획서만 볼 게 아니라 실제 피난동선도 확인해봐야겠다.")}>📁 03_청사도면</button></div></>;
     if(screen==="fire-folder")return <><Nav onBack={()=>go("folders")} title="01_합동소방훈련"/><div className="stack">{decoys.map(([f,l])=><button key={f} className="fileBtn small" onClick={()=>inspectFile(f,l)}>📄 {f}</button>)}<button className="fileBtn small" onClick={()=>go("draft","그래도 이게 제일 마지막 파일 같긴 한데… 한번 보자.")}>📄 ★★2025년_성남시청_합동소방훈련_계획_진짜최종_과장님수정.hwp</button></div></>;
     if(screen==="safety-folder")return <><Nav onBack={()=>go("folders")} title="02_소방안전관리"/><div className="stack"><button className="fileBtn" onClick={()=>go("fire-plan","이건 청사 전체 소방안전관리 계획이구나. 피난 관련 내용도 있을 것 같은데.")}>📄 2025년_성남시청_소방계획서.hwp</button><button className="fileBtn" onClick={()=>inspectFile("소방안전관리자_업무현황.hwp","소방안전관리자 업무현황이네. 관련 자료긴 한데 지금 찾는 핵심 단서는 아닌 것 같다.")}>📄 소방안전관리자_업무현황.hwp</button><button className="fileBtn" onClick={()=>inspectFile("소방시설_점검결과.pdf","소방시설 점검자료네. 중요한 자료지만 지금은 합동소방훈련 내용을 파악하는 게 먼저다.")}>📄 소방시설_점검결과.pdf</button></div></>;
@@ -115,53 +63,20 @@ export default function Page(){
     if(screen==="clues")return <><Nav onBack={()=>go("desktop")} title="🧩 단서함"/><div className="stack">{found.length?found.map((c,i)=><div className="clueCard" key={c}><small>단서 {i+1}</small><b>{clues[c].title}</b><span>{clues[c].value}</span></div>):<div className="empty">아직 확보한 단서가 없습니다.</div>}</div></>;
     if(screen==="report")return <><Nav onBack={()=>go("desktop")} title="팀장 보고"/><div className="confirm"><h2>지금 보고하시겠습니까?</h2><p>현재 확보한 단서 <b>{found.length} / 10</b></p><small>보고를 시작하면 자료를 다시 확인할 수 없습니다.</small><button onClick={()=>go("desktop")}>조금 더 확인한다</button><button className="primaryBtn" onClick={beginBoss}>이 정도면 됐다. 보고하러 가자</button></div></>;
     if(screen==="auto-call")return <div className="confirm"><small>🧩 단서 10 / 10</small><h1>띠링 ♪</h1><div className="message"><b>💬 팀장님</b><p>“○○주무관, 작년 소방훈련 내용 파악됐어요? 잠깐 와봐요.”</p></div><button className="primaryBtn" onClick={beginBoss}>팀장님께 가기</button></div>;
-    if(screen==="boss")return <div className="bossScene"><div className="reportProgress"><span>팀장 보고</span><b>{qIndex+1} / 5</b></div><div className="bossIdentity"><span><GameIcon name="person"/></span><div><small>회계과 · 청사관리</small><b>팀장님</b></div></div><div className="bossBubble"><p>“{questions[qIndex].q}”</p></div><div className="stack">{questions[qIndex].a.map((a,i)=><button className="choice" key={a} onClick={()=>answer(i)}><span className="answerNumber">{i+1}</span>{a}</button>)}</div></div>;
-    if(screen==="boss-reply")return <div className="bossScene"><div className="reportProgress"><span>팀장 보고</span><b>{qIndex+1} / 5</b></div><div className="bossIdentity"><span><GameIcon name="person"/></span><div><small>회계과 · 청사관리</small><b>팀장님</b></div></div><div className={`bossBubble ${lastCorrect?"positive":"thoughtful"}`}><p>“{bossReply}”</p></div><button className="primaryBtn" onClick={nextQuestion}>{qIndex===4?"보고 마치기":"다음 질문"} →</button></div>;
-    if(screen==="score")return <div className="score"><small>🏆 인수인계 평가</small><h1>{grade[0]}</h1><h2>{grade[1]}</h2><div className="summary"><p><span>정답</span><b>{score} / 5</b></p><p><span>보고 시 확보 단서</span><b>{reportedAt} / 10</b></p><p><span>메신저</span><b>{msgHints}회</b></p><p><span>전화</span><b>{callHints}회</b></p></div><button className="primaryBtn" onClick={()=>go("ending","설마… 벌써 올해 훈련 얘기인가?")}>업무 계속하기</button></div>;
-    if(screen==="ending")return <div className="call"><div className="phone">📞</div><small>전화가 옵니다.</small><h2>야탑119안전센터</h2><div className="message"><p>“회계과 담당자님 맞으시죠? 올해 합동소방훈련 일정 협의드리려고 전화드렸습니다.”</p></div><button className="primaryBtn" onClick={()=>go("final","…그래. 이제 내가 담당자구나.")}>전화 받기</button></div>;
-    if(screen==="final")return <div className="score"><div className="phone">🔥</div><h1 className="finalTitle">이제 진짜 담당자입니다.</h1><p>업무 파악 완료</p><button className="primaryBtn" onClick={()=>go("raffle","업무도 했는데 기프티콘 정도는 노려봐도 되겠지.")}>🎁 경품 추첨 참여하기</button></div>;
-    if(screen==="raffle")return <><h2>추첨 참여</h2><form className="raffle" onSubmit={raffle}><input placeholder="성명" value={form.name} onChange={e=>setForm({...form,name:e.target.value})}/><input placeholder="소속" value={form.affiliation} onChange={e=>setForm({...form,affiliation:e.target.value})}/><input placeholder="010-1234-5678" inputMode="numeric" value={form.phone} onChange={e=>setForm({...form,phone:e.target.value})}/><label><input type="checkbox" checked={form.consent} onChange={e=>setForm({...form,consent:e.target.checked})}/> 경품 추첨 및 기프티콘 발송을 위한 개인정보 수집·이용에 동의합니다.</label><button className="primaryBtn">응모하기</button>{raffleStatus&&<div className="status">{raffleStatus}</div>}</form></>;
+    if(screen==="boss")return <div className="bossScene"><div className="reportProgress"><span>팀장 보고</span><b>{qIndex+1} / 5</b></div><div className="bossPortrait"><Character who="boss"/><span>회계과 · 청사관리팀장</span></div><div className="bossBubble"><small>팀장님</small><p><TypeLine key={qIndex} text={questions[qIndex].q}/></p></div><div className="stack">{questions[qIndex].a.map((a,i)=><button className="choice" key={a} onClick={()=>answer(i)}><span className="answerNumber">{i+1}</span>{a}<ArrowRight size={15}/></button>)}</div></div>;
+    if(screen==="boss-reply")return <div className={`bossScene reaction-${lastCorrect?"yes":"no"}`}><div className="reportProgress"><span>팀장 보고</span><b>{qIndex+1} / 5</b></div><div className="bossPortrait"><Character who="boss" mood={lastCorrect?"happy":"worried"}/><span>{lastCorrect?"잠깐, 표정이 풀렸다.":"팀장님의 눈썹이 살짝 올라갔다."}</span></div><div className="bossBubble"><small>팀장님</small><p><TypeLine text={bossReply}/></p></div><button className="primaryBtn" disabled={busy} onClick={nextQuestion}>{busy?"보고 기록 중…":qIndex===4?"보고 마치기":"다음 질문"}<ArrowRight size={18}/></button></div>;
+    if(screen==="score")return <div className="score"><small className="eyebrow">FIRST DAY · REPORT COMPLETE</small><div className={`gradeSeal grade-${grade[0]}`}>{grade[0]}</div><h2>{grade[1]}</h2><p className="resultMessage">{score===5?"“……제법인데요. 다음 것도 맡겨도 되겠어요.”":score===4?"“잘했어요. 빠진 부분 하나만 다시 확인해두세요.”":score>=2?"“첫날이니까요. 근거 확인하는 습관부터 들여요.”":"“급하게 보고할 필요 없어요. 자료부터 다시 차근차근.”"}</p><div className="resultMetrics"><div><strong>{score}<small>/5</small></strong><span>정확한 보고</span></div><div><strong>{reportedAt}<small>/10</small></strong><span>찾아낸 단서</span></div><div><strong>{msgHints+callHints}</strong><span>선배의 도움</span></div></div><button className="secondaryBtn" onClick={()=>setReview(v=>!v)}>{review?"보고 내용 접기":"내 보고 돌아보기"}</button>{review&&<div className="reviewList">{questions.map((q,i)=><div key={q.q}><b>{answers[i]===q.correct?"✓":"!"} {q.q}</b><p>{q.a[q.correct]}</p><small>확인할 자료 · {sourceNames[i]}</small></div>)}</div>}<button className="primaryBtn" onClick={()=>go("ending","전화가 온다. 설마… 벌써 올해 업무?")}>업무 계속하기<ArrowRight size={18}/></button></div>;
+    if(screen==="ending")return <div className="incomingScene"><div className="incomingIcon"><Phone/></div><small>전화가 옵니다</small><h2>야탑119안전센터</h2><p>“회계과 담당자님 맞으시죠?”</p><button className="primaryBtn" onClick={()=>setContact("ending")}><Phone size={18}/> 전화 받기</button></div>;
+    if(screen==="final")return <div className="finalScene"><span className="eyebrow">CHAPTER 01 · COMPLETE</span><Character mood="happy"/><h1>이제 진짜<br/>담당자입니다.</h1><p>누군가 남긴 흔적을 따라,<br/>오늘의 업무가 당신의 것이 되었습니다.</p><button className="primaryBtn" onClick={()=>go("raffle","첫 업무도 끝냈으니, 작은 행운도 노려볼까?")}><Gift size={18}/> 경품 추첨 참여하기</button><button className="textButton" onClick={()=>go("intro")}>첫 화면으로</button></div>;
+    if(screen==="raffle")return <div className="raffleWrap"><Gift className="raffleGift"/><span className="eyebrow">첫 업무를 마친 당신에게</span><h2>작은 행운에<br/>응모해보세요.</h2><p>같은 휴대전화 번호로 한 번 참여할 수 있어요.</p><form className="raffle" onSubmit={raffle}><label>성명<input required autoComplete="name" maxLength={50} placeholder="성함을 입력해주세요" value={form.name} onChange={e=>setForm({...form,name:e.target.value})}/></label><label>소속<input required autoComplete="organization" maxLength={100} placeholder="부서 또는 소속" value={form.affiliation} onChange={e=>setForm({...form,affiliation:e.target.value})}/></label><label>휴대전화<input required type="tel" inputMode="tel" autoComplete="tel" maxLength={13} placeholder="010-1234-5678" value={form.phone} onChange={e=>setForm({...form,phone:e.target.value})}/></label><div className="privacyNote">이름·소속·휴대전화 번호를 경품 추첨과 발송에 사용합니다. 행사 운영 완료 후 관리자가 삭제합니다. 동의하지 않아도 게임은 이용할 수 있어요.</div><label className="consent"><input required type="checkbox" checked={form.consent} onChange={e=>setForm({...form,consent:e.target.checked})}/> 개인정보 수집·이용에 동의합니다.</label><button className="primaryBtn" disabled={busy}>{busy?"응모를 접수하고 있어요…":"응모하기"}<ArrowRight size={18}/></button>{raffleStatus&&<div className="status error" role="alert">{raffleStatus}</div>}</form></div>;
+    if(screen==="raffle-done")return <div className="score raffleDone"><div className="successCircle"><CheckCheck/></div><span className="eyebrow">MISSION ACCOMPLISHED</span><h1>응모 완료!</h1><p>참여 정보가 정상적으로 접수됐어요.<br/>오늘의 첫 업무, 고생 많았습니다.</p><div className="closingQuote">작은 단서들이 모여,<br/>진짜 담당자가 됩니다.</div><button className="primaryBtn" onClick={()=>go("intro")}>첫 화면으로<ArrowRight size={18}/></button><a className="textButton" href="/admin">관리자</a></div>;
     return null;
   }
 
-  if(screen==="intro")return (
-    <main className="page">
-      <section className="intro" aria-labelledby="intro-title">
-        <h1 id="intro-title" className="introAccessibleCopy">인수인계의 전설</h1>
-        <p className="introAccessibleCopy">성남시청 신규 담당자 업무 시뮬레이션. 전임자는 떠났습니다. 인수인계서는 없습니다. 그래도 오늘의 업무는 시작됩니다.</p>
-        <div className="introArtwork" role="img" aria-label="햇살이 비치는 성남시청 사무실, 첫 업무를 앞둔 신규 담당자">
-          <span className="introTears" aria-hidden="true"><i /><i /></span>
-          <span className="introMotes" aria-hidden="true"><i /><i /><i /></span>
-        </div>
-        <div className="introWelcome">
-          <div className="introGuideHeading">
-            <h2>첫 업무, 이렇게 시작하세요</h2>
-            <span>약 5분</span>
-          </div>
-          <ol className="introSteps" aria-label="플레이 방법">
-            <li><span aria-hidden="true">01</span><strong>자료 찾기</strong><p>업무폴더와<br/>문등대 살펴보기</p></li>
-            <li><span aria-hidden="true">02</span><strong>단서 모으기</strong><p>문서 속 음영<br/>표시 눌러보기</p></li>
-            <li><span aria-hidden="true">03</span><strong>팀장 보고</strong><p>찾아낸 단서로<br/>질문에 답하기</p></li>
-          </ol>
-          <button className="introStart" onClick={start}>업무 시작하기<span aria-hidden="true">→</span></button>
-          <p className="introFootnote">작은 단서들이 모여, 진짜 담당자가 됩니다.</p>
-        </div>
-      </section>
-    </main>
-  );
-
-  const reportPhase=["boss","boss-reply","score","ending","final","raffle"].includes(screen);
-  const folderPhase=["folders","fire-folder","safety-folder","drawing-folder","drawing-sub"].includes(screen);
-  const windowTitle=screen==="desktop"?"바탕화면":folderPhase?"파일 탐색기":screen==="registry"?"문서등록대장":reportPhase?"팀장 보고":"업무 자료";
-  return <main className="page playPage"><section className={`gameShell cinematicGame ${reportPhase?"sunsetPhase":"dayPhase"}`}>
-    <Image className="officeBackdrop" src="/art/office-cinematic-v2.png" alt="" fill sizes="460px" quality={75}/>
-    <header className="sceneHeader"><div><small>인수인계의 전설 · 첫 번째 업무</small><b>성남시청 <span>회계과</span></b></div><div className="clueMeter"><span>확보한 단서 <b>{found.length}<small> / 10</small></b></span><progress value={found.length} max={10} aria-label="확보한 단서"/></div></header>
-    <div className="sceneCaption"><span>{reportPhase?"어느덧, 보고할 시간":"햇살이 스며드는 사무실"}</span><small>{reportPhase?"알아낸 내용을 차근차근 전해보자.":"전임자의 흔적을 따라, 나의 첫 업무가 시작된다."}</small></div>
-    <div className="office"><div className="monitor"><div className="monitorBar"><span className="monitorBrand"><i/> SEONGNAM</span><span>회계과 · 업무용 PC</span></div><div className={`monitorScreen screen-${screen}`} key={screen}><div className="appTitlebar"><span><GameIcon name={folderPhase?"folder":"document"}/>{windowTitle}</span><span aria-hidden="true">— &nbsp; □</span></div><div className="screenBody">{mainContent()}</div></div><nav aria-label="업무PC 작업표시줄"><button aria-label="홈" disabled={reportPhase} onClick={()=>go("desktop","일단 작년 자료부터 찾아보자.")}><span className="windowsMark" aria-hidden="true"><i/><i/><i/><i/></span><span>홈</span></button><button onClick={()=>hint("msg")} disabled={reportPhase}><GameIcon name="chat"/><span>메신저</span></button><button onClick={()=>hint("call")} disabled={reportPhase}><GameIcon name="phone"/><span>전화</span></button><div className="trayStatus"><i/>업무 중</div></nav></div><div className="stand"/><div className="base"/></div>
-    <div className="storyDialogue" aria-live="polite"><div className="dialoguePortrait" aria-hidden="true"/><div className="dialogueCopy"><div className="dialogueName"><b>나</b><i aria-hidden="true">✦</i></div><p key={line}>{line}</p></div></div>
-    {latestClue&&<div className="clueToast" key={latestClue} role="status"><span><GameIcon name="clue"/></span><div><small>새로운 단서 발견 · {found.length} / 10</small><b>{clues[latestClue].title}</b></div><strong>+1</strong></div>}
-    {contact&&<ContactDialog kind={contact.kind} text={contact.text} history={chatHistory} onClose={()=>setContact(null)} onAccept={()=>setCallHints(v=>v+1)}/>}
-  </section></main>;
+ const audioButton=<button className="roundButton" onClick={toggleAudio} aria-label={audio?"소리 끄기":"소리 켜기"} title={audio?"소리 켜짐":"소리 꺼짐"}>{audio?<Volume2 size={18}/>:<VolumeX size={18}/>}</button>;
+ if(screen==="intro")return <main className="stage"><section className="introScene"><div className="sceneImage"/><div className="sunRay"/><div className="floatingDust" aria-hidden="true"><i/><i/><i/><i/><i/></div><header className="introHeader"><span className="arcadeBrand">DLC <b>오락실</b><i/></span>{audioButton}</header><div className="introTitle"><span className="chapterLabel">EPISODE 01 · 성남시청</span><h1>인수인계의<br/><em>전설</em><span className="titleStar">✦</span></h1><p>전임자는 떠났습니다.<br/>인수인계서는 없습니다.</p></div><div className="introCharacter"><Character mood="worried"/><div className="characterAside">……최종이<br/>왜 이렇게 많아?</div></div><div className="introBottom"><p className="introTagline">그래도, 오늘의 업무는 시작된다.</p><button className="introStart" disabled={busy} onClick={resume?continueGame:start}><span>{busy?"업무 준비 중…":resume?"이어서 근무하기":"첫 출근 하기"}<small>{resume?"저장된 플레이 이어하기":"당신의 첫 번째 업무가 기다립니다"}</small></span><ArrowRight size={26}/></button><div className="introMeta"><span><Clock3 size={13}/> 약 5분</span><span><Sparkles size={13}/> 단서 탐색 · 업무 체험</span></div>{resume&&<button className="textButton" disabled={busy} onClick={()=>{if(window.confirm("기존 플레이 대신 새로운 첫날을 시작할까요?"))start();}}>새로 시작하기</button>}{error&&<p className="error" role="alert">{error}</p>}<footer><span>기획 · 김동주</span><a href="/admin"><ShieldCheck size={12}/> 관리자</a></footer></div></section><aside className="desktopSide"><span>DLC ARCADE / 01</span><h2>인수인계는 없지만,<br/>단서는 남아 있다.</h2><p>전임자의 업무폴더와 결재문서를 탐색하며<br/>나만의 첫 업무를 완성하세요.</p><div><FolderOpen/><span>자료를 찾고</span><ArrowRight/><NotebookPen/><span>단서를 모으고</span></div><small>휴대폰 세로 화면에 맞춘 인터랙티브 업무 체험</small></aside></main>;
+ if(screen==="prologue"){const scenes=[{who:"나",text:"첫 출근. 책상은 있는데… 인수인계서는 없다.",mood:"worried"},{who:"팀장님",text:"새로 오셨죠? 작년 합동소방훈련부터 파악해봐요. 파일은 공용폴더에 있을 거예요.",mood:"normal"},{who:"팀장님",text:"참, 제목에 ‘최종’ 붙었다고 그냥 믿지는 마세요. 근거까지 확인하고 보고해요.",mood:"normal"}];const current=scenes[prologue];return <main className="stage"><section className="prologueScene"><div className="sceneImage"/><div className="prologueTop"><span>성남시청 · 회계과</span><button onClick={()=>go("desktop")}>건너뛰기</button></div><Character className="prologueCharacter" who={current.who==="나"?"hero":"boss"} mood={current.mood}/><div className="storyBox"><small>{current.who}</small><p><TypeLine key={prologue} text={current.text}/></p><button className="primaryBtn" onClick={()=>prologue<2?setPrologue(n=>n+1):go("desktop","일단 전임자의 업무폴더부터 확인해보자.")}>{prologue<2?"계속":"업무 PC 켜기"}<ArrowRight size={18}/></button></div></section></main>;}
+ const windowTitle=screen==="desktop"?"업무용 PC":folderPhase?"파일 탐색기":screen==="registry"?"문서등록대장":reportPhase?"첫 업무, 첫 보고":"업무 자료";
+ return <main className="stage"><section className={`gameShell ${reportPhase?"sunsetPhase":"dayPhase"} ${screen==="final"?"endPhase":""}`}><div className="sceneImage"/><div className="sunRay"/><header className="gameHeader"><a className="gameBrand" href="/" onClick={e=>{e.preventDefault();go("intro");}}><span>인수인계의 전설</span><small>EP.01 · 첫 번째 업무</small></a><div className="headerRight"><span className="clueCount"><NotebookPen size={14}/><b>{found.length}</b><small>/10</small></span>{audioButton}</div></header><div className="progressTrack"><i style={{width:`${found.length*10}%`}}/></div><div className="sceneCaption"><span>{reportPhase?"17:30 · 첫 보고의 시간":"09:02 · 나의 첫 번째 책상"}</span><b>{reportPhase?"알아낸 내용을 전해보자.":"전임자의 흔적을 찾아서"}</b></div><div className="monitor"><div className="monitorBar"><span><i/><i/><i/></span><b>{windowTitle}</b><span className="syncIndicator">{sync==="saving"?"저장 중":sync==="error"?<button onClick={()=>setSyncNonce(n=>n+1)} aria-label="저장 다시 시도"><WifiOff size={13}/>재시도</button>:<Check size={12}/>}</span></div><div className={`monitorScreen screen-${screen}`} key={screen}><div className="screenBody">{mainContent()}</div></div><nav className="gameDock" aria-label="업무 PC 메뉴"><button disabled={reportPhase} onClick={()=>go("desktop")} aria-label="업무 PC 홈" className={screen==="desktop"?"active":""}><Home/><span>바탕화면</span></button><button disabled={reportPhase} onClick={()=>hint("msg")}><MessageCircle/><span>메신저</span><i className="notificationDot"/></button><button disabled={reportPhase} onClick={()=>hint("call")}><Phone/><span>전화</span></button><button disabled={reportPhase} onClick={()=>go("clues")}><NotebookPen/><span>단서함</span></button></nav></div><div className="storyDialogue"><div className="dialoguePortrait"><Character mood={screen==="boss-reply"?(lastCorrect?"happy":"worried"):latestClue?"happy":"normal"}/></div><div><small>나의 생각</small><p><TypeLine text={line} speed={18}/></p></div></div>{error&&<div className="floatingError" role="alert">{error}<button onClick={()=>setError("")} aria-label="알림 닫기"><X size={15}/></button></div>}{latestClue&&<div className="clueToast" role="status"><Sparkles/><div><small>새로운 단서 발견 · {found.length}/10</small><b>{clues[latestClue].title}</b></div><strong>+1</strong></div>}{contact==="msg"&&<Messenger audio={audio} nextHint={nextHint} onHint={()=>setMsgHints(n=>n+1)} onClose={()=>setContact(null)}/>} {(contact==="call"||contact==="ending")&&<PhoneCall audio={audio} nextHint={nextHint} ending={contact==="ending"} onHint={()=>{if(contact==="call")setCallHints(n=>n+1);}} onClose={()=>{if(contact==="ending")go("final","……그래. 이제 내가 담당자구나.");setContact(null);}}/>}</section><aside className="desktopSide"><span>DLC ARCADE / 01</span><h2>정답보다 중요한 건,<br/>확인하는 습관.</h2><p>이름만 ‘최종’인 파일과<br/>실제로 결재된 문서는 다를 수 있어요.</p><div className="desktopProgress"><strong>{found.length}<small>/10</small></strong><span>확인한 업무 단서</span></div><small>플레이 기록은 자동으로 저장됩니다.</small><a href="/admin"><ShieldCheck size={14}/> 관리자 페이지</a></aside></main>;
 }
-
-function Nav({onBack,title}:{onBack:()=>void;title:string}){return <div className="navHead"><button onClick={onBack} aria-label="이전 화면">←</button><b>{title}</b></div>}
+function Nav({onBack,title}:{onBack:()=>void;title:string}){return <div className="navHead"><button onClick={onBack} aria-label="이전 화면"><ArrowLeft size={18}/></button><b>{title}</b></div>}

@@ -1,0 +1,51 @@
+"use client";
+import {useEffect,useRef,useState} from "react";
+import {ArrowLeft,CheckCheck,Phone,PhoneOff,Send,Volume2,VolumeX,MessageSquare} from "lucide-react";
+
+export function useDialog(onClose:()=>void){
+ const ref=useRef<HTMLElement>(null),close=useRef(onClose);close.current=onClose;
+ useEffect(()=>{const previous=document.activeElement as HTMLElement|null;const node=ref.current;if(!node)return;const focusable=()=>Array.from(node.querySelectorAll<HTMLElement>('button:not(:disabled),input:not(:disabled),select,[tabindex="0"]'));focusable()[0]?.focus();const key=(e:KeyboardEvent)=>{if(e.key==="Escape"){e.preventDefault();close.current();}if(e.key==="Tab"){const items=focusable(),first=items[0],last=items[items.length-1];if(e.shiftKey&&document.activeElement===first){e.preventDefault();last?.focus();}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first?.focus();}}};node.addEventListener("keydown",key);return()=>{node.removeEventListener("keydown",key);previous?.focus();};},[]);return ref;
+}
+let audioContext:AudioContext|null=null;
+export function sound(kind:"tap"|"message"|"clue"|"ring"|"connect",enabled=true){
+ if(!enabled)return;try{audioContext??=new AudioContext();void audioContext.resume();const ctx=audioContext;
+ const frequencies=kind==="clue"?[523,659,784]:kind==="message"?[880,1175]:kind==="ring"?[440,480]:kind==="connect"?[660,520]:[520];
+ frequencies.forEach((f,i)=>{const o=ctx.createOscillator(),g=ctx.createGain();o.type="sine";o.frequency.value=f;o.connect(g);g.connect(ctx.destination);const t=ctx.currentTime+i*.09;g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.045,t+.01);g.gain.exponentialRampToValueAtTime(.001,t+.14);o.start(t);o.stop(t+.16);});
+ }catch{/* Audio remains optional on unsupported devices. */}
+}
+export function haptic(){try{navigator.vibrate?.(14);}catch{}}
+export function Character({who="hero",mood="normal",className=""}:{who?:"hero"|"senior"|"boss";mood?:string;className?:string}){
+ const column=who==="senior"?0:who==="boss"?(mood==="happy"?2:mood==="worried"?1:0):mood==="worried"?1:mood==="happy"?2:0;
+ return <div className={`character ${who==="boss"?"bossCharacter":""} ${className}`} role="img" aria-label={who==="hero"?"신규 담당자":who==="senior"?"전임자 선배":"팀장님"} style={{backgroundPosition:`${column*50}% ${who==="senior"?100:0}%`}}/>;
+}
+export function TypeLine({text,speed=24}:{text:string;speed?:number}){
+ const [count,setCount]=useState(0);useEffect(()=>{setCount(0);if(window.matchMedia("(prefers-reduced-motion: reduce)").matches){setCount(text.length);return;}const id=window.setInterval(()=>setCount(n=>{if(n>=text.length)clearInterval(id);return Math.min(text.length,n+1);}),speed);return()=>clearInterval(id);},[text,speed]);
+ return <span className="typedLine" onClick={()=>setCount(text.length)} aria-label={text}><span aria-hidden="true">{text.slice(0,count)}{count<text.length&&<i className="typeCursor"/>}</span></span>;
+}
+type Exchange={id:number;question:string;reply:string};
+const topics=[{key:"next",label:"어디부터 보면 될까요?"},{key:"date",label:"파일마다 날짜가 다른데요…"},{key:"evidence",label:"결재문서는 어떻게 찾아요?"},{key:"route",label:"피난동선도 봐야 하나요?"}];
+export function Messenger({onClose,onHint,nextHint,audio}:{onClose:()=>void;onHint:()=>void;nextHint:string;audio:boolean}){
+ const dialog=useDialog(onClose);
+ const [history,setHistory]=useState<Exchange[]>([]),[phase,setPhase]=useState<"idle"|"sent"|"read"|"typing">("idle"),[pending,setPending]=useState(""),[draft,setDraft]=useState("");const bottom=useRef<HTMLDivElement>(null),timers=useRef<number[]>([]);
+ useEffect(()=>{try{const h=JSON.parse(sessionStorage.getItem("handover-chat")||"[]");if(Array.isArray(h))setHistory(h);}catch{}return()=>timers.current.forEach(clearTimeout);},[]);
+ useEffect(()=>{bottom.current?.scrollIntoView({behavior:"smooth",block:"nearest"});},[phase,history]);
+ function ask(key:string,label:string){if(phase!=="idle")return;setPending(label);setDraft("");setPhase("sent");sound("tap",audio);haptic();onHint();
+ const answer=key==="date"?"그 폴더… 아직 최종 파일이 여러 개죠? 😅 파일명보다 결재된 계획안이 정확해요. 실제로 언제 했는지는 결과보고도 같이 봐주세요.":key==="evidence"?"문서등록대장에서 ‘합동소방’을 검색해봐요. 계획안하고 결과보고 두 개요! 등록번호랑 연도를 보면 다른 자료와 구분할 수 있어요.":key==="route"?"네! 훈련계획만 보면 절반이에요. 소방안전관리 폴더의 소방계획서, 청사도면 → 소방 → 피난동선도도 확인해봐요.":nextHint;
+ timers.current.push(window.setTimeout(()=>setPhase("read"),550),window.setTimeout(()=>setPhase("typing"),1050),window.setTimeout(()=>{setHistory(h=>{const next=[...h,{id:Date.now(),question:label,reply:answer}].slice(-25);try{sessionStorage.setItem("handover-chat",JSON.stringify(next));}catch{}return next;});setPhase("idle");setPending("");sound("message",audio);},2300));}
+ function freeAsk(){const text=draft.trim();if(!text)return;const key=/날짜|언제|일정|최종/.test(text)?"date":/문등대|결재|문서|검색/.test(text)?"evidence":/피난|동선|대피|도면/.test(text)?"route":"next";ask(key,text.slice(0,160));}
+ return <div className="contactBackdrop"><section ref={dialog} className="messengerPanel" role="dialog" aria-modal="true" aria-labelledby="messenger-title"><header className="contactHeader"><button onClick={onClose} aria-label="메신저 닫기"><ArrowLeft/></button><div className="contactAvatar"><Character who="senior"/></div><div><b id="messenger-title">전임자 선배</b><small><i/>지금 대화 가능</small></div><span>직원 메신저</span></header>
+ <div className="messages"><div className="chatDate">오늘 · 첫 출근</div><div className="seniorBubble"><small>전임자 선배</small>첫날이죠? 바쁘겠지만 하나씩 찾아봐요.<br/>막히면 여기로 물어보고요 🙂</div>{history.map(h=><div className="exchange" key={h.id}><div className="myBubble">{h.question}</div><small className="readReceipt"><CheckCheck size={12}/> 읽음</small><div className="seniorBubble"><small>전임자 선배</small>{h.reply}</div></div>)}{pending&&<><div className="myBubble">{pending}</div><small className="readReceipt">{phase==="sent"?"전송됨":"읽음"}</small></>}{phase==="typing"&&<div className="typingBubble"><i/><i/><i/><span>선배가 입력 중…</span></div>}<div ref={bottom}/></div>
+ <div className="suggestedQuestions">{topics.map(t=><button disabled={phase!=="idle"} key={t.key} onClick={()=>ask(t.key,t.label)}>{t.label}</button>)}</div><form className="chatInput" onSubmit={e=>{e.preventDefault();freeAsk();}}><input maxLength={160} value={draft} onChange={e=>setDraft(e.target.value)} placeholder="선배에게 질문하기" aria-label="선배에게 보낼 질문" disabled={phase!=="idle"}/><button disabled={phase!=="idle"||!draft.trim()} aria-label="보내기"><Send size={19}/></button></form><button className="contactReturn" onClick={onClose}>대화 닫고 업무로 돌아가기</button></section></div>;
+}
+export function PhoneCall({onClose,onHint,nextHint,audio,ending=false}:{onClose:()=>void;onHint:()=>void;nextHint:string;audio:boolean;ending?:boolean}){
+ const dialog=useDialog(onClose),connectionTimer=useRef<ReturnType<typeof setTimeout>|null>(null),ringTimer=useRef<ReturnType<typeof setInterval>|null>(null);
+ const [phase,setPhase]=useState<"dialing"|"connected"|"ended">("dialing"),[seconds,setSeconds]=useState(0),[step,setStep]=useState(0),[speaker,setSpeaker]=useState(false),[muted,setMuted]=useState(false);const name=ending?"야탑119안전센터":"전임자 선배";
+ const lines=ending?["회계과 담당자님 맞으시죠?","올해 합동소방훈련 일정 협의드리려고 전화드렸습니다.","작년 자료 확인하셨다고요? 좋습니다. 이번에는 담당자님과 같이 준비하겠습니다."]:["어, 전화했어요? 첫날이라 정신없죠?",nextHint,"파일 이름만 믿지 말고, 결재문서와 결과를 꼭 같이 봐요. 할 수 있어요!"];
+ useEffect(()=>{sound("ring",audio);const ring=ringTimer.current=setInterval(()=>sound("ring",audio),1800);const connect=connectionTimer.current=setTimeout(()=>{clearInterval(ring);setPhase("connected");sound("connect",audio);onHint();},2400);return()=>{clearInterval(ring);clearTimeout(connect);window.speechSynthesis?.cancel();};},[]);
+ useEffect(()=>{if(phase!=="connected")return;const t=setInterval(()=>setSeconds(n=>n+1),1000);return()=>clearInterval(t);},[phase]);
+ useEffect(()=>{if(!speaker||phase!=="connected"||!window.speechSynthesis)return;const utterance=new SpeechSynthesisUtterance(lines[step]);utterance.lang="ko-KR";utterance.rate=.97;window.speechSynthesis.cancel();window.speechSynthesis.speak(utterance);return()=>window.speechSynthesis.cancel();},[step,speaker,phase]);
+ function hangup(){if(connectionTimer.current)clearTimeout(connectionTimer.current);if(ringTimer.current)clearInterval(ringTimer.current);setPhase("ended");window.speechSynthesis?.cancel();sound("connect",audio);}
+ return <div className="contactBackdrop phoneBackdrop"><section ref={dialog} className="phonePanel" role="dialog" aria-modal="true" aria-labelledby="call-title"><div className="phoneTop"><span>{ending?"수신 전화":"발신 전화"}</span><small>업무용 전화</small></div><div className={`callAvatar ${phase==="dialing"?"ringing":""}`}>{ending?<Phone size={48}/>:<Character who="senior"/>}</div><h2 id="call-title">{name}</h2><p className="callStatus">{phase==="dialing"?"연결 중 · 뚜… 뚜…":phase==="ended"?"통화가 종료되었습니다":`${String(Math.floor(seconds/60)).padStart(2,"0")}:${String(seconds%60).padStart(2,"0")}`}</p>
+ {phase==="connected"?<div className="callDialogue"><div className="waveform" aria-hidden="true">{Array.from({length:20},(_,i)=><i key={i} style={{animationDelay:`${i*.07}s`}}/>)}</div><small>{name}</small><p>{muted?<span className="captionsHidden">자막이 꺼져 있어요.</span>:<TypeLine key={step} text={lines[step]} speed={35}/>}</p>{step<lines.length-1?<button className="listenButton" onClick={()=>{setStep(n=>n+1);sound("tap",audio);}}>{step===0?(ending?"네, 회계과 담당자입니다.":"네, 선배님. 말씀해주세요."):"아, 그렇군요. 계속 듣기"}<span>→</span></button>:<button className="listenButton" onClick={hangup}>{ending?"네, 제가 준비하겠습니다.":"감사합니다. 확인해볼게요!"}<CheckCheck size={18}/></button>}</div>:<div className="callWaiting">{phase==="dialing"?<><div className="dialDots"><i/><i/><i/></div><p>{ending?"전화를 연결하고 있어요.":"잠시만요, 선배가 전화를 받고 있어요."}</p></>:<p>{ending?"이제, 당신이 담당자입니다.":"선배의 말을 기억하며 자료를 찾아보자."}</p>}</div>}
+ {phase!=="ended"?<><div className="callOptions"><button onClick={()=>setMuted(v=>!v)} aria-pressed={muted}><MessageSquare/><span>{muted?"자막 켜기":"자막 끄기"}</span></button><button onClick={()=>setSpeaker(v=>!v)} aria-pressed={speaker}>{speaker?<Volume2/>:<VolumeX/>}<span>{speaker?"음성 켜짐":"대사 읽기"}</span></button></div><button className="hangup" onClick={hangup} aria-label="통화 종료"><PhoneOff/></button></>:<button className="primaryBtn" onClick={onClose}>{ending?"업무 계속하기":"업무로 돌아가기"} →</button>}</section></div>;
+}

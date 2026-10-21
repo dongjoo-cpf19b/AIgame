@@ -58,36 +58,3 @@ export function EvacuationPlan({ found, onCollect }: { found: boolean; onCollect
       <path d="M321 26V11m-4 6 4-6 4 6" stroke="#71899b" fill="none"/><text x="309" y="22" fontSize="9" fill="#71899b">N</text>
     </svg><div className="planLegend"><span><i className="locationDot"/>현 위치</span><span><i className="routeDash"/>대피 경로</span><span><i className="exitBox"/>비상구</span></div><p className="planInstruction">업무공간 → 복도 → 피난계단 → 비상구</p><button className="primaryBtn" onClick={onCollect}>{found ? "✓ 피난동선 확인 완료" : "피난동선·피난계단 확인"}</button></div>;
 }
-export function ContactDialog({ kind, text, history, onClose, onAccept }: {
-  kind: "msg" | "call"; text: string; history: ChatEntry[]; onClose: () => void; onAccept: () => void;
-}) {
-  const dialogRef = useRef<HTMLDialogElement>(null);
-  const messagesRef = useRef<HTMLDivElement>(null);
-  const [connected, setConnected] = useState(false);
-  const [seconds, setSeconds] = useState(0);
-  useEffect(() => {
-    const previousFocus = document.activeElement;
-    const dialog = dialogRef.current;
-    dialog?.showModal();
-    messagesRef.current?.scrollTo({ top: messagesRef.current.scrollHeight });
-    return () => { dialog?.close(); if (previousFocus instanceof HTMLElement && previousFocus.isConnected) previousFocus.focus(); };
-  }, []);
-  useEffect(() => {
-    if (!connected) return;
-    const timer = window.setInterval(() => setSeconds(s => s + 1), 1000);
-    return () => window.clearInterval(timer);
-  }, [connected]);
-  return <dialog ref={dialogRef} className={`contactDialog ${kind === "msg" ? "messengerDialog" : "callDialog"}`} aria-labelledby="contact-title" onCancel={onClose}>
-    <div className="contactTop"><span>{kind === "msg" ? "직원 메신저" : "업무용 전화"}</span><button autoFocus type="button" onClick={onClose} aria-label="닫기">×</button></div>
-    {kind === "msg" ? <>
-      <div className="contactIdentity"><div className="contactAvatar"><GameIcon name="person"/></div><div><h2 id="contact-title">전임자 선배</h2><span><i/> 대화 가능</span></div></div>
-      <div className="chatHistory" ref={messagesRef}><p className="chatDate">오늘 · 업무 인수인계</p>{history.map(entry=><div className="chatExchange" key={entry.id}><div className="chatMine">선배님, 자료 찾다가 막혔어요.<br/>어디를 더 확인하면 좋을까요?</div><small className="chatRead">읽음</small><div className="chatTheirs"><small>전임자 선배</small><p>{entry.text}</p></div></div>)}</div>
-      <div className="chatComposer"><span>선배의 답변을 확인했어요.</span><button onClick={onClose}>업무로 돌아가기 ↗</button></div>
-    </> : <>
-      <p className="callState">{connected ? "통화 연결됨" : "전화가 왔습니다"}</p><div className={`callPortrait ${connected ? "connected" : ""}`}><GameIcon name="person"/></div>
-      <h2 id="contact-title">전임자 선배</h2><p className="callSubtitle">{connected ? `${String(Math.floor(seconds / 60)).padStart(2,"0")}:${String(seconds % 60).padStart(2,"0")}` : "부재중이었죠? 지금 잠깐 통화돼요."}</p>
-      {connected && <div className="callTranscript" role="status"><div className="voiceBars" aria-hidden="true"><i/><i/><i/><i/><i/></div><small>선배의 말</small><p>“{text}”</p></div>}
-      <div className="callActions">{!connected && <button className="answerCall" onClick={()=>{setConnected(true);onAccept();}}><GameIcon name="phone"/><span>전화 받기</span></button>}<button className="endCall" onClick={onClose}><GameIcon name="phone"/><span>{connected ? "통화 종료" : "나중에 받기"}</span></button></div>
-    </>}
-  </dialog>;
-}
