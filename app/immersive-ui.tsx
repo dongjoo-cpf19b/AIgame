@@ -16,22 +16,22 @@ export function sound(kind:"tap"|"message"|"clue"|"ring"|"connect",enabled=true)
 export function haptic(){try{navigator.vibrate?.(14);}catch{}}
 export function Character({who="hero",mood="normal",className=""}:{who?:"hero"|"senior"|"boss";mood?:string;className?:string}){
  const column=who==="senior"?0:who==="boss"?(mood==="happy"?2:mood==="worried"?1:0):mood==="worried"?1:mood==="happy"?2:0;
- return <div className={`character ${who==="boss"?"bossCharacter":""} ${className}`} role="img" aria-label={who==="hero"?"신규 담당자":who==="senior"?"전임자 선배":"팀장님"} style={{backgroundPosition:`${column*50}% ${who==="senior"?100:0}%`}}/>;
+ return <div className={`character ${who==="boss"?"bossCharacter":""} ${className}`} role="img" aria-label={who==="hero"?"신규 담당자":who==="senior"?"전임자 선배":"청사관리팀장 · 지방공업주사"} style={{backgroundPosition:`${column*50}% ${who==="senior"?100:0}%`}}/>;
 }
 export function TypeLine({text,speed=24}:{text:string;speed?:number}){
  const [count,setCount]=useState(0);useEffect(()=>{setCount(0);if(window.matchMedia("(prefers-reduced-motion: reduce)").matches){setCount(text.length);return;}const id=window.setInterval(()=>setCount(n=>{if(n>=text.length)clearInterval(id);return Math.min(text.length,n+1);}),speed);return()=>clearInterval(id);},[text,speed]);
  return <span className="typedLine" onClick={()=>setCount(text.length)} aria-label={text}><span aria-hidden="true">{text.slice(0,count)}{count<text.length&&<i className="typeCursor"/>}</span></span>;
 }
-type Exchange={id:number;question:string;reply:string};
+export type Exchange={id:number;question:string;reply:string};
 const topics=[{key:"next",label:"어디부터 보면 될까요?"},{key:"date",label:"파일마다 날짜가 다른데요…"},{key:"evidence",label:"결재문서는 어떻게 찾아요?"},{key:"route",label:"피난동선도 봐야 하나요?"}];
-export function Messenger({onClose,onHint,nextHint,audio}:{onClose:()=>void;onHint:()=>void;nextHint:string;audio:boolean}){
+export function Messenger({onClose,onHint,nextHint,audio,history,onHistoryChange}:{onClose:()=>void;onHint:()=>void;nextHint:string;audio:boolean;history:Exchange[];onHistoryChange:(history:Exchange[])=>void}){
  const dialog=useDialog(onClose);
- const [history,setHistory]=useState<Exchange[]>([]),[phase,setPhase]=useState<"idle"|"sent"|"read"|"typing">("idle"),[pending,setPending]=useState(""),[draft,setDraft]=useState("");const bottom=useRef<HTMLDivElement>(null),timers=useRef<number[]>([]);
- useEffect(()=>{try{const h=JSON.parse(sessionStorage.getItem("handover-chat")||"[]");if(Array.isArray(h))setHistory(h);}catch{}return()=>timers.current.forEach(clearTimeout);},[]);
+ const [phase,setPhase]=useState<"idle"|"sent"|"read"|"typing">("idle"),[pending,setPending]=useState(""),[draft,setDraft]=useState("");const bottom=useRef<HTMLDivElement>(null),timers=useRef<number[]>([]);
+ useEffect(()=>()=>timers.current.forEach(clearTimeout),[]);
  useEffect(()=>{bottom.current?.scrollIntoView({behavior:"smooth",block:"nearest"});},[phase,history]);
  function ask(key:string,label:string){if(phase!=="idle")return;setPending(label);setDraft("");setPhase("sent");sound("tap",audio);haptic();onHint();
  const answer=key==="date"?"그 폴더… 아직 최종 파일이 여러 개죠? 😅 파일명보다 결재된 계획안이 정확해요. 실제로 언제 했는지는 결과보고도 같이 봐주세요.":key==="evidence"?"문서등록대장에서 ‘합동소방’을 검색해봐요. 계획안하고 결과보고 두 개요! 등록번호랑 연도를 보면 다른 자료와 구분할 수 있어요.":key==="route"?"네! 훈련계획만 보면 절반이에요. 소방안전관리 폴더의 소방계획서, 청사도면 → 소방 → 피난동선도도 확인해봐요.":nextHint;
- timers.current.push(window.setTimeout(()=>setPhase("read"),550),window.setTimeout(()=>setPhase("typing"),1050),window.setTimeout(()=>{setHistory(h=>{const next=[...h,{id:Date.now(),question:label,reply:answer}].slice(-25);try{sessionStorage.setItem("handover-chat",JSON.stringify(next));}catch{}return next;});setPhase("idle");setPending("");sound("message",audio);},2300));}
+ timers.current.push(window.setTimeout(()=>setPhase("read"),550),window.setTimeout(()=>setPhase("typing"),1050),window.setTimeout(()=>{onHistoryChange([...history,{id:Date.now(),question:label,reply:answer}].slice(-25));setPhase("idle");setPending("");sound("message",audio);},2300));}
  function freeAsk(){const text=draft.trim();if(!text)return;const key=/날짜|언제|일정|최종/.test(text)?"date":/문등대|결재|문서|검색/.test(text)?"evidence":/피난|동선|대피|도면/.test(text)?"route":"next";ask(key,text.slice(0,160));}
  return <div className="contactBackdrop"><section ref={dialog} className="messengerPanel" role="dialog" aria-modal="true" aria-labelledby="messenger-title"><header className="contactHeader"><button onClick={onClose} aria-label="메신저 닫기"><ArrowLeft/></button><div className="contactAvatar"><Character who="senior"/></div><div><b id="messenger-title">전임자 선배</b><small><i/>지금 대화 가능</small></div><span>직원 메신저</span></header>
  <div className="messages"><div className="chatDate">오늘 · 첫 출근</div><div className="seniorBubble"><small>전임자 선배</small>첫날이죠? 바쁘겠지만 하나씩 찾아봐요.<br/>막히면 여기로 물어보고요 🙂</div>{history.map(h=><div className="exchange" key={h.id}><div className="myBubble">{h.question}</div><small className="readReceipt"><CheckCheck size={12}/> 읽음</small><div className="seniorBubble"><small>전임자 선배</small>{h.reply}</div></div>)}{pending&&<><div className="myBubble">{pending}</div><small className="readReceipt">{phase==="sent"?"전송됨":"읽음"}</small></>}{phase==="typing"&&<div className="typingBubble"><i/><i/><i/><span>선배가 입력 중…</span></div>}<div ref={bottom}/></div>
