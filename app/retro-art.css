@@ -44,7 +44,7 @@
 .castPreview { display: grid!important; grid-template-columns: 1fr 1fr; gap: 12px!important; margin: 25px 0!important; }
 .castPreview>div { height: 210px; overflow: hidden; position: relative; border-radius: 9px; background: #c3ced1; border: 1px solid #a5b5be; }
 .castPreview .character { width: 140px; margin: 0 auto; }
-.castPreview span { position: absolute; bottom: 0; left: 0; right: 0; padding: 22px 9px 9px; background: linear-gradient(transparent,#253c51); color: white; text-align: center; line-height: 1.6; }
+.castPreview>div>span { position: absolute; bottom: 0; left: 0; right: 0; padding: 22px 9px 9px; background: linear-gradient(transparent,#253c51); color: white; text-align: center; line-height: 1.6; }
 
 /* Illustrated prologue, with dialogue and its action always in normal flow. */
 .prologueScene { display: flex; flex-direction: column; overflow-y: auto; background: #172f42; }
@@ -141,3 +141,21 @@
 @media(prefers-reduced-motion:reduce) {
   .character { animation: none!important; }
 }
+
+/* Local continuation keeps the primary action prominent on narrow phones. */
+.restartLink { display:flex;align-items:center;justify-content:center;gap:7px;width:100%;min-height:42px;background:transparent;color:#d9e8ea;font-size:13px;margin-top:7px; }
+.hasSavedRun .introMeta { display:none; }
+.hasSavedRun .singlePlayNote { margin-top:6px!important; }
+.restartPrompt h2 {font-size:25px;}
+.voiceRetry {display:block;margin-top:8px;padding:7px 10px;border:1px solid currentColor;border-radius:5px;color:inherit;background:transparent;font-size:12px;}
+
+/* Brief cel animation beats, separated by long still poses. */
+.character { position:relative; }
+.characterBlink { position:absolute;inset:0;pointer-events:none;background-image:url('/art/retro-v5/hero-blink.webp');background-size:300% 100%;background-position:inherit;clip-path:inset(33% 24% 60% 42%);opacity:0;animation:celBlink 5.3s step-end infinite; }
+.bossCharacter .characterBlink {background-image:url('/art/retro-v5/boss-blink.webp');clip-path:inset(29% 35% 63% 27%);animation-duration:6.1s;animation-delay:1.2s;}
+.sweatDrops {position:absolute;left:71%;top:35%;width:13%;height:24%;pointer-events:none;}
+.sweatDrops i {position:absolute;left:4%;top:0;width:30%;height:28%;border-radius:70% 70% 70% 8%;background:#94dce9;border:1px solid #2d6474;box-shadow:inset 1px 1px #f0ffff;transform:rotate(-35deg);opacity:0;animation:nervousSweat 2.8s ease-in infinite;}
+.sweatDrops i+i {left:55%;top:12%;width:23%;height:22%;animation-delay:1.15s;}
+@keyframes celBlink {0%,86%,89%,100%{opacity:0}87%,88.5%{opacity:1}}
+@keyframes nervousSweat {0%,38%,100%{opacity:0;transform:translateY(0) rotate(-35deg)}46%{opacity:.95}74%{opacity:.85}87%{opacity:0;transform:translateY(100%) rotate(-35deg)}}
+@media(prefers-reduced-motion:reduce){.characterBlink,.sweatDrops{display:none!important}}

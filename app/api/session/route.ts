@@ -1,7 +1,15 @@
 import {db,json,token,digest,limited,sameOrigin,gameSession,cleanRunSummary,validAnswers,evaluate,serverFailure} from "../../../lib/game-server";
 
-// Each visit is a new play. Never expose a saved screen, answer or conversation.
-export async function GET(){return json({error:"이 게임은 이어하기를 제공하지 않습니다."},405,{Allow:"POST"});}
+// Progress stays on the player's browser; only validate its own session and completion.
+export async function GET(req:Request){
+ try{
+  if(!sameOrigin(req))return json({error:"잘못된 요청입니다."},403);
+  const s=await gameSession(req);
+  if(!s)return json({error:"저장된 플레이를 확인할 수 없어요. 새로 시작해주세요."},401);
+  const entered=!!await db().prepare("SELECT session_id FROM raffle_entries WHERE session_id=?").bind(s.id).first();
+  return json({id:s.id,completed:!!s.completed_at,score:s.score,grade:s.grade,entered});
+ }catch(e){return serverFailure(e);}
+}
 
 export async function POST(req:Request){
  try{
@@ -17,9 +25,11 @@ export async function POST(req:Request){
   const s=await gameSession(req);
   if(!s)return json({error:"플레이 정보를 다시 확인해주세요."},401);
   if(!validAnswers(b.answers))return json({error:"다섯 질문에 모두 답해주세요."},400);
+  if(s.completed_at)return json({ok:true,score:s.score,grade:s.grade});
   const result=evaluate(b.answers),summary=cleanRunSummary(b.summary);
-  // Keep completion and aggregate results for raffle/admin use, never resumable progress.
-  await db().prepare("UPDATE game_sessions SET completed_at=COALESCE(completed_at,?),updated_at=?,score=?,grade=?,clues=?,messenger_hints=?,phone_hints=?,progress=? WHERE id=?").bind(Date.now(),Date.now(),result.score,result.grade,summary.found.length,summary.msgHints,summary.callHints,"{}",s.id).run();
-  return json({ok:true,...result});
+  // Retrying after navigation cannot overwrite an already completed report.
+  await db().prepare("UPDATE game_sessions SET completed_at=?,updated_at=?,score=?,grade=?,clues=?,messenger_hints=?,phone_hints=?,progress=? WHERE id=? AND completed_at IS NULL").bind(Date.now(),Date.now(),result.score,result.grade,summary.found.length,summary.msgHints,summary.callHints,"{}",s.id).run();
+  const finished=await gameSession(req);
+  return json({ok:true,score:finished?.score??result.score,grade:finished?.grade??result.grade});
  }catch(e){return serverFailure(e);}
 }

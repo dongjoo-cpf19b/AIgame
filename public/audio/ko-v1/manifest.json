@@ -1,0 +1,561 @@
+{
+  "version": "ko-v1",
+  "provider": "Microsoft Edge online speech via edge-tts",
+  "generator_version": "7.3.1",
+  "generation_only": "Generated from fixed fictional game dialogue. No runtime speech API requests or celebrity voice cloning.",
+  "voice_roles": {
+    "hero": {
+      "voice": "ko-KR-InJoonNeural",
+      "gender": "male",
+      "rate": "-3%",
+      "pitch": "+0Hz"
+    },
+    "boss": {
+      "voice": "ko-KR-SunHiNeural",
+      "gender": "female",
+      "rate": "-3%",
+      "pitch": "+0Hz"
+    },
+    "senior": {
+      "voice": "ko-KR-InJoonNeural",
+      "gender": "male",
+      "rate": "-3%",
+      "pitch": "-4Hz"
+    },
+    "firefighter": {
+      "voice": "ko-KR-InJoonNeural",
+      "gender": "male",
+      "rate": "-3%",
+      "pitch": "-8Hz"
+    }
+  },
+  "clips": [
+    {
+      "role": "boss",
+      "text": "10월 15일? 그거 파일명만 보고 말씀하시는 거예요? 결과보고는 확인했어요?",
+      "voice": "ko-KR-SunHiNeural",
+      "gender": "female",
+      "rate": "-3%",
+      "pitch": "+0Hz",
+      "file": "/audio/ko-v1/boss-7f1eb2dadd901f5e.mp3",
+      "sources": [
+        "questions.bad"
+      ],
+      "duration_seconds": 8.28,
+      "bytes": 49680,
+      "codec": "mp3",
+      "sample_rate": 24000,
+      "channels": 1
+    },
+    {
+      "role": "boss",
+      "text": "10월 22일. 맞아요. 파일명만 보고 온 건 아니네요. 계속해봐요.",
+      "voice": "ko-KR-SunHiNeural",
+      "gender": "female",
+      "rate": "-3%",
+      "pitch": "+0Hz",
+      "file": "/audio/ko-v1/boss-203fdf3fc0286212.mp3",
+      "sources": [
+        "questions.ok"
+      ],
+      "duration_seconds": 7.92,
+      "bytes": 47520,
+      "codec": "mp3",
+      "sample_rate": 24000,
+      "channels": 1
+    },
+    {
+      "role": "boss",
+      "text": "거기였어요? 작년 협조기관 다시 확인해봐야 할 것 같은데.",
+      "voice": "ko-KR-SunHiNeural",
+      "gender": "female",
+      "rate": "-3%",
+      "pitch": "+0Hz",
+      "file": "/audio/ko-v1/boss-e6ddecfce628a927.mp3",
+      "sources": [
+        "questions.bad"
+      ],
+      "duration_seconds": 6.288,
+      "bytes": 37728,
+      "codec": "mp3",
+      "sample_rate": 24000,
+      "channels": 1
+    },
+    {
+      "role": "boss",
+      "text": "그 날짜는 아닌 것 같은데… 일단 계속해보죠.",
+      "voice": "ko-KR-SunHiNeural",
+      "gender": "female",
+      "rate": "-3%",
+      "pitch": "+0Hz",
+      "file": "/audio/ko-v1/boss-a798a93aea4c7fcd.mp3",
+      "sources": [
+        "questions.bad"
+      ],
+      "duration_seconds": 5.16,
+      "bytes": 30960,
+      "codec": "mp3",
+      "sample_rate": 24000,
+      "channels": 1
+    },
+    {
+      "role": "boss",
+      "text": "그 법이 이 훈련의 직접적인 근거였나요? 한번 더 확인해봐야겠는데.",
+      "voice": "ko-KR-SunHiNeural",
+      "gender": "female",
+      "rate": "-3%",
+      "pitch": "+0Hz",
+      "file": "/audio/ko-v1/boss-60c7863df6a08268.mp3",
+      "sources": [
+        "questions.bad"
+      ],
+      "duration_seconds": 6.6,
+      "bytes": 39600,
+      "codec": "mp3",
+      "sample_rate": 24000,
+      "channels": 1
+    },
+    {
+      "role": "boss",
+      "text": "그렇죠. 예산이 없다고 준비할 일까지 없는 건 아니에요. 그건 알고 있네요.",
+      "voice": "ko-KR-SunHiNeural",
+      "gender": "female",
+      "rate": "-3%",
+      "pitch": "+0Hz",
+      "file": "/audio/ko-v1/boss-c3d0abd62fb00bdc.mp3",
+      "sources": [
+        "questions.ok"
+      ],
+      "duration_seconds": 7.848,
+      "bytes": 47088,
+      "codec": "mp3",
+      "sample_rate": 24000,
+      "channels": 1
+    },
+    {
+      "role": "boss",
+      "text": "도면까지 확인했어요? ……제법인데요. 다음 것도 맡겨도 되겠어요.",
+      "voice": "ko-KR-SunHiNeural",
+      "gender": "female",
+      "rate": "-3%",
+      "pitch": "+0Hz",
+      "file": "/audio/ko-v1/boss-ca08278e1b4bb425.mp3",
+      "sources": [
+        "questions.ok"
+      ],
+      "duration_seconds": 7.344,
+      "bytes": 44064,
+      "codec": "mp3",
+      "sample_rate": 24000,
+      "channels": 1
+    },
+    {
+      "role": "boss",
+      "text": "맞아요. 근거는 정확히 알고 있어야죠. 그건 잘 확인했네요.",
+      "voice": "ko-KR-SunHiNeural",
+      "gender": "female",
+      "rate": "-3%",
+      "pitch": "+0Hz",
+      "file": "/audio/ko-v1/boss-40cdfe7b2ad45fbb.mp3",
+      "sources": [
+        "questions.ok"
+      ],
+      "duration_seconds": 7.272,
+      "bytes": 43632,
+      "codec": "mp3",
+      "sample_rate": 24000,
+      "channels": 1
+    },
+    {
+      "role": "boss",
+      "text": "별도 예산을 썼다고요? 계획서에 그렇게 되어 있었나요?",
+      "voice": "ko-KR-SunHiNeural",
+      "gender": "female",
+      "rate": "-3%",
+      "pitch": "+0Hz",
+      "file": "/audio/ko-v1/boss-55178fee2b5ccfe3.mp3",
+      "sources": [
+        "questions.bad"
+      ],
+      "duration_seconds": 5.592,
+      "bytes": 33552,
+      "codec": "mp3",
+      "sample_rate": 24000,
+      "channels": 1
+    },
+    {
+      "role": "boss",
+      "text": "새로 오셨죠? 작년 합동소방훈련부터 파악해봐요. 파일은 공용폴더에 있을 거예요.",
+      "voice": "ko-KR-SunHiNeural",
+      "gender": "female",
+      "rate": "-3%",
+      "pitch": "+0Hz",
+      "file": "/audio/ko-v1/boss-3858bcc918632c8d.mp3",
+      "sources": [
+        "prologue"
+      ],
+      "duration_seconds": 8.784,
+      "bytes": 52704,
+      "codec": "mp3",
+      "sample_rate": 24000,
+      "channels": 1
+    },
+    {
+      "role": "boss",
+      "text": "야탑119안전센터. 맞아요. 올해 협의할 때도 기억해두세요.",
+      "voice": "ko-KR-SunHiNeural",
+      "gender": "female",
+      "rate": "-3%",
+      "pitch": "+0Hz",
+      "file": "/audio/ko-v1/boss-cd2043189033054b.mp3",
+      "sources": [
+        "questions.ok"
+      ],
+      "duration_seconds": 7.608,
+      "bytes": 45648,
+      "codec": "mp3",
+      "sample_rate": 24000,
+      "channels": 1
+    },
+    {
+      "role": "boss",
+      "text": "우리 시청 피난계획이나 피난동선도 확인했어요?",
+      "voice": "ko-KR-SunHiNeural",
+      "gender": "female",
+      "rate": "-3%",
+      "pitch": "+0Hz",
+      "file": "/audio/ko-v1/boss-5e894dd0b9d90ac0.mp3",
+      "sources": [
+        "questions.q"
+      ],
+      "duration_seconds": 4.344,
+      "bytes": 26064,
+      "codec": "mp3",
+      "sample_rate": 24000,
+      "channels": 1
+    },
+    {
+      "role": "boss",
+      "text": "우리가 소방관서하고 합동훈련하는 근거가 뭐예요?",
+      "voice": "ko-KR-SunHiNeural",
+      "gender": "female",
+      "rate": "-3%",
+      "pitch": "+0Hz",
+      "file": "/audio/ko-v1/boss-920798d351ce8b06.mp3",
+      "sources": [
+        "questions.q"
+      ],
+      "duration_seconds": 4.488,
+      "bytes": 26928,
+      "codec": "mp3",
+      "sample_rate": 24000,
+      "channels": 1
+    },
+    {
+      "role": "boss",
+      "text": "작년 합동소방훈련 언제 했어요?",
+      "voice": "ko-KR-SunHiNeural",
+      "gender": "female",
+      "rate": "-3%",
+      "pitch": "+0Hz",
+      "file": "/audio/ko-v1/boss-acba98c7f0b61262.mp3",
+      "sources": [
+        "questions.q"
+      ],
+      "duration_seconds": 3.408,
+      "bytes": 20448,
+      "codec": "mp3",
+      "sample_rate": 24000,
+      "channels": 1
+    },
+    {
+      "role": "boss",
+      "text": "작년에는 어디랑 같이 했어요?",
+      "voice": "ko-KR-SunHiNeural",
+      "gender": "female",
+      "rate": "-3%",
+      "pitch": "+0Hz",
+      "file": "/audio/ko-v1/boss-546f3ef0ebeb8c9a.mp3",
+      "sources": [
+        "questions.q"
+      ],
+      "duration_seconds": 3.24,
+      "bytes": 19440,
+      "codec": "mp3",
+      "sample_rate": 24000,
+      "channels": 1
+    },
+    {
+      "role": "boss",
+      "text": "참, 제목에 ‘최종’ 붙었다고 그냥 믿지는 마세요. 근거까지 확인하고 보고해요.",
+      "voice": "ko-KR-SunHiNeural",
+      "gender": "female",
+      "rate": "-3%",
+      "pitch": "+0Hz",
+      "file": "/audio/ko-v1/boss-cf044e0b80f2c455.mp3",
+      "sources": [
+        "prologue"
+      ],
+      "duration_seconds": 7.8,
+      "bytes": 46800,
+      "codec": "mp3",
+      "sample_rate": 24000,
+      "channels": 1
+    },
+    {
+      "role": "boss",
+      "text": "훈련계획서만 봐서는 부족해요. 실제 대피할 때 어디로 가는지도 알아야죠.",
+      "voice": "ko-KR-SunHiNeural",
+      "gender": "female",
+      "rate": "-3%",
+      "pitch": "+0Hz",
+      "file": "/audio/ko-v1/boss-43479e6dc22dad71.mp3",
+      "sources": [
+        "questions.bad"
+      ],
+      "duration_seconds": 7.08,
+      "bytes": 42480,
+      "codec": "mp3",
+      "sample_rate": 24000,
+      "channels": 1
+    },
+    {
+      "role": "boss",
+      "text": "훈련하면서 별도 예산이나 준비할 사항은 있었어요?",
+      "voice": "ko-KR-SunHiNeural",
+      "gender": "female",
+      "rate": "-3%",
+      "pitch": "+0Hz",
+      "file": "/audio/ko-v1/boss-8d9358c962b1a7fe.mp3",
+      "sources": [
+        "questions.q"
+      ],
+      "duration_seconds": 4.728,
+      "bytes": 28368,
+      "codec": "mp3",
+      "sample_rate": 24000,
+      "channels": 1
+    },
+    {
+      "role": "firefighter",
+      "text": "올해 합동소방훈련 일정 협의드리려고 전화드렸습니다.",
+      "voice": "ko-KR-InJoonNeural",
+      "gender": "male",
+      "rate": "-3%",
+      "pitch": "-8Hz",
+      "file": "/audio/ko-v1/firefighter-c696e1de4252acd1.mp3",
+      "sources": [
+        "PhoneCall"
+      ],
+      "duration_seconds": 5.16,
+      "bytes": 30960,
+      "codec": "mp3",
+      "sample_rate": 24000,
+      "channels": 1
+    },
+    {
+      "role": "firefighter",
+      "text": "작년 자료 확인하셨다고요? 좋습니다. 이번에는 담당자님과 같이 준비하겠습니다.",
+      "voice": "ko-KR-InJoonNeural",
+      "gender": "male",
+      "rate": "-3%",
+      "pitch": "-8Hz",
+      "file": "/audio/ko-v1/firefighter-cfb4531aea38d536.mp3",
+      "sources": [
+        "PhoneCall"
+      ],
+      "duration_seconds": 9.816,
+      "bytes": 58896,
+      "codec": "mp3",
+      "sample_rate": 24000,
+      "channels": 1
+    },
+    {
+      "role": "firefighter",
+      "text": "회계과 담당자님 맞으시죠?",
+      "voice": "ko-KR-InJoonNeural",
+      "gender": "male",
+      "rate": "-3%",
+      "pitch": "-8Hz",
+      "file": "/audio/ko-v1/firefighter-d3eacb3af6b01705.mp3",
+      "sources": [
+        "PhoneCall"
+      ],
+      "duration_seconds": 3.312,
+      "bytes": 19872,
+      "codec": "mp3",
+      "sample_rate": 24000,
+      "channels": 1
+    },
+    {
+      "role": "hero",
+      "text": "첫 출근. 책상은 있는데… 인수인계서는 없다.",
+      "voice": "ko-KR-InJoonNeural",
+      "gender": "male",
+      "rate": "-3%",
+      "pitch": "+0Hz",
+      "file": "/audio/ko-v1/hero-2f927aea49de1350.mp3",
+      "sources": [
+        "prologue"
+      ],
+      "duration_seconds": 7.368,
+      "bytes": 44208,
+      "codec": "mp3",
+      "sample_rate": 24000,
+      "channels": 1
+    },
+    {
+      "role": "senior",
+      "text": "결재된 계획안을 아래까지 읽어봐요. 근거, 협조기관, 훈련 순서, 준비사항이 모두 있어요.",
+      "voice": "ko-KR-InJoonNeural",
+      "gender": "male",
+      "rate": "-3%",
+      "pitch": "-4Hz",
+      "file": "/audio/ko-v1/senior-e6bd1437ff8eced6.mp3",
+      "sources": [
+        "nextHint"
+      ],
+      "duration_seconds": 11.472,
+      "bytes": 68832,
+      "codec": "mp3",
+      "sample_rate": 24000,
+      "channels": 1
+    },
+    {
+      "role": "senior",
+      "text": "계획대로 실제로 했는지도 봐야죠. 문서등록대장에서 결과보고를 찾아봐요.",
+      "voice": "ko-KR-InJoonNeural",
+      "gender": "male",
+      "rate": "-3%",
+      "pitch": "-4Hz",
+      "file": "/audio/ko-v1/senior-74ed5cd6e885b5f9.mp3",
+      "sources": [
+        "nextHint"
+      ],
+      "duration_seconds": 8.064,
+      "bytes": 48384,
+      "codec": "mp3",
+      "sample_rate": 24000,
+      "channels": 1
+    },
+    {
+      "role": "senior",
+      "text": "공용폴더 확인했어요? 이제 문서등록대장, 우리가 문등대라고 부르는 곳에서 결재된 계획안을 찾아봐요.",
+      "voice": "ko-KR-InJoonNeural",
+      "gender": "male",
+      "rate": "-3%",
+      "pitch": "-4Hz",
+      "file": "/audio/ko-v1/senior-e7760b924043eb1a.mp3",
+      "sources": [
+        "nextHint"
+      ],
+      "duration_seconds": 10.344,
+      "bytes": 62064,
+      "codec": "mp3",
+      "sample_rate": 24000,
+      "channels": 1
+    },
+    {
+      "role": "senior",
+      "text": "그 정도면 충분해요. 팀장님께 차근차근 보고해봐요!",
+      "voice": "ko-KR-InJoonNeural",
+      "gender": "male",
+      "rate": "-3%",
+      "pitch": "-4Hz",
+      "file": "/audio/ko-v1/senior-185270fa012eaa15.mp3",
+      "sources": [
+        "nextHint"
+      ],
+      "duration_seconds": 6.36,
+      "bytes": 38160,
+      "codec": "mp3",
+      "sample_rate": 24000,
+      "channels": 1
+    },
+    {
+      "role": "senior",
+      "text": "소방안전관리 폴더의 청사 소방계획서요. 피난계획이 거기 있어요.",
+      "voice": "ko-KR-InJoonNeural",
+      "gender": "male",
+      "rate": "-3%",
+      "pitch": "-4Hz",
+      "file": "/audio/ko-v1/senior-f5fd98ea3df67390.mp3",
+      "sources": [
+        "nextHint"
+      ],
+      "duration_seconds": 7.656,
+      "bytes": 45936,
+      "codec": "mp3",
+      "sample_rate": 24000,
+      "channels": 1
+    },
+    {
+      "role": "senior",
+      "text": "어, 전화했어요? 첫날이라 정신없죠?",
+      "voice": "ko-KR-InJoonNeural",
+      "gender": "male",
+      "rate": "-3%",
+      "pitch": "-4Hz",
+      "file": "/audio/ko-v1/senior-88dc4aa22c20f801.mp3",
+      "sources": [
+        "PhoneCall"
+      ],
+      "duration_seconds": 5.712,
+      "bytes": 34272,
+      "codec": "mp3",
+      "sample_rate": 24000,
+      "channels": 1
+    },
+    {
+      "role": "senior",
+      "text": "업무폴더의 합동소방훈련 폴더부터 열어봐요. 마지막 수정본에 표시된 날짜를 한번 확인해보세요.",
+      "voice": "ko-KR-InJoonNeural",
+      "gender": "male",
+      "rate": "-3%",
+      "pitch": "-4Hz",
+      "file": "/audio/ko-v1/senior-6cf6b2494241e323.mp3",
+      "sources": [
+        "nextHint"
+      ],
+      "duration_seconds": 9.552,
+      "bytes": 57312,
+      "codec": "mp3",
+      "sample_rate": 24000,
+      "channels": 1
+    },
+    {
+      "role": "senior",
+      "text": "청사도면 폴더 안의 소방 폴더를 찾아봐요. 피난동선도가 있을 거예요.",
+      "voice": "ko-KR-InJoonNeural",
+      "gender": "male",
+      "rate": "-3%",
+      "pitch": "-4Hz",
+      "file": "/audio/ko-v1/senior-bea27f27076e4ee4.mp3",
+      "sources": [
+        "nextHint"
+      ],
+      "duration_seconds": 7.584,
+      "bytes": 45504,
+      "codec": "mp3",
+      "sample_rate": 24000,
+      "channels": 1
+    },
+    {
+      "role": "senior",
+      "text": "파일 이름만 믿지 말고, 결재문서와 결과를 꼭 같이 봐요. 할 수 있어요!",
+      "voice": "ko-KR-InJoonNeural",
+      "gender": "male",
+      "rate": "-3%",
+      "pitch": "-4Hz",
+      "file": "/audio/ko-v1/senior-323851b2d7318704.mp3",
+      "sources": [
+        "PhoneCall"
+      ],
+      "duration_seconds": 8.472,
+      "bytes": 50832,
+      "codec": "mp3",
+      "sample_rate": 24000,
+      "channels": 1
+    }
+  ]
+}
