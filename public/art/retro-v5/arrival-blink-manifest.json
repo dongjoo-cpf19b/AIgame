@@ -1,0 +1,148 @@
+{
+  "version": "retro-v5-arrival-blink",
+  "generator": "Built-in image_gen.imagegen",
+  "file": "arrival-blink.webp",
+  "source": "arrival.webp",
+  "original_modified": false,
+  "width": 1280,
+  "height": 720,
+  "color_mode": "RGB",
+  "transparent": false,
+  "bytes": 133838,
+  "prompt": "Use case: precise-object-edit.\nAsset: a single blink-closed animation frame derived from the attached 1280 x 720 opaque retro cel-anime office illustration. This attached image is the exact EDIT TARGET, not just a reference.\nChange ONLY both characters' eyelids: the male office worker on the left and the female team leader on the right must each have both eyes completely and gently closed for a natural quick blink. Draw subtle relaxed closed-lid lines at the existing eye positions. NOT smiling eyes, NOT tense squinting, NOT sleeping. Preserve the pupils' former eye-socket positions; preserve the existing eyebrows and mouth expressions.\nThe left man's original eyes occupy approximately x390–500, y175–212 on the 1280x720 canvas. The right woman's original eyes occupy approximately x835–957, y211–258. Edit only these small eye neighborhoods.\nCRITICAL: preserve the precise original 1280x720 frame, composition, perspective, exact head/face/hair/body/hand locations, all facial contours, every brow, nose and mouth, the man's cheek sweat drop, clothing, document, red pen, office furniture, and background. No recentering, reframing, zoom, tilting, movement, or other expression change. Preserve the woman's bright neutral ivory skin and the man's warmer skin exactly. Keep original restrained matte hand-drawn cel colors and texture. No text or new details. The surrounding image should remain visually identical and pixel-aligned, because this frame will be overlaid on the original for a brief blink. Opaque full-bleed background.",
+  "postprocessing": "Proportionally normalized to the source canvas of 1280×720 with Lanczos and encoded as opaque WebP at quality 92 using ffmpeg.",
+  "integration": {
+    "render_mode": "Keep the original arrival.webp visible. Overlay this file at exactly the same rendered size and image position, clipped to one character's eye region. Use separate overlay elements to allow independent blinking.",
+    "original_expression_preserved": "Both characters keep their existing eyebrows, mouths, facial contours, poses and skin tones. Only gently closed eyelids are intended.",
+    "recommended_hero_clip": {
+      "bounds_px": {
+        "left": 383,
+        "top": 174,
+        "right": 506,
+        "bottom": 218
+      },
+      "bounds_percent": {
+        "left": 29.921875,
+        "top": 24.166666666666664,
+        "right": 39.53125,
+        "bottom": 30.27777777777778
+      },
+      "clip_path": "inset(24.1667% 60.4688% 69.7222% 29.9219%)"
+    },
+    "recommended_boss_clip": {
+      "bounds_px": {
+        "left": 828,
+        "top": 211,
+        "right": 959,
+        "bottom": 261
+      },
+      "bounds_percent": {
+        "left": 64.6875,
+        "top": 29.305555555555554,
+        "right": 74.921875,
+        "bottom": 36.25
+      },
+      "clip_path": "inset(29.3056% 25.0781% 63.7500% 64.6875%)"
+    },
+    "source_eye_bounds_approximate": {
+      "hero_left_eye": {
+        "left": 389,
+        "top": 175,
+        "right": 433,
+        "bottom": 199
+      },
+      "hero_right_eye": {
+        "left": 464,
+        "top": 190,
+        "right": 502,
+        "bottom": 212
+      },
+      "boss_left_eye": {
+        "left": 831,
+        "top": 211,
+        "right": 875,
+        "bottom": 239
+      },
+      "boss_right_eye": {
+        "left": 903,
+        "top": 231,
+        "right": 955,
+        "bottom": 258
+      }
+    },
+    "applied_timing": {
+      "hero": {
+        "interval_ms": 3600,
+        "delay_ms": 200,
+        "closed_duration_ms": 180
+      },
+      "boss": {
+        "interval_ms": 4200,
+        "delay_ms": 850,
+        "closed_duration_ms": 210
+      }
+    },
+    "applied_eye_ellipses_px": {
+      "hero": [
+        {
+          "cx": 411,
+          "cy": 185,
+          "rx": 30,
+          "ry": 16
+        },
+        {
+          "cx": 482,
+          "cy": 200,
+          "rx": 26,
+          "ry": 18
+        }
+      ],
+      "boss": [
+        {
+          "cx": 851,
+          "cy": 225,
+          "rx": 27,
+          "ry": 19
+        },
+        {
+          "cx": 928,
+          "cy": 244,
+          "rx": 33,
+          "ry": 19
+        }
+      ]
+    }
+  },
+  "validation": {
+    "visual_inspection": "Inspected the original and the final normalized WebP. Both eyes on both characters are gently closed; no visible canvas reframing, head movement, skin-tone change or mouth-expression change.",
+    "integer_registration": {
+      "method": "Compared original and generated RGB patches at offsets -3…+3 pixels in each direction. Eye areas were masked out of face comparisons.",
+      "best_offset_px": {
+        "hero_face": [
+          0,
+          0
+        ],
+        "boss_face": [
+          0,
+          0
+        ],
+        "hero_hair": [
+          0,
+          0
+        ],
+        "boss_hair": [
+          0,
+          0
+        ]
+      },
+      "mean_absolute_rgb_difference_0_to_255": {
+        "hero_face": 4.153,
+        "boss_face": 3.566,
+        "hero_hair": 4.162,
+        "boss_hair": 3.847
+      }
+    },
+    "limitation": "The generated frame is visually aligned but not pixel-identical outside the eyes; use the eye-only overlay to avoid full-frame texture flicker.",
+    "retries_needed": 0
+  }
+}

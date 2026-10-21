@@ -9,16 +9,18 @@
   background-image: url('/art/retro-v5/hero-expressions.webp');
   background-size: 300% 100%;
   aspect-ratio: 2 / 3;
-  animation: celIdle 2.2s ease-in-out infinite;
+  animation: celIdle 3.6s ease-in-out infinite;
   transform-origin: 50% 85%;
 }
-.character.bossCharacter { background-image: url('/art/retro-v5/boss-expressions.webp'); background-size: 300% 100%; animation-duration: 2.7s; animation-delay: -.45s; }
-.character.seniorCharacter { background-image: url('/art/retro-v5/senior.webp'); background-size: contain; background-position: center top!important; animation-duration: 2.6s; }
-.character.mood-worried { animation: celNervous 1.65s ease-in-out infinite; }
-.character.mood-happy { animation: celNod 2.1s ease-in-out infinite; }
+.character.bossCharacter { background-image: url('/art/retro-v5/boss-expressions.webp'); background-size: 300% 100%; animation-duration: 4s; animation-delay: -.45s; }
+.character.seniorCharacter { background-image: url('/art/retro-v5/senior.webp'); background-size: contain; background-position: center top!important; animation-duration: 3.8s; }
+.character.mood-worried { animation: celNervous 3s ease-in-out infinite; }
+.character.mood-happy { animation: celNod 3.2s ease-in-out infinite; }
 .sceneStill { position: relative; margin: 0; overflow: hidden; background: #c2cbd0; border-radius: 9px; }
 .sceneStill img { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; object-fit: cover; }
-.introArt img,.prologueStill img,.incomingScene .sceneStill img,.phoneStoryStrip img,.finalScene .sceneStill img { transform-origin: 50% 45%; animation: celCamera 3.6s ease-in-out infinite alternate; }
+.sceneEyeOverlay {position:absolute;inset:0;display:block;width:100%;height:100%;pointer-events:none;}
+.sceneEyeBlink {opacity:0;animation:celBlink 3.6s step-end infinite;animation-delay:.2s;}
+.sceneEyeBlink-boss {animation-duration:4.2s;animation-delay:.85s;}
 .sceneStill figcaption { position: absolute; bottom: 0; left: 0; right: 0; padding: 24px 12px 9px; color: #fff; background: linear-gradient(transparent,#1b2a3cd9); font-size: 12px; font-weight: 700; line-height: 1.6; }
 .sceneCompact { margin: 0 0 18px; }
 .sceneCompact img { max-height: 182px; }
@@ -35,7 +37,7 @@
 .introTitle p { margin: 0; font-size: 13px; line-height: 1.6; text-shadow: none; }
 .introTitle p br { display: none; }
 .introArt { flex: 1 0 205px; min-height: 205px; max-height: 340px; margin: 0 14px; border: 1px solid #c7d0d34d; border-radius: 10px; }
-.introArt img { height: 100%; min-height: 205px; object-position: center 42%; }
+.introArt img { height: 100%; min-height: 205px; object-position: center; }
 .introArt figcaption { padding: 32px 15px 12px; font-size: 14px; }
 .introBottom { position: relative; flex: 0 0 auto; padding: 15px 24px max(15px,env(safe-area-inset-bottom)); background: #162c42; }
 .introTagline { font-size: 14px; margin: 0 0 12px; color: #f6eee0; }
@@ -102,10 +104,9 @@
 .raffleClose { z-index: 2; background: #fff!important; }
 .raffleDone .sceneStill { margin-bottom: 18px; }
 
-@keyframes celIdle { 0%,100% { transform: translateY(0) rotate(-.6deg); } 50% { transform: translateY(-2.5%) rotate(.8deg); } }
-@keyframes celNervous { 0%,100% { transform: translateY(0) rotate(0); } 22% { transform: translate(-1.2%,-2%) rotate(-1.4deg); } 42% { transform: translate(1.2%,-3%) rotate(1.4deg); } 64% { transform: translate(-.7%,-1%) rotate(-.8deg); } 82% { transform: translate(.5%,-1.5%) rotate(.5deg); } }
-@keyframes celNod { 0%,60%,100% { transform: translateY(0) rotate(-.4deg); } 18% { transform: translateY(3%) rotate(1.2deg); } 34% { transform: translateY(-1.5%) rotate(-.5deg); } }
-@keyframes celCamera { from { transform: scale(1.035) translate(-.35%,0); } to { transform: scale(1.075) translate(.35%,-.5%); } }
+@keyframes celIdle { 0%,100% { transform: translateY(0) rotate(-.25deg); } 50% { transform: translateY(-1.2%) rotate(.35deg); } }
+@keyframes celNervous { 0%,100% { transform: translateY(0) rotate(0); } 30% { transform: translate(-.4%,-.8%) rotate(-.45deg); } 60% { transform: translate(.45%,-1.2%) rotate(.5deg); } }
+@keyframes celNod { 0%,60%,100% { transform: translateY(0) rotate(-.2deg); } 22% { transform: translateY(1.6%) rotate(.6deg); } 40% { transform: translateY(-.7%) rotate(-.25deg); } }
 @media(max-height:740px) {
   .introHeader { padding-top: max(13px,env(safe-area-inset-top)); padding-bottom: 8px; }
   .introTitle { padding-bottom: 10px; }
@@ -153,15 +154,13 @@
 .restartPrompt h2 {font-size:25px;}
 .voiceRetry {display:block;margin-top:8px;padding:7px 10px;border:1px solid currentColor;border-radius:5px;color:inherit;background:transparent;font-size:12px;}
 
-/* First blink lands within a second; the reaction remains visible on phones. */
+/* A brief blink with a quiet pause; larger scene eyes follow their own timing. */
 .character { position:relative; }
-.characterBlink { position:absolute;inset:0;pointer-events:none;background-image:url('/art/retro-v5/hero-blink.webp');background-size:300% 100%;background-position:inherit;clip-path:inset(33% 24% 60% 42%);opacity:0;animation:celBlink 2.2s step-end infinite; }
-.bossCharacter .characterBlink {background-image:url('/art/retro-v5/boss-blink.webp');clip-path:inset(29% 35% 63% 27%);animation-duration:2.6s;animation-delay:.35s;}
-.mood-worried .characterBlink {animation-name:celDoubleBlink;animation-duration:2.4s;}
+.characterBlink { position:absolute;inset:0;pointer-events:none;background-image:url('/art/retro-v5/hero-blink.webp');background-size:300% 100%;background-position:inherit;clip-path:inset(33% 24% 60% 42%);opacity:0;animation:celBlink 3.4s step-end infinite; }
+.bossCharacter .characterBlink {background-image:url('/art/retro-v5/boss-blink.webp');clip-path:inset(29% 35% 63% 27%);animation-duration:3.8s;animation-delay:.4s;}
 .sweatDrops {position:absolute;left:70%;top:34%;width:17%;height:23%;pointer-events:none;}
-.sweatDrops i {position:absolute;left:0;top:0;width:36%;height:27%;min-width:3px;min-height:6px;border-radius:70% 70% 70% 8%;background:#8ee5f4;border:1px solid #285565;box-shadow:inset 1px 1px #f0ffff;transform:rotate(-35deg);opacity:0;animation:nervousSweat 1.25s ease-in infinite;}
-.sweatDrops i+i {left:58%;top:16%;width:28%;height:23%;animation-delay:.48s;}
-@keyframes celBlink {0%,17%,100%{opacity:0}9%,16%{opacity:1}}
-@keyframes celDoubleBlink {0%,17%,39%,100%{opacity:0}9%,16%,31%,38%{opacity:1}}
-@keyframes nervousSweat {0%{opacity:0;transform:translateY(0) rotate(-35deg)}12%{opacity:1}65%{opacity:.95}88%,100%{opacity:0;transform:translateY(145%) rotate(-25deg)}}
-@media(prefers-reduced-motion:reduce){.characterBlink,.sweatDrops{display:none!important}}
+.sweatDrops i {position:absolute;left:0;top:0;width:36%;height:27%;min-width:3px;min-height:6px;border-radius:70% 70% 70% 8%;background:#8ee5f4;border:1px solid #285565;box-shadow:inset 1px 1px #f0ffff;transform:rotate(-35deg);opacity:0;animation:nervousSweat 2.1s ease-in infinite;}
+.sweatDrops i+i {left:58%;top:16%;width:28%;height:23%;animation-delay:.85s;}
+@keyframes celBlink {0%,23%,100%{opacity:0}18%,22%{opacity:1}}
+@keyframes nervousSweat {0%,12%{opacity:0;transform:translateY(0) rotate(-35deg)}24%{opacity:1}65%{opacity:.95}88%,100%{opacity:0;transform:translateY(120%) rotate(-25deg)}}
+@media(prefers-reduced-motion:reduce){.characterBlink,.sweatDrops,.sceneEyeOverlay{display:none!important}}

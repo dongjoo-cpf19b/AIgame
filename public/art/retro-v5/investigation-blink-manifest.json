@@ -1,0 +1,170 @@
+{
+  "version": 1,
+  "asset": "investigation-blink.webp",
+  "source": "investigation.webp",
+  "sourceSha256": "2ba85442638b49d6ea0bbb17f5e6e2ff8a9996440b1705c8ae69c326fd46f5a9",
+  "purpose": "Single closed-eye frame for a quiet blink. Overlay only the two eye patches on the original frame.",
+  "canvas": {
+    "width": 1280,
+    "height": 720,
+    "opaque": true,
+    "colorSpace": "sRGB"
+  },
+  "fileBytes": 125254,
+  "provenance": {
+    "tool": "built-in image_gen.imagegen",
+    "mode": "edit",
+    "generatedFile": "exec-9d0eb84c-60ea-4095-9573-95e7ff304b49.png",
+    "generatedDimensions": {
+      "width": 1672,
+      "height": 941
+    },
+    "postProcessing": "Uniform frame normalization to 1280x720 using sharp resize fit:fill; WebP quality 94 effort 6. No painting, compositing, or geometry correction.",
+    "attempts": 1,
+    "prompt": "Use case: precise-object-edit. Asset type: second frame of a subtle eye blink animation. The attached image is the EDIT TARGET and exact original frame, 1280 x 720. Make ONLY the man's two eyes gently closed for a natural blink: replace each open eye and iris with a fine dark curved closed eyelid and matching adjacent skin. Left eye on screen occupies approximately x533-579 y199-224, right eye x612-652 y212-239, in the original 1280x720 canvas. Keep eyelids within these same eye positions. Preserve his surprised slightly open mouth EXACTLY, preserve eyebrows EXACTLY, nose EXACTLY, face shape and skin shading EXACTLY. Do not change his expression beyond eyelids. Absolutely preserve every other part of the image: hair, head tilt, head/face location, torso, clothing, tie, hands, two documents, monitor, office background, all line art and colors, lighting, objects. Output the SAME complete 16:9 1280x720 frame, precisely registered to the original. NO crop, NO zoom, NO rescaling content, NO camera movement, NO repositioning, NO redrawing of background or body. This frame will be overlaid on the original at identical coordinates; pixel alignment is critical. Match the original 1990s matte cel anime line style. No new text or marks. Opaque background. Only both eyelids close."
+  },
+  "eyePatches": [
+    {
+      "name": "screen-left-eye",
+      "x": 530,
+      "y": 198,
+      "width": 55,
+      "height": 35,
+      "percent": {
+        "left": 41.40625,
+        "top": 27.500000000000004,
+        "width": 4.296875,
+        "height": 4.861111111111112
+      }
+    },
+    {
+      "name": "screen-right-eye",
+      "x": 609,
+      "y": 211,
+      "width": 48,
+      "height": 35,
+      "percent": {
+        "left": 47.578125,
+        "top": 29.305555555555557,
+        "width": 3.75,
+        "height": 4.861111111111112
+      }
+    }
+  ],
+  "combinedBounds": {
+    "x": 530,
+    "y": 198,
+    "width": 127,
+    "height": 48,
+    "percent": {
+      "left": 41.40625,
+      "top": 27.5,
+      "width": 9.921875,
+      "height": 6.6666666667
+    }
+  },
+  "integration": {
+    "placement": "Render at identical dimensions and position as investigation.webp, with object-fit/object-position matching the original. Use separate eye-region masks; do not replace the full frame.",
+    "patchEdge": "A small 1-2 px feather at the boundary helps blend the slight generated skin-shading difference. Exclude eyebrows and nose.",
+    "timing": "UI owner controls timing; this asset contains one closed-eye frame only.",
+    "applied_timing": {
+      "interval_ms": 3600,
+      "delay_ms": 200,
+      "closed_duration_ms": 180
+    },
+    "applied_eye_ellipses_px": [
+      {
+        "cx": 557,
+        "cy": 212,
+        "rx": 31,
+        "ry": 18
+      },
+      {
+        "cx": 633,
+        "cy": 227,
+        "rx": 27,
+        "ry": 18
+      }
+    ]
+  },
+  "validation": {
+    "dimensions": "1280x720",
+    "format": "WebP",
+    "alpha": false,
+    "framing": "No detectable frame translation in the checked landmarks. Original and normalized generated image were compared at the same coordinates.",
+    "alignmentSearch": "Grayscale normalized cross-correlation within +/-5 px, using eyebrows, mouth, ear and hair regions. Best displacement was (0,0) for all checked unchanged regions.",
+    "landmarks": [
+      {
+        "name": "left eyebrow",
+        "rect": [
+          525,
+          167,
+          77,
+          29
+        ],
+        "bestOffsetXY": [
+          0,
+          0
+        ],
+        "correlation": 0.97895
+      },
+      {
+        "name": "right eyebrow",
+        "rect": [
+          615,
+          182,
+          44,
+          24
+        ],
+        "bestOffsetXY": [
+          0,
+          0
+        ],
+        "correlation": 0.98671
+      },
+      {
+        "name": "mouth",
+        "rect": [
+          548,
+          282,
+          51,
+          30
+        ],
+        "bestOffsetXY": [
+          0,
+          0
+        ],
+        "correlation": 0.98177
+      },
+      {
+        "name": "ear",
+        "rect": [
+          434,
+          171,
+          40,
+          65
+        ],
+        "bestOffsetXY": [
+          0,
+          0
+        ],
+        "correlation": 0.98273
+      },
+      {
+        "name": "hair",
+        "rect": [
+          475,
+          65,
+          100,
+          65
+        ],
+        "bestOffsetXY": [
+          0,
+          0
+        ],
+        "correlation": 0.93748
+      }
+    ],
+    "limitations": "The generated image is not pixel-identical outside the eyes. Minor line and skin-shading changes exist; hence only the eye regions should be used. No registration correction was needed."
+  }
+}
