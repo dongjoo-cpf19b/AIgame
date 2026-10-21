@@ -17,21 +17,29 @@ export function GameIcon({ name }: { name: IconName }) {
 }
 
 export function OfficialPaper({ screen, children, record }: { screen: string; children: ReactNode; record?:{number:string;date:string} }) {
-  const canShowCover = screen === "plan" || screen === "result";
-  const approved = canShowCover || !!record;
-  const [showCover, setShowCover] = useState(false);
-  const documentNumber = record?.number ?? (screen === "plan" ? "회계과-18421" : screen === "result" ? "회계과-21347" : "미등록");
-  const documentDate = record?.date ?? (screen === "plan" ? "2025. 9. 22." : screen === "result" ? "2025. 10. 27." : "—");
-  return <div className="documentViewer">
-    <div className="documentTools"><span><GameIcon name="document"/> {approved ? documentNumber : "공용폴더 저장본"}</span>{canShowCover?<div className="documentTabs"><button aria-pressed={!showCover} onClick={()=>setShowCover(false)}>본문</button><button aria-pressed={showCover} onClick={()=>setShowCover(true)}>결재표지</button></div>:record&&<span>{documentDate} · 결재완료</span>}</div>
-    <div className="paperShell"><article className={`paper officialPaper ${showCover?"coverSheet":"bodySheet"} ${screen==="reference"?"referenceSheet":""}`}>
-      {showCover ? <>
-        <div className="coverCity">성남시<span>시민의 오늘을 위한 행정</span></div>
-        <div className="approvalGrid"><table className="registrationTable"><tbody><tr><th>생산등록번호</th><td>{documentNumber}</td></tr><tr><th>등 록 일</th><td>{documentDate}</td></tr><tr><th>결 재 일</th><td>{documentDate}</td></tr><tr><th>공개구분</th><td>공개</td></tr></tbody></table><table className="signoffTable"><tbody><tr><th rowSpan={2}>결<br/>재</th><th>주무관</th><th>팀장</th><th>과장</th><th>국장</th></tr><tr><td>검토</td><td>검토</td><td>검토</td><td>{documentDate}<br/>결재</td></tr><tr><th>협조</th><td colSpan={4}>각 부서 임무요원 · 소방관서</td></tr></tbody></table></div>
-        <p className="coverSubtitle">- 화재 및 재난사고에 대한 초기대응태세 확립을 위한 -</p><h2>2025년 성남시청<br/>합동소방훈련·교육 {screen==="result"?"결과보고":"계획(안)"}</h2><div className="coverOrganization">성 남 시<strong>(회 계 과)</strong></div>
-      </> : children}
+  const canShowCover=screen==="plan"||screen==="result";
+  const approved=canShowCover||!!record;
+  const [showCover,setShowCover]=useState(false),[original,setOriginal]=useState(false);
+  const documentNumber=record?.number??(screen==="plan"?"회계과-18421":screen==="result"?"회계과-21347":"미등록");
+  const documentDate=record?.date??(screen==="plan"?"2025. 9. 22.":screen==="result"?"2025. 10. 27.":"—");
+  return <div className={`documentViewer ${original?"documentOriginal":"documentReading"}`}>
+    <div className="hwpAppBar"><span className="hwpLogo">한</span><b>한글 문서 보기</b><span>읽기 전용</span></div>
+    <div className="hwpMenu" aria-hidden="true"><span>파일</span><span>편집</span><span>보기</span><span>입력</span><span>서식</span><span>쪽</span></div>
+    <div className="documentTools"><span><GameIcon name="document"/> {approved?documentNumber:"공용폴더 저장본"}</span><span>{approved?"결재완료":"내부 검토"}</span></div>
+    <div className="documentViewActions"><div className="documentTabs"><button aria-pressed={!original} onClick={()=>setOriginal(false)}>읽기 편하게</button><button aria-pressed={original} onClick={()=>setOriginal(true)}>A4 원본</button></div>{canShowCover&&<div className="documentTabs"><button aria-pressed={!showCover} onClick={()=>setShowCover(false)}>본문</button><button aria-pressed={showCover} onClick={()=>setShowCover(true)}>결재표지</button></div>}</div>
+    {original&&<p className="originalHint">문서를 좌우로 밀어볼 수 있어요. 창 오른쪽 위 ⛶ 버튼으로 크게 볼 수 있어요.</p>}
+    <div className="documentRuler" aria-hidden="true"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span></div>
+    <div className="paperShell" tabIndex={original?0:undefined} aria-label={original?"A4 문서 영역, 좌우로 스크롤 가능":undefined}><article className={`paper officialPaper ${showCover?"coverSheet":"bodySheet"} ${screen==="reference"?"referenceSheet":""} ${screen==="letter"?"letterSheet":""}`}>
+      {showCover?<>
+        <div className="coverTop"><span>등록번호　{documentNumber}</span><b>공개</b></div>
+        <div className="approvalGrid"><table className="registrationTable"><tbody><tr><th>등록일자</th><td>{documentDate}</td></tr><tr><th>결재일자</th><td>{documentDate}</td></tr><tr><th>보존기간</th><td>5년</td></tr><tr><th>공개구분</th><td>공개</td></tr></tbody></table><table className="signoffTable"><tbody><tr><th>주무관</th><th>청사관리팀장</th><th>회계과장</th></tr><tr><td><span className="signoffName">○○○</span></td><td><span className="signoffName">○○○</span></td><td><small>{documentDate}</small><span className="signoffName">○○○</span></td></tr><tr><th>협조자</th><td colSpan={2}>관계부서 협의</td></tr></tbody></table></div>
+        <div className="approvalComment"><b>검토사항</b><span>계획 및 관계기관 협의내용 확인</span></div>
+        <p className="coverSubtitle">- 화재 및 재난사고 초기대응태세 확립을 위한 -</p><h2>2025년 성남시청<br/>합동소방훈련·교육<br/>{screen==="result"?"결과보고":"계획(안)"}</h2>
+        <div className="coverDate">2025. {screen==="result"?"10.":"9."}</div><div className="coverOrganization">성 남 시<strong>( 회 계 과 )</strong></div>
+      </>:<><div className="paperMetadata"><span>{approved?documentNumber:"청사관리 업무자료"}</span><span>{approved?documentDate:"검토용"}</span></div>{children}</>}
       <footer className="documentFooter"><span>성남시 · 회계과</span><span>업무 체험용 재구성 문서</span></footer>
     </article></div>
+    <div className="hwpStatusbar"><span>{showCover?"결재표지":screen==="letter"?"시행문":"본문"} · A4</span><span>{original?"원본 크기":"화면 너비에 맞춤"}</span><span>읽기 전용</span></div>
   </div>;
 }
 
