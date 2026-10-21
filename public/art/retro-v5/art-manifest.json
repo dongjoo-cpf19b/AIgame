@@ -1,0 +1,82 @@
+{
+  "version": "retro-v5",
+  "generator": "Built-in image_gen.imagegen",
+  "approved_reference": "B retro cel anime with bright neutral ivory team-leader skin",
+  "shared_prompt": "Use case: illustration-story. Asset for an existing Korean office-comedy mobile game. The supplied image is the APPROVED art bible: preserve its exact retro hand-inked cel-animation style, characteristic faces, hair design, wardrobe, line weight, restrained matte shading and light paper texture. This is a new game asset, not an edit of its layout. Absolutely NO text, labels, speech balloons, logos or watermarks.\nArt direction: late-1990s / early-2000s 2D television cel animation, thin confident dark-navy pen outlines, matte flat local colors, only one or two clean hard-edged cel-shadow shapes. Cool gray/blue mundane Korean public office palette, never a glossy digital painting or 3D/plastic render. Faces remain drawn and appealing. No bloom, no lens flare, no bokeh, no golden rays.\nCast bible: The hero is the SAME chubby kind adult Korean man in the reference, early 30s with broad round face and full cheeks, small gentle slightly droopy eyes, thick natural eyebrows, small slightly parted mouth, short parted black hair, pale blue shirt, navy tie and navy ID lanyard. No glasses or beard; do not turn him into a slim handsome idol or a child. The female boss is the SAME exceptionally pretty adult Korean woman in the reference: Kim Ji-won-inspired balanced oval face, fine almond eyes with dark pupils, softly full lips, long side-parted black hair, charcoal blazer over ivory blouse, small silver studs, navy ID lanyard. Her skin is LIGHT NEUTRAL IVORY exactly as the approved reference, brighter than the hero's skin, with very subtle peach life; NO yellow/tan cast. Her exacting composed attitude and small approving smiles are restrained, not exaggerated rage. Both belong to the same authored 2D work.",
+  "assets": [
+    {
+      "file": "hero-expressions.webp",
+      "transparent": true,
+      "prompt": "Create a WIDE horizontal transparent sprite sheet, 1536 by 768 preferred, exactly THREE equally wide columns in ONE row. Each cell has the SAME HERO ONLY, waist-up front/very slight three-quarter view, identical body scale, head size, shoulder width and eye-line. Column centers at 1/6, 1/2, 5/6 of total width. Leave clear transparent gutters between all silhouettes, do not touch or overlap neighbors or canvas edges, whole hair and shoulders visible, straight waist cutoff at same level. Keep his arms simply at his sides/low and no props. Left expression: neutral attentive, slightly baffled kind face. Middle: embarrassed worried expression with small sweat bead and raised inner eyebrows. Right: relieved warm closed-mouth/small open-mouth happy smile. Maintain exact reference face identity. TRANSPARENT alpha background throughout, no white rectangle, checkerboard, shadows, scenery, labels or frames.",
+      "expression_order": [
+        "normal",
+        "worried",
+        "happy"
+      ],
+      "width": 1536,
+      "height": 768,
+      "bytes": 147814
+    },
+    {
+      "file": "boss-expressions.webp",
+      "transparent": true,
+      "prompt": "Create a WIDE horizontal transparent sprite sheet, 1536 by 768 preferred, exactly THREE equally wide columns in ONE row. Each cell has the SAME FEMALE BOSS ONLY, waist-up front/very slight three-quarter view, identical body scale, head size, shoulder width and eye-line. Column centers at 1/6, 1/2, 5/6 of total width. Leave clear transparent gutters between silhouettes, no touching neighbors or canvas edges, complete hair and shoulders visible, straight waist cutoff at same level. Long hair gracefully over shoulders, business blazer and lanyard intact. Arms simply folded low, no red pen or any props. Left: calm stern attentive face and closed lips. Middle: one eyebrow subtly raised, questioning skeptical sideways look. Right: rare restrained warm approving small smile, not broad laugh. Very fair neutral ivory skin consistently across all faces/neck/hands, matching approved reference. TRANSPARENT alpha background, no white rectangle, checkerboard, scenery, shadows, labels or frames.",
+      "expression_order": [
+        "normal",
+        "worried",
+        "happy"
+      ],
+      "width": 1536,
+      "height": 768,
+      "bytes": 152292
+    },
+    {
+      "file": "office.webp",
+      "transparent": false,
+      "prompt": "Create a WIDE 16:9 empty Korean local-government office background, no people. Eye-level view from employee aisle toward a few ordinary workstations: gray cloth partitions, blue binders, a matte dark monitor showing abstract simple Windows-like blue rectangles, practical beige desks with modest stack of A4 papers and a corded desk phone, fluorescent ceiling fixtures, cool daylight from an office window. Familiar lived-in but tidy civil-service workplace, no luxury. Midground coherent perspective with central open visual breathing room for game UI. Everything drawn in exact reference cel-art style; soft painted background but no photographic blur. No readable writing anywhere, no logos.",
+      "width": 1280,
+      "height": 720,
+      "bytes": 67662
+    },
+    {
+      "file": "arrival.webp",
+      "transparent": false,
+      "prompt": "Create a WIDE 16:9 narrative keyframe with both MAIN CHARACTERS at an ordinary office desk. Male hero on left holding a plain A4 report nervously, female team leader on right with red pen watching him calmly with a slightly raised eyebrow. Both waist-up, faces fully inside center 70% safe area and upper bodies fully readable. This is his first work assignment. Same faces, same costumes and very fair female skin as reference. Gray partitions, cool blue PC and binders behind. Characters occupy most of frame, desk at bottom, no unusual camera angle. No text or balloons on documents or image.",
+      "width": 1280,
+      "height": 720,
+      "bytes": 98634
+    },
+    {
+      "file": "senior.webp",
+      "transparent": true,
+      "prompt": "Create ONE transparent chest-to-waist-up friendly male predecessor / senior colleague in his early-to-mid 40s, in exactly the approved hand-drawn cel-animation style. He is a distinct character, not the main hero: average build, softly rectangular face, round thin-framed glasses, short neatly side-parted black hair, clean-shaven, muted sage-gray cardigan over ivory collared shirt, navy ID lanyard. Warm helpful small smile, relaxed pose, one hand at low chest as if explaining. Front slight three-quarter orientation, generous transparent margin around full hair and shoulders, waist cutoff. No phone or other props. PNG-style genuine TRANSPARENT alpha background, no scenery, checkerboard, text or frame.",
+      "width": 640,
+      "height": 683,
+      "bytes": 62170
+    },
+    {
+      "file": "investigation.webp",
+      "transparent": false,
+      "prompt": "Create a WIDE 16:9 story keyframe of the MAIN MALE HERO investigating documents at his office PC. Camera from front three-quarter view so we clearly see his recognizable round face and kind eyes. He looks between a dark monitor on one side and TWO plain A4 reports in his hands/desk, eyebrows lifted with a small 'I noticed something' realization. Keep sleeves, navy tie and lanyard exactly consistent with reference. Gray partitions, blue binders, simple desk. Monitor and paper only abstract subtle line placeholders with NO legible dates/words, no game-answer spoilers, no magnifying glass, no floating UI. Daytime cool office lighting, same restrained cel style.",
+      "width": 1280,
+      "height": 720,
+      "bytes": 75980
+    },
+    {
+      "file": "phone.webp",
+      "transparent": false,
+      "prompt": "Create a WIDE 16:9 story keyframe of the MAIN MALE HERO answering a corded office desk telephone. Chest-up, slight three-quarter frontal view; he holds the black receiver properly near one ear with one hand, other hand on a plain report on desk. His characteristic round cheeks and small kind eyes show earnest concentration and a little surprise, no panic. Blue business shirt, navy tie, navy ID lanyard. Coiled phone cable leading to a base visible on desk. A blue office PC and gray partition in background. No other characters. Light cool everyday office lighting, no dramatic special effects. No words anywhere.",
+      "width": 1280,
+      "height": 720,
+      "bytes": 81230
+    },
+    {
+      "file": "ending.webp",
+      "transparent": false,
+      "prompt": "Create a WIDE 16:9 story keyframe of the SAME MAIN PAIR after a successful first report. Hero on left, still chubby and slightly awkward, smiles with quiet relief/pride while holding a neatly clipped small stack of plain A4 reports. Female team leader on right offers her rare subtle approving smile, her very fair neutral ivory skin and exact face from reference preserved. They stand/sit beside the mundane workstation, no touching or romance pose, coworker chemistry conveyed by expressions. Cool late-afternoon pale office light, gray partitions, dark monitor and blue binders, NO warm golden sunset glare. A gentle satisfying end-of-chapter feeling. Both faces inside central safe area, waist-up, no text/bubbles.",
+      "width": 1280,
+      "height": 720,
+      "bytes": 91018
+    }
+  ]
+}
