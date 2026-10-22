@@ -36,10 +36,10 @@
 .introTitle h1 em { margin-left: .15em; color: #ead9b5; }
 .introTitle p { margin: 0; font-size: 13px; line-height: 1.6; text-shadow: none; }
 .introTitle p br { display: none; }
-.introArt { flex: 1 0 205px; min-height: 205px; max-height: 340px; margin: 0 14px; border: 1px solid #c7d0d34d; border-radius: 10px; }
-.introArt img { height: 100%; min-height: 205px; object-position: center; }
+.introArt { flex: 0 0 auto; aspect-ratio: 4 / 3; min-height: 0; margin: auto 14px 0; border: 1px solid #c7d0d34d; border-radius: 10px; }
+.introArt img { position: absolute; inset: 0; height: 100%; object-position: center; }
 .introArt figcaption { padding: 32px 15px 12px; font-size: 14px; }
-.introBottom { position: relative; flex: 0 0 auto; padding: 15px 24px max(15px,env(safe-area-inset-bottom)); background: #162c42; }
+.introBottom { position: relative; flex: 0 0 auto; margin-top: auto; padding: 15px 24px max(15px,env(safe-area-inset-bottom)); background: #162c42; }
 .introTagline { font-size: 14px; margin: 0 0 12px; color: #f6eee0; }
 .introStart { border-radius: 9px; min-height: 60px; padding: 12px 17px; background: #d9e7db; box-shadow: 0 3px 0 #7c9a92; color: #203d43; }
 .introMeta { font-size: 11px; margin: 14px 0 9px; }
@@ -50,12 +50,14 @@
 .castPreview .character { width: 140px; margin: 0 auto; }
 .castPreview>div>span { position: absolute; bottom: 0; left: 0; right: 0; padding: 22px 9px 9px; background: linear-gradient(transparent,#253c51); color: white; text-align: center; line-height: 1.6; }
 
-/* Illustrated prologue, with dialogue and its action always in normal flow. */
-.prologueScene { display: flex; flex-direction: column; overflow-y: auto; background: #172f42; }
-.prologueTop { flex: 0 0 auto; padding: max(20px,env(safe-area-inset-top)) 20px 18px; }
-.prologueStill { flex: 1 0 235px; min-height: 235px; margin: 13px 14px 0; border: 1px solid #d4e0e644; }
-.prologueStill img { height: 100%; object-position: center; min-height: 235px; }
+/* Bound the illustration's crop to 4:3 so both faces stay inside the frame.
+   Extra screen height becomes spacing, never a tighter portrait crop. */
+.prologueScene { display: flex; flex-direction: column; overflow-y: auto; padding-bottom: max(18px,env(safe-area-inset-bottom)); background: #172f42; }
+.prologueTop { flex: 0 0 auto; margin-bottom: 13px; padding: max(20px,env(safe-area-inset-top)) 20px 18px; }
+.prologueStill { flex: 0 0 auto; aspect-ratio: 4 / 3; min-height: 0; margin: auto 14px 0; border: 1px solid #d4e0e644; }
+.prologueStill img { position: absolute; inset: 0; height: 100%; object-position: center; }
 .storyBox { position: relative; inset: auto; flex: 0 0 auto; margin: 14px 14px max(18px,env(safe-area-inset-bottom)); padding: 17px 18px; border-radius: 10px; background: #173247f5; backdrop-filter: none; }
+.prologueScene .storyBox { margin-bottom: auto; }
 .storySpeaker { display: flex; align-items: center; gap: 12px; }
 .storySpeaker>div { height: 70px; width: 58px; overflow: hidden; flex-shrink: 0; border-radius: 5px; background: #d1d9d1; }
 .storySpeaker .character { width: 58px; }
@@ -112,16 +114,13 @@
   .introTitle { padding-bottom: 10px; }
   .introTitle h1 { font-size: 35px; margin-top: 7px; }
   .introTitle p { font-size: 12px; }
-  .introArt { flex-basis: 184px; min-height: 184px; }
-  .introArt img { min-height: 184px; }
+  .introArt { aspect-ratio: 16 / 9; }
   .introBottom { padding-top: 11px; padding-bottom: max(10px,env(safe-area-inset-bottom)); }
   .introTagline { font-size: 13px; margin-bottom: 9px; }
   .introStart { min-height: 54px; }
   .introMeta { margin: 10px 0 7px; }
   .introBottom footer { font-size: 11px; padding-top: 8px; }
   .prologueTop { padding: max(15px,env(safe-area-inset-top)) 18px 14px; }
-  .prologueStill,.prologueStill img { min-height: 185px; }
-  .prologueStill { flex-basis: 185px; }
   .storyBox { padding: 14px 15px; margin-top: 10px; }
   .storyBox>p { font-size: 16px; min-height: 88px; margin: 11px 0 14px; }
   .storySpeaker>div { height: 55px; width: 46px; }
