@@ -3,7 +3,7 @@
   "generator": "Built-in image_gen.imagegen",
   "purpose": "Brief closed-eyelid overlays for the existing retro-v5 expression sprites.",
   "integration": {
-    "render_mode": "Keep the original expression sheet visible, overlay the blink sheet at identical dimensions/background position, and clip to the eye region.",
+    "render_mode": "Keep the original expression sheet visible and overlay only two feathered eye ellipses using expression-specific CSS mask positions. Preserve nose, face contour and hair from the original.",
     "reason": "Image editing regenerated small areas outside the eyelids; an eye-only overlay avoids silhouette or clothing flicker.",
     "sheet_columns": 3,
     "cell_width": 512,
@@ -19,7 +19,9 @@
     "prefers_reduced_motion": "Hide the blink overlay.",
     "original_assets_modified": false,
     "first_blink_within_ms": 1084,
-    "worried_double_blink": false
+    "worried_double_blink": false,
+    "mask_feather": "Opaque through 78% of each radial ellipse, fading to transparent at 100%.",
+    "unsupported_css_mask": "Hide the blink overlay and retain the original expression."
   },
   "assets": [
     {
@@ -35,9 +37,50 @@
       "height": 768,
       "bytes": 166796,
       "prompt": "Use case: precise-object-edit.\nEdit target: attached existing 1536 x 768 pixel transparent sprite sheet with 3 exactly equal 512 x 768 cells showing the same male office-worker character in normal, worried, and happy expressions.\nCreate the BLINK-CLOSED animation frame for this existing sprite sheet. Change ONLY the eyelids of all three characters: both eyes completely and gently closed for an ordinary relaxed blink. Use thin curved closed-eyelid lines. Not smiling eyes, not a squint, not sleep. Preserve each original brow and each original mouth expression.\nCRITICAL INVARIANTS: exact same canvas 1536 x 768, same 3 columns, exact pixel alignment of every head, eye socket, hair, body, shoulders, shirt, tie, lanyard and every other detail. Same matte retro cel animation rendering and original skin color. Same head angle and face shape, same hair silhouette, identical bust positions. Do not recenter or zoom any person. No new objects, no text, no labels.\nKeep the transparent background and original alpha silhouette. This is a two-frame blink animation so changing any pixels outside the small two-eye areas will make the animation jump. Preserve those pixels.",
-      "eye_clip_path": "inset(33% 24% 60% 42%)",
       "inspected": "All six eyelids are gently closed. Original mouth expressions, brow directions, warm skin, pose, and outfit are visually retained.",
-      "caveat": "Use as a clipped eye overlay, not a full-sheet swap. Source sheet face positions vary slightly by expression."
+      "caveat": "Use only the feathered eye masks for the selected expression, never a full-sheet swap or a broad rectangular face strip.",
+      "eye_mask_centers_percent": {
+        "normal": {
+          "left": [
+            52.7,
+            35.8
+          ],
+          "right": [
+            68.7,
+            36.9
+          ]
+        },
+        "worried": {
+          "left": [
+            51.5,
+            36.3
+          ],
+          "right": [
+            67.7,
+            37.5
+          ]
+        },
+        "happy": {
+          "left": [
+            49.4,
+            35.9
+          ],
+          "right": [
+            65.9,
+            37.2
+          ]
+        }
+      },
+      "eye_mask_radii_percent": {
+        "left": [
+          7,
+          3.1
+        ],
+        "right": [
+          6.5,
+          3
+        ]
+      }
     },
     {
       "file": "boss-blink.webp",
@@ -52,9 +95,50 @@
       "height": 768,
       "bytes": 164460,
       "prompt": "Use case: precise-object-edit.\nEdit target: attached existing 1536 x 768 pixel transparent sprite sheet with 3 exactly equal 512 x 768 cells showing the same female team leader in calm, skeptical, and soft-smile expressions.\nCreate the BLINK-CLOSED animation frame for this existing sprite sheet. Change ONLY the eyelids of all three characters: both eyes completely and gently closed for an ordinary relaxed blink. Use thin curved closed-eyelid lash lines. NOT smiling eyes, NOT squinting, NOT sleeping. Preserve each original brow and each original mouth expression.\nCRITICAL INVARIANTS: exact same canvas 1536 x 768, same 3 equal columns, exact pixel alignment of every head, eye socket, hair, body, crossed arms, blazer, blouse, lanyard and every other detail. Same matte retro cel animation rendering. Preserve the bright neutral ivory skin tone without tanning, yellowing or adding blush. Same head angle and face shape, same hair silhouette, identical bust positions. Do not recenter or zoom any person. No new objects, no text, no labels.\nKeep the transparent background and original alpha silhouette. This will be a two-frame blink animation so changing any pixels outside the small two-eye areas will make the animation jump. Preserve those pixels.",
-      "eye_clip_path": "inset(29% 35% 63% 27%)",
       "inspected": "All six eyelids are gently closed with lash lines. Bright neutral ivory skin, original mouth expressions, hair, and outfit are visually retained.",
-      "caveat": "Use as a clipped eye overlay, not a full-sheet swap. Source sheet face positions vary slightly by expression."
+      "caveat": "Use only the feathered eye masks for the selected expression, never a full-sheet swap or a broad rectangular face strip.",
+      "eye_mask_centers_percent": {
+        "normal": {
+          "left": [
+            42.6,
+            32.0
+          ],
+          "right": [
+            57.6,
+            33.5
+          ]
+        },
+        "worried": {
+          "left": [
+            38.4,
+            32.0
+          ],
+          "right": [
+            53.8,
+            33.7
+          ]
+        },
+        "happy": {
+          "left": [
+            33.7,
+            31.9
+          ],
+          "right": [
+            49.1,
+            33.5
+          ]
+        }
+      },
+      "eye_mask_radii_percent": {
+        "left": [
+          7,
+          3.1
+        ],
+        "right": [
+          6.5,
+          3
+        ]
+      }
     }
   ],
   "postprocessing": "Generated PNGs proportionally resized to 1536×768 with Lanczos and encoded as RGBA WebP at quality 90 using ffmpeg."

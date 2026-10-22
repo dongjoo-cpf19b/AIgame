@@ -156,8 +156,25 @@
 
 /* A brief blink with a quiet pause; larger scene eyes follow their own timing. */
 .character { position:relative; }
-.characterBlink { position:absolute;inset:0;pointer-events:none;background-image:url('/art/retro-v5/hero-blink.webp');background-size:300% 100%;background-position:inherit;clip-path:inset(33% 24% 60% 42%);opacity:0;animation:celBlink 3.4s step-end infinite; }
-.bossCharacter .characterBlink {background-image:url('/art/retro-v5/boss-blink.webp');clip-path:inset(29% 35% 63% 27%);animation-duration:3.8s;animation-delay:.4s;}
+/* Each expression has different eye positions. Two soft masks keep the nose,
+   face contour and hair from being replaced by the generated blink sheet. */
+.characterBlink {
+  --eye-left:52.7% 35.8%; --eye-right:68.7% 36.9%;
+  --blink-mask:radial-gradient(ellipse 7% 3.1% at var(--eye-left),#000 78%,transparent 100%),radial-gradient(ellipse 6.5% 3% at var(--eye-right),#000 78%,transparent 100%);
+  position:absolute;inset:0;pointer-events:none;display:none;
+  background-image:url('/art/retro-v5/hero-blink.webp');background-size:300% 100%;background-position:inherit;
+  -webkit-mask-image:var(--blink-mask);mask-image:var(--blink-mask);
+  -webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;
+  opacity:0;animation:celBlink 3.4s step-end infinite;
+}
+.mood-worried .characterBlink {--eye-left:51.5% 36.3%;--eye-right:67.7% 37.5%;}
+.mood-happy .characterBlink {--eye-left:49.4% 35.9%;--eye-right:65.9% 37.2%;}
+.bossCharacter .characterBlink {--eye-left:42.6% 32%;--eye-right:57.6% 33.5%;background-image:url('/art/retro-v5/boss-blink.webp');animation-duration:3.8s;animation-delay:.4s;}
+.bossCharacter.mood-worried .characterBlink {--eye-left:38.4% 32%;--eye-right:53.8% 33.7%;}
+.bossCharacter.mood-happy .characterBlink {--eye-left:33.7% 31.9%;--eye-right:49.1% 33.5%;}
+@supports (mask-image:radial-gradient(#000,transparent)) or (-webkit-mask-image:radial-gradient(#000,transparent)) {
+  .characterBlink {display:block;}
+}
 .sweatDrops {position:absolute;left:70%;top:34%;width:17%;height:23%;pointer-events:none;}
 .sweatDrops i {position:absolute;left:0;top:0;width:36%;height:27%;min-width:3px;min-height:6px;border-radius:70% 70% 70% 8%;background:#8ee5f4;border:1px solid #285565;box-shadow:inset 1px 1px #f0ffff;transform:rotate(-35deg);opacity:0;animation:nervousSweat 2.1s ease-in infinite;}
 .sweatDrops i+i {left:58%;top:16%;width:28%;height:23%;animation-delay:.85s;}
