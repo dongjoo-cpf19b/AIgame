@@ -63,7 +63,7 @@ export default function Page(){
  const paper=(body:ReactNode)=><OfficialPaper screen={screen}>{body}</OfficialPaper>;
  const clueBtn=(cid:ClueId,children:ReactNode)=><button className={`clueTap ${found.includes(cid)?"got":""}`} onClick={()=>clue(cid)}>{children}{found.includes(cid)&&<Check size={12}/>}</button>;
   function mainContent(){
-    if(screen==="file-preview"&&preview)return <><Nav onBack={()=>go(preview.from)} title={preview.name}/><SupportingFile key={preview.name} name={preview.name} record={preview.record} onBack={()=>go(preview.from)}/></>;
+    if(screen==="file-preview"&&preview)return <><Nav backLabel="목록으로" onBack={()=>go(preview.from)} title={preview.name}/><SupportingFile key={preview.name} name={preview.name} record={preview.record} onBack={()=>go(preview.from)}/></>;
     if(screen==="desktop")return <WindowsDesktop found={found.length} onOpen={go}/>;
     if(screen==="folders")return <Explorer path={["내 PC","업무폴더"]} onBack={()=>go("desktop")} items={[
       {name:"01_합동소방훈련",folder:true,onOpen:()=>go("fire-folder","……최종이 왜 이렇게 많아.")},
@@ -86,11 +86,11 @@ export default function Page(){
       {name:"피난동선도.pdf",size:"862 KB",onOpen:()=>go("route","도면까지 있네. 실제 대피 경로를 한번 확인해보자.")}
     ]}/>;
     if(screen==="registry")return <><div className="registrySystemBrand"><span>업무관리시스템</span><b>문서관리</b><small>회계과 · 생산문서</small></div><Nav onBack={()=>go("desktop")} title="문서등록대장"/><form onSubmit={e=>{e.preventDefault();runSearch(search);}} className="searchBox"><label htmlFor="document-search">문서 제목 · 문서번호</label><input id="document-search" value={search} onChange={e=>setSearch(e.target.value)} placeholder="예: 합동소방, 훈련, 소방"/><button>검색</button></form><div className="searchSuggestions"><span>빠른 검색</span>{["합동소방","훈련","소방"].map(q=><button key={q} onClick={()=>runSearch(q)}>{q}</button>)}</div>{searched?<><div className="searchCount">검색 결과 <b>{searchRegistry(search).length}건</b><span>등록일 최신순</span></div><div className="stack">{searchRegistry(search).map(doc=><button className="docResult" data-document-id={doc.id} key={doc.id} onClick={()=>doc.target?go(doc.target,doc.remark):inspectFile(doc.title,doc.remark,{number:doc.number,date:doc.date})}><small>{doc.date} · 결재완료</small><b>{doc.title}</b><span>{doc.number}</span></button>)}{!searchRegistry(search).length&&<div className="empty">{search.trim()?"일치하는 문서가 없습니다. 다른 검색어를 입력해보세요.":"문서 제목이나 문서번호를 입력해주세요."}</div>}</div></>:<div className="registryEmpty"><GameIcon name="document"/><b>어떤 문서를 찾으시나요?</b><p>제목의 일부나 문서번호로 검색할 수 있습니다.</p></div>}</>;
-    if(screen==="draft")return <><Nav onBack={()=>go("fire-folder")} title="★★…과장님수정.hwp"/>{paper(<DraftPlanBody clue={clueBtn}/>)}</>;
-    if(screen==="plan")return <><Nav onBack={()=>go("registry")} title="회계과-18421 · 결재완료"/>{paper(<FirePlanBody clue={clueBtn}/>)}</>;
-    if(screen==="result")return <><Nav onBack={()=>go("registry")} title="회계과-21347 · 결재완료"/>{paper(<FireResultBody clue={clueBtn}/>)}</>;
-    if(screen==="fire-plan")return <><Nav onBack={()=>go("safety-folder")} title="2025년_성남시청_소방계획서.hwp"/>{paper(<FireSafetyBody clue={clueBtn}/>)}</>;
-    if(screen==="route")return <><Nav onBack={()=>go("drawing-sub")} title="피난동선도.pdf"/><EvacuationPlan found={found.includes("c9")} onCollect={()=>clue("c9")}/></>;
+    if(screen==="draft")return <><Nav backLabel="목록으로" onBack={()=>go("fire-folder")} title="★★…과장님수정.hwp"/>{paper(<DraftPlanBody clue={clueBtn}/>)}</>;
+    if(screen==="plan")return <><Nav backLabel="목록으로" onBack={()=>go("registry")} title="회계과-18421 · 결재완료"/>{paper(<FirePlanBody clue={clueBtn}/>)}</>;
+    if(screen==="result")return <><Nav backLabel="목록으로" onBack={()=>go("registry")} title="회계과-21347 · 결재완료"/>{paper(<FireResultBody clue={clueBtn}/>)}</>;
+    if(screen==="fire-plan")return <><Nav backLabel="목록으로" onBack={()=>go("safety-folder")} title="2025년_성남시청_소방계획서.hwp"/>{paper(<FireSafetyBody clue={clueBtn}/>)}</>;
+    if(screen==="route")return <><Nav backLabel="목록으로" onBack={()=>go("drawing-sub")} title="피난동선도.pdf"/><EvacuationPlan found={found.includes("c9")} onCollect={()=>clue("c9")}/></>;
     if(screen==="clues")return <><Nav onBack={()=>go("desktop")} title="🧩 단서함"/><SceneStill scene="investigation" className="evidenceArt" caption="흩어진 자료가 하나씩 이어지고 있다."/><div className="stack">{found.length?found.map((c,i)=><div className="clueCard" key={c}><small>단서 {i+1}</small><b>{clues[c].title}</b><span>{clues[c].value}</span></div>):<div className="empty">아직 확보한 단서가 없습니다.</div>}</div></>;
     if(screen==="report")return <><Nav onBack={()=>go("desktop")} title="팀장 보고"/><SceneStill scene="arrival" className="sceneCompact" caption="첫 보고. 확인한 근거를 떠올려보자."/><div className="confirm"><h2>지금 보고하시겠습니까?</h2><p>현재 확보한 단서 <b>{found.length} / 10</b></p><small>보고를 시작하면 자료를 다시 확인할 수 없습니다.</small><button onClick={()=>go("desktop")}>조금 더 확인한다</button><button className="primaryBtn" onClick={beginBoss}>이 정도면 됐다. 보고하러 가자</button></div></>;
     if(screen==="auto-call")return <div className="confirm"><SceneStill scene="arrival" className="sceneCompact"/><small>🧩 단서 10 / 10</small><h1>띠링 ♪</h1><div className="message"><b>💬 팀장님</b><p>“○○주무관, 작년 소방훈련 내용 파악됐어요? 잠깐 와봐요.”</p></div><button className="primaryBtn" onClick={beginBoss}>팀장님께 가기</button></div>;
@@ -112,7 +112,7 @@ export default function Page(){
 }
 function ReportCast({mood="normal",caption}:{mood?:string;caption:string}){return <div className="reportCast"><Character className="reportHero" mood={mood==="normal"?"worried":mood}/><Character className="reportBoss" who="boss" mood={mood}/><span>{caption}</span></div>}
 function BossName(){return <small className="bossIdentity"><b>청사관리팀장</b><span>/ 지방공업주사</span></small>}
-function Nav({onBack,title}:{onBack:()=>void;title:string}){return <div className="navHead"><button onClick={onBack} aria-label="이전 화면"><ArrowLeft size={18}/></button><b>{title}</b></div>}
+function Nav({onBack,title,backLabel="뒤로"}:{onBack:()=>void;title:string;backLabel?:string}){return <nav className="navHead" aria-label="화면 이동"><button type="button" onClick={onBack} aria-label={backLabel==="목록으로"?"목록으로 돌아가기":"이전 화면으로 돌아가기"}><ArrowLeft size={18} aria-hidden="true"/><span>{backLabel}</span></button><b title={title}>{title}</b></nav>}
 
 function RaffleInvitation({onClose,onEnter}:{onClose:()=>void;onEnter:()=>void}){
  const dialog=useDialog(onClose);

@@ -72,6 +72,12 @@
 .registrySystemBrand{display:flex;flex-wrap:wrap;align-items:center;gap:9px;background:#155c8d;color:#fff;margin:-16px -16px 16px;padding:12px 13px;border-bottom:3px solid #f3b44c}.registrySystemBrand>span{font-size:14px;font-weight:800}.registrySystemBrand>b{font-size:12px;font-weight:400;border-left:1px solid #ffffff66;padding-left:9px}.registrySystemBrand small{font-size:11px;color:#eaf7ff;flex-basis:100%}
 .screen-registry .searchBox{grid-template-columns:minmax(0,1fr) 64px;padding:12px;border:1px solid #b8cbd8;background:#edf3f7;border-radius:2px;gap:8px}.screen-registry .searchBox>label{grid-column:1/-1;font-size:13px}.screen-registry .searchBox>input{padding:8px;font-size:16px;border-radius:2px}.screen-registry .searchBox>button{font-size:13px;border-radius:2px;padding:8px;min-height:47px}.screen-registry .docResult{border-radius:1px;border-color:#c9d7e1;border-left:3px solid #5b90b6;box-shadow:none}.screen-registry .docResult b{font-size:14px}.screen-registry .docResult small{color:#3e6e8c}
 /* A Hancom-style viewer around a reconstructed administrative report. */
+/* Keep the return action above the document tabs throughout vertical scrolling. */
+.gameShell .screenBody:has(>.navHead){--document-nav-height:60px;padding-top:0;scroll-padding-top:calc(var(--document-nav-height) + 54px)}
+.gameShell .screenBody>.navHead{position:sticky;top:0;z-index:5;height:var(--document-nav-height);min-height:var(--document-nav-height);margin:0 0 12px;padding:8px 0;background:#f3f6f6;box-shadow:0 1px 0 #ccd9df}
+.gameShell .navHead button{display:inline-flex;align-items:center;justify-content:center;gap:6px;width:auto;min-height:44px;padding:0 10px;white-space:nowrap;font-size:13px;font-weight:700;color:#284c61}
+.gameShell .navHead b{flex:1;min-width:0;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.screenBody:has(>.navHead) .documentViewActions{top:var(--document-nav-height)}
 .documentViewer{border:1px solid #b8c5d0;background:#dce1e5}
 .hwpAppBar{display:flex;align-items:center;gap:8px;background:#3b6687;color:#fff;padding:7px 9px;min-height:35px}.hwpLogo{display:grid;place-items:center;background:#fff;color:#2873a7;font-size:14px;font-weight:800;width:21px;height:22px;border-radius:1px}.hwpAppBar b{font-size:12px}.hwpAppBar>span:last-child{font-size:10px;margin-left:auto;color:#fff}
 .hwpMenu{display:flex;gap:19px;padding:6px 9px;color:#344d60;background:#f4f5f6;border-bottom:1px solid #d0d7dc;font-size:11px}
