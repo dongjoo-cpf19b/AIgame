@@ -12,6 +12,9 @@
 .pcExpanded .winTitlebar{padding-top:env(safe-area-inset-top);height:calc(39px + env(safe-area-inset-top))}
 .pcExpanded .screenBody{padding:16px}
 .pcExpanded .screen-desktop .screenBody,.pcExpanded .screen-folders .screenBody,.pcExpanded .screen-fire-folder .screenBody,.pcExpanded .screen-safety-folder .screenBody,.pcExpanded .screen-drawing-folder .screenBody,.pcExpanded .screen-drawing-sub .screenBody{padding:0}
+.pcExpanded .clueToast,.pcExpanded .floatingError{position:fixed;left:16px;right:16px;max-width:430px;margin-inline:auto;z-index:70}
+.pcExpanded .clueToast{top:calc(48px + env(safe-area-inset-top))}
+.pcExpanded .floatingError{bottom:calc(65px + env(safe-area-inset-bottom))}
 .windowsDesktop.winDesktop{position:relative;isolation:isolate;min-height:100%;padding:15px 10px 30px;overflow:hidden;background:radial-gradient(ellipse at 95% 40%,#00d1ff 0%,#008bdc 22%,#0072c8 42%,#055aaf 66%,#07418b 100%)}
 .winDesktop:before{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(163deg,transparent 25%,#87dfff14 25.5%,transparent 47%),linear-gradient(10deg,transparent 15%,#0150aa66 50%,transparent 50.5%)}
 .winWallpaper{position:absolute;right:-20px;top:23%;width:190px;height:220px;z-index:-1;color:#30caff;filter:drop-shadow(0 0 7px #9eefff) drop-shadow(-30px 0 25px #1dbfff);transform:perspective(400px) rotateY(-18deg)}
