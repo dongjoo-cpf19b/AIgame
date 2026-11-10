@@ -11,6 +11,7 @@ import {SceneStill} from "./scene-art";
 import {Character,TypeLine,Messenger,PhoneCall,useDialog,sound,haptic,type Exchange} from "./immersive-ui";
 
 import {useGameSave} from "./use-game-save";
+import {useBrowserBack} from "./use-browser-back";
 import {reconcileSavedRun,savedRunLabel,type Credential,type RunProgress,type SessionStatus,type PhoneProgress} from "./game-save";
 const grades:Record<string,string>={S:"청사관리 마스터",A:"믿고 맡길 주무관",B:"인수인계 적응 완료",C:"이제 업무 시작"};
 const sourceNames=["결재된 계획안 + 결과보고","결재된 계획안 · 추진근거","결재된 계획안 · 협조기관","결재된 계획안 · 행정사항","청사 소방계획서 + 피난동선도"];
@@ -24,8 +25,10 @@ export default function Page(){
  const [raffleInvitation,setRaffleInvitation]=useState(false);
  const [pcExpanded,setPcExpanded]=useState(false);
  const [documentCompact,setDocumentCompact]=useState(false);
+ const [navigationRun,setNavigationRun]=useState("title"),[reportStarted,setReportStarted]=useState(false);
  const [restartPrompt,setRestartPrompt]=useState(false),[phoneProgress,setPhoneProgress]=useState<PhoneProgress|null>(null),[completion,setCompletion]=useState<{score:number;grade:string}|null>(null);
- useEffect(()=>{setRaffleInvitation(screen==="final");},[screen]);
+ const restoringNavigation=useRef(false);
+ useEffect(()=>{if(restoringNavigation.current){restoringNavigation.current=false;return;}setRaffleInvitation(screen==="final");},[screen]);
  const autoCallTimer=useRef<ReturnType<typeof setTimeout>|null>(null);
  useEffect(()=>()=>{if(autoCallTimer.current)clearTimeout(autoCallTimer.current);},[]);
  const [chatHistory,setChatHistory]=useState<Exchange[]>([]);
@@ -35,18 +38,27 @@ export default function Page(){
  const reportPhase=["boss","boss-reply","score","ending","final","raffle","raffle-done"].includes(screen),folderPhase=["folders","fire-folder","safety-folder","drawing-folder","drawing-sub"].includes(screen);
  const viewingDocument=documentScreens.has(screen),windowExpanded=viewingDocument?!documentCompact:pcExpanded;
  const summary={found,msgHints,callHints};
+ const navigationView=useMemo(()=>({screen,line,prologue,preview,contact,restartPrompt,raffleInvitation,review}),[screen,line,prologue,preview,contact,restartPrompt,raffleInvitation,review]);
+ useBrowserBack(navigationView,`${navigationRun}:${completion?"complete":reportStarted?"report":"explore"}`,busy,view=>{
+  if(autoCallTimer.current)clearTimeout(autoCallTimer.current);
+  if(view.screen!==screen)restoringNavigation.current=true;
+  setLatestClue(null);setDocumentCompact(false);setScreen(view.screen);setLine(view.line);
+  setPrologue(view.prologue);setPreview(view.preview);setContact(view.contact);
+  setRestartPrompt(view.restartPrompt);setRaffleInvitation(view.raffleInvitation);setReview(view.review);
+ });
  useEffect(()=>{try{setAudio(localStorage.getItem("handover-audio")==="true");}catch{}},[]);
  useEffect(()=>{if(!latestClue)return;const timer=setTimeout(()=>setLatestClue(null),2600);return()=>clearTimeout(timer);},[latestClue]);
  async function api<T={ok:boolean}>(path:string,body?:unknown,c=credential){const res=await fetch(path,{method:body?"POST":"GET",headers:{"Content-Type":"application/json",...(c?{Authorization:`Bearer ${c.token}`}:{})},body:body?JSON.stringify(body):undefined});const data=await res.json() as T & {error?:string};if(!res.ok)throw new Error(data.error||"연결을 확인해주세요.");return data;}
  function go(s:string,l?:string){if(autoCallTimer.current)clearTimeout(autoCallTimer.current);setDocumentCompact(false);setScreen(s);if(l)setLine(l);sound("tap",audio);haptic();}
  function inspectFile(name:string,remark:string,record?:{number:string;date:string}){setPreview({name,from:screen,record});go("file-preview",remark);}
  function runSearch(query:string){setSearch(query);setSearched(true);setLine(searchRegistry(query).length?"제목과 연도를 잘 살펴보자. 결재된 자료에 답이 있다.":"검색어를 조금 다르게 넣어봐야겠다.");sound("tap",audio);}
- async function start(){if(busy)return;setBusy(true);setError("");sound("tap",audio);try{const c=await api<Credential>("/api/session",{action:"start"},null);setCredential(c);setCompletion(null);setPhoneProgress(null);setRestartPrompt(false);setChatHistory([]);setFound([]);setAnswers([]);setMsgHints(0);setCallHints(0);setReportedAt(0);setQIndex(0);setPrologue(0);setContact(null);setPreview(null);setLatestClue(null);setSearch("");setSearched(false);setBossReply("");setLastCorrect(false);setReview(false);setPcExpanded(false);setRaffleStatus("");setForm({name:"",affiliation:"",phone:"",consent:false});go("prologue","일단 작년 자료부터 찾아보자.");}catch(e){setError((e as Error).message);}finally{setBusy(false);}}
+ async function start(){if(busy)return;setBusy(true);setError("");sound("tap",audio);try{const c=await api<Credential>("/api/session",{action:"start"},null);setNavigationRun(crypto.randomUUID());setReportStarted(false);setCredential(c);setCompletion(null);setPhoneProgress(null);setRestartPrompt(false);setChatHistory([]);setFound([]);setAnswers([]);setMsgHints(0);setCallHints(0);setReportedAt(0);setQIndex(0);setPrologue(0);setContact(null);setPreview(null);setLatestClue(null);setSearch("");setSearched(false);setBossReply("");setLastCorrect(false);setReview(false);setPcExpanded(false);setRaffleStatus("");setForm({name:"",affiliation:"",phone:"",consent:false});go("prologue","일단 작년 자료부터 찾아보자.");}catch(e){setError((e as Error).message);}finally{setBusy(false);}}
  async function resume(){
   if(!savedRun||busy)return;setBusy(true);setError("");
   try{
    const status=await api<SessionStatus>("/api/session",undefined,savedRun.credential),p=reconcileSavedRun(savedRun,status);
    if(autoCallTimer.current)clearTimeout(autoCallTimer.current);
+   setNavigationRun(crypto.randomUUID());setReportStarted(["boss","boss-reply","score","ending","final","raffle","raffle-done"].includes(p.screen));
    setCredential(savedRun.credential);setFound(p.found);setAnswers(p.answers);setQIndex(p.qIndex);setReportedAt(p.reportedAt);setMsgHints(p.msgHints);setCallHints(p.callHints);setPrologue(p.prologue);setSearch(p.search);setSearched(p.searched);setPreview(p.preview);setChatHistory(p.chatHistory);setContact(p.contact);setPhoneProgress(p.phoneProgress);setLatestClue(null);setReview(false);setPcExpanded(false);setRaffleStatus("");setForm({name:"",affiliation:"",phone:"",consent:false});
    setCompletion(status.completed&&status.score!==null&&status.grade?{score:status.score,grade:status.grade}:null);
    const chosen=p.answers[p.qIndex],question=questions[p.qIndex],correct=chosen===question.correct;
@@ -58,7 +70,7 @@ export default function Page(){
  const missing=(Object.keys(clues)as ClueId[]).find(c=>!found.includes(c));
  const nextHint=missing==="c1"?"업무폴더의 합동소방훈련 폴더부터 열어봐요. 마지막 수정본에 표시된 날짜를 한번 확인해보세요.":missing==="c2"?"공용폴더 확인했어요? 이제 문서등록대장, 우리가 문등대라고 부르는 곳에서 결재된 계획안을 찾아봐요.":missing==="c3"||missing==="c10"?"계획대로 실제로 했는지도 봐야죠. 문서등록대장에서 결과보고를 찾아봐요.":["c4","c5","c6","c7"].includes(missing||"")?"결재된 계획안을 아래까지 읽어봐요. 근거, 협조기관, 훈련 순서, 준비사항이 모두 있어요.":missing==="c8"?"소방안전관리 폴더의 청사 소방계획서요. 피난계획이 거기 있어요.":missing==="c9"?"청사도면 폴더 안의 소방 폴더를 찾아봐요. 피난동선도가 있을 거예요.":"그 정도면 충분해요. 팀장님께 차근차근 보고해봐요!";
  function hint(kind:"msg"|"call"){sound("tap",audio);if(kind==="call")setPhoneProgress(null);setContact(kind);}
- function beginBoss(){setReportedAt(found.length);setQIndex(0);setAnswers([]);go("boss","침착하자. 내가 확인한 자료대로 말씀드리면 된다.");}
+ function beginBoss(){setReportStarted(true);setReportedAt(found.length);setQIndex(0);setAnswers([]);go("boss","침착하자. 내가 확인한 자료대로 말씀드리면 된다.");}
  function answer(i:number){const q=questions[qIndex],ok=i===q.correct;setAnswers(prev=>[...prev.slice(0,qIndex),i]);setLastCorrect(ok);setBossReply(ok?q.ok:q.bad[i]);go("boss-reply",ok?"좋아. 확인한 근거가 있으니 대답할 수 있다.":"……그 자료를 좀 더 꼼꼼히 봤어야 했나.");sound(ok?"clue":"tap",audio);}
  async function nextQuestion(){if(qIndex<4){setQIndex(n=>n+1);go("boss","다음 질문도 차근차근.");return;}if(busy)return;setBusy(true);setError("");try{const result=await api<{score:number;grade:string}>("/api/session",{action:"finish",answers,summary});setCompletion(result);go("score","휴… 첫 보고를 마쳤다.");}catch(e){setError((e as Error).message);}finally{setBusy(false);}}
  async function raffle(e:FormEvent){e.preventDefault();if(busy)return;setBusy(true);setRaffleStatus("");try{await api("/api/raffle",form);go("raffle-done");sound("clue",audio);}catch(e){setRaffleStatus((e as Error).message);}finally{setBusy(false);}}
