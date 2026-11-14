@@ -13,6 +13,13 @@
 - 같은 브라우저에서 진행 자동 저장·이어서 하기, 새로 시작 전 확인창
 - 완료 후 경품 응모, 번호 중복 방지, 관리자 명단·검색·CSV·무작위 추첨·개별 삭제
 
+## 이용 및 홍보
+
+- 게임 접속: https://handover-legend.s2airsystems2.chatgpt.site
+- [QR 포스터·인쇄용 PDF·캐릭터 원본](docs/promotion/README.md)
+- 문서는 처음부터 확대해 열리며, 목록으로 돌아가는 버튼은 문서 상단에 고정됩니다.
+- 브라우저·휴대폰 뒤로가기는 게임 내부의 이전 화면으로 이동합니다.
+
 ## 운영 구조
 
 GPT Sites에서 사이트 배포, 런타임 비밀값, 데이터베이스를 관리합니다. Vinext/React 프런트엔드와 Cloudflare Worker API, Sites에 연결된 D1을 사용합니다. Vercel과 Supabase의 SDK, 공개 키, 외부 저장 요청은 없습니다.
